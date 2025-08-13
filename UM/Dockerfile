@@ -3,5 +3,5 @@ WORKDIR /opt/server
 COPY *.json .
 COPY *.js .
 RUN npm install 
-ADD static/ /opt/server/
+ADD static /opt/server/
 CMD ["node", "app-server.js"]
