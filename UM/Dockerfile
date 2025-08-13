@@ -1,14 +1,28 @@
+# FROM node:16.10.0
+# WORKDIR /opt/server
+# COPY package.json package-lock.json ./
+# RUN npm install 
+# COPY *.js .
+
+# ADD static /opt/server/
+# CMD ["node", "app-server.js"]
+
+
+
 FROM node:16.10.0
+
 WORKDIR /opt/server
-COPY package.json package-lock.json ./
-RUN npm install 
-COPY *.js .
 
-ADD static /opt/server/
-CMD ["node", "app-server.js"]
+# Copy package files from "server" folder
+COPY server/package.json server/package-lock.json ./
 
+RUN npm install
 
+# Copy rest of the app from "server" folder
+COPY server/ . 
 
+EXPOSE 3000
+CMD ["npm", "start"]
 
 
 
