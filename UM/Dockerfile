@@ -3,9 +3,7 @@ FROM node:16.10.0
 # COPY --chown=node:node *.json . 
 # RUN npm install 
 WORKDIR /opt/api
-RUN ls -la 
-COPY package.json package-lock.json ./
-RUN ls -la  # Debugging line to verify files
+COPY package*.json ./
 RUN npm install
 COPY *.js .
 ADD static /opt/server/
