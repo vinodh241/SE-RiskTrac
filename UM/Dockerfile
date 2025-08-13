@@ -11,7 +11,8 @@ FROM node:18
 WORKDIR /opt/server
 # Copy package files first (for better caching)
 COPY package*.json ./
+RUN npm install 
 COPY  *.js ./
-RUN npm install
+
 CMD ["node", "app-server.js"]
 
