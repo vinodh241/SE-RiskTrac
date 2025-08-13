@@ -4,7 +4,6 @@ FROM node:16.10.0
 # RUN npm install 
 WORKDIR /opt/api
 COPY UM/package*.json ./
-COPY UM/. .
 RUN npm install
 COPY *.js .
 ADD static /opt/server/
