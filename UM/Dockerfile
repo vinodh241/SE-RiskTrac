@@ -14,7 +14,9 @@ FROM node:16.10.0
 WORKDIR /opt/server
 
 # Copy package files from "server" folder
-COPY server/package.json server/package-lock.json ./
+COPY package.json package-lock.json ./
+COPY . .
+
 
 RUN npm install
 
