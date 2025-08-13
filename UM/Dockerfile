@@ -18,20 +18,14 @@
 
 FROM node:18
 
-# 1️⃣ Set working directory
 WORKDIR /opt/server
 
-# 2️⃣ Copy package files first (so npm install runs correctly)
-COPY package*.json ./
-
-# 3️⃣ Install dependencies
+COPY UM/package*.json ./
 RUN npm install
 
-# 4️⃣ Copy the rest of the application
-COPY . .
-
-# 5️⃣ Start app
+COPY UM/. .
 CMD ["node", "app-server.js"]
+
 
 
 
