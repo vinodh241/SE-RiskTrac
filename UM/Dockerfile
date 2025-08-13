@@ -3,7 +3,8 @@ FROM node:16.10.0
 # COPY --chown=node:node *.json . 
 # RUN npm install 
 WORKDIR /opt/api
-COPY package*.json ./
+COPY UM/package*.json ./
+COPY UM/. .
 RUN npm install
 COPY *.js .
 ADD static /opt/server/

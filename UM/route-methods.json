@@ -1,0 +1,32 @@
+{
+    "ROUTE_METHODS": [
+        {
+            "get-user-details-from-ad"  : "getUserDetailsFromAD",
+            "validateFunction"          : 1
+        },
+        {
+            "get-users"                 : "getUsers",
+            "validateFunction"          : 1
+        },       
+        {
+            "delete-user"               : "deleteUser",
+            "validateFunction"          : 1
+        },
+        {
+            "get-assigned-user-info"    : "getAssignedUserInfo",
+            "validateFunction"          : 1
+        },
+        {
+            "add-assign-user"           : "addAssignUser",
+            "validateFunction"          : 1
+        },
+        {
+            "logout"                    : "updateUserLogout",
+            "validateFunction"          : 0
+        },
+        {
+            "get-All-Accounts-Name"     : "getAllAccountsName",
+            "validateFunction"          : 0
+        }
+    ]
+}
