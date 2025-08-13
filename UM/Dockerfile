@@ -9,7 +9,7 @@
 
 FROM node:16.10.0
 WORKDIR /opt/api
-COPY *.json .  # Ensure both files exist
+ADD *.json .  # Ensure both files exist
 RUN npm ci
 COPY *.js .
 ADD static /opt/server/
