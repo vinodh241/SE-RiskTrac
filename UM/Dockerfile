@@ -1,6 +1,6 @@
 FROM node:16.10.0
 WORKDIR /opt/server
-COPY *.json .
+COPY package.json package-lock.json ./
 RUN npm install 
 COPY *.js .
 
