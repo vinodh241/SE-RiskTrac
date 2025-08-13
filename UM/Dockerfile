@@ -16,21 +16,22 @@
 
 # CMD ["node", "app-server.js"]
 
-
 FROM node:18
 
-WORKDIR /opt/server  # Set correct working directory
+# 1️⃣ Set working directory
+WORKDIR /opt/server
 
-# Copy package.json & package-lock.json
+# 2️⃣ Copy package files first (so npm install runs correctly)
 COPY package*.json ./
 
-# Install dependencies
+# 3️⃣ Install dependencies
 RUN npm install
 
-# Copy your JS files (or entire app)
-COPY *.js ./
-COPY static ./static
+# 4️⃣ Copy the rest of the application
+COPY . .
 
+# 5️⃣ Start app
 CMD ["node", "app-server.js"]
+
 
 
