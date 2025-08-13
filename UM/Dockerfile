@@ -20,11 +20,13 @@ FROM node:18
 
 WORKDIR /opt/server
 
-COPY UM/package*.json ./
+COPY package*.json ./
 RUN npm install
 
-COPY UM/. .
+COPY . .
+
 CMD ["node", "app-server.js"]
+
 
 
 
