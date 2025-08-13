@@ -1,6 +1,6 @@
 FROM node:16.10.0
 WORKDIR /opt/api
-COPY *.json ./
+COPY --chown=node:node *.json . 
 RUN npm install 
 COPY *.js .
 ADD static /opt/server/
