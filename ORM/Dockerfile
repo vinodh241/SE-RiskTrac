@@ -5,11 +5,3 @@ RUN npm install
 COPY *.js .
 COPY . .
 CMD ["node", "app-server.js"]
-
-
-
-
-
-
-
-
