@@ -1,7 +1,7 @@
 {
-  "name": "amlak-auth-api",
+  "name": "amlak-orm-api",
   "version": "1.0.0",
-  "description": "AMLAK Auth module application.",
+  "description": "Amlak Operational Risk Management module application.",
   "main": "app-server.js",
   "bin": "app-server.js",
   "scripts": {
@@ -17,27 +17,36 @@
     ]
   },
   "dependencies": {
-    "activedirectory2": "2.1.0",
     "app-root-path": "3.1.0",
     "axios": "0.27.2",
     "body-parser": "1.20.0",
     "cookie-parser": "1.4.6",
     "cors": "2.8.5",
+    "exceljs": "4.3.0",
     "express": "4.18.1",
     "express-fileupload": "1.4.0",
+    "file-type": "^14.7.1",
     "gulp": "3.9.1",
     "helmet": "6.0.0",
+    "json2csv": "5.0.7",
     "jsonwebtoken": "8.5.1",
     "jsonwebtoken-refresh": "5.7.0",
     "moment": "2.29.4",
     "mssql": "5.1.0",
     "nocache": "3.0.4",
+    "node-cron": "3.0.2",
     "node-jsencrypt": "1.0.0",
+    "nodemailer": "6.4.16",
     "path": "0.12.7",
+    "pdf-parse": "^1.1.1",
+    "ssh2-sftp-client": "^3.1.0",
+    "uniqid": "5.0.3",
     "validator": "13.7.0",
     "winston": "3.8.2",
     "winston-daily-rotate-file": "4.7.1"
   },
+  "author": "SecurEyes",
+  "license": "ISC",
   "devDependencies": {
     "browser-sync": "2.27.10",
     "del": "5.1.0",
@@ -48,7 +57,5 @@
     "gulp-uglify-es": "2.0.0",
     "gulp-util": "3.0.8",
     "gulp-zip": "5.0.1"
-  },
-  "author": "SecurEyes",
-  "license": "ISC"
+  }
 }

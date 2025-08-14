@@ -129,84 +129,111 @@ module.exports = async function validateUpdateToken(request, response, next){
         /**
          * updating user login table with refresh token
          */
-        const COMMON_DB_RESPONSE = await commonDBObject.updateUserLoginForRefreshToken(userIdFromToken, userNameFromToken, refreshedToken, token, validateFunction, functionName);
+        const GET_INFO_USER_LOGIN = await commonDBObject.getInfoForUserLogin(userIdFromToken, userNameFromToken);
+        if(CONSTANT_FILE_OBJ.APP_CONSTANT.UNDEFINED == GET_INFO_USER_LOGIN || CONSTANT_FILE_OBJ.APP_CONSTANT.NULL == GET_INFO_USER_LOGIN){
+            logger.log('error', 'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware: getInfoForUserLogin : Execution end. : GET_INFO_USER_LOGIN is undefined or null.');
+            return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json(unsuccessfulResponse(CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED, MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.INVALID_SESSION));
+        }
+        if (GET_INFO_USER_LOGIN.status != CONSTANT_FILE_OBJ.APP_CONSTANT.ONE) {
+            logger.log('error', 'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware: getInfoForUserLogin : Execution end. : Error details :' + DB_RESPONSE.errorMsg);
+            return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json(unsuccessfulResponse(CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED, MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.INVALID_SESSION));
+        }
+        if (GET_INFO_USER_LOGIN.status === CONSTANT_FILE_OBJ.APP_CONSTANT.ONE && GET_INFO_USER_LOGIN.procedureSuccess === CONSTANT_FILE_OBJ.APP_CONSTANT.FALSE) {
+            logger.log('error', 'User Id : '+userIdFromToken +' : ValidateUpdateTokenMiddleware: getInfoForUserLogin: Execution end. : Error details : ' + DB_RESPONSE.procedureMessage);
+            return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json(unsuccessfulResponse(CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED, MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.INVALID_SESSION));
+        }
         
-        if(CONSTANT_FILE_OBJ.APP_CONSTANT.UNDEFINED != COMMON_DB_RESPONSE){
-            if (COMMON_DB_RESPONSE.procedureMessage === CONSTANT_FILE_OBJ.APP_CONSTANT.INVALID_SESSION) {
-                // Case : Unable to update user login for refresh token
-                logger.log('error', 'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : Execution end. : Error in db update for refresh token : '+COMMON_DB_RESPONSE.procedureMessage);
+        let usersLoginData  = GET_INFO_USER_LOGIN.recordset[CONSTANT_FILE_OBJ.APP_CONSTANT.ZERO];
+        let roleId          = usersLoginData.filter(ele => ele.UserGUID == userIdFromToken).map(ele => ele.RoleID);
 
-                return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json({
-                    success : CONSTANT_FILE_OBJ.APP_CONSTANT.ZERO,
-                    message : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
-                    result  : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
-                    token   : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
-                    error   : {
-                        errorCode       : CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED,
-                        errorMessage    : MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.INVALID_SESSION
-                    }
-                });
-            } else if (COMMON_DB_RESPONSE.procedureMessage === CONSTANT_FILE_OBJ.APP_CONSTANT.UNAUTHORIZED_ACCESS) {
-                // Case : Unable to update user login for refresh token
-                logger.log('error', 'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : Execution end. : Error in db update for refresh token : '+COMMON_DB_RESPONSE.procedureMessage);
+        logger.log('info', 'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : userIdFromToken = ' + userIdFromToken);
+        logger.log('info', 'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : roleId          = ' + roleId);
 
-                return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json({
-                    success : CONSTANT_FILE_OBJ.APP_CONSTANT.ZERO,
-                    message : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
-                    result  : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
-                    token   : refreshedToken,
-                    error   : {
-                        errorCode       : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
-                        errorMessage    : MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.UNAUTHORIZED_ACCESS
-                    }
-                });
-            } else if (COMMON_DB_RESPONSE.status === CONSTANT_FILE_OBJ.APP_CONSTANT.ONE && COMMON_DB_RESPONSE.procedureMessage != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL && COMMON_DB_RESPONSE.procedureSuccess != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL){
-                logger.log('info', 'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : Execution end. : Refresh token updated successfully.');
+        if(userIdFromToken != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL && userIdFromToken != CONSTANT_FILE_OBJ.APP_CONSTANT.UNDEFINED && roleId != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL && roleId != CONSTANT_FILE_OBJ.APP_CONSTANT.UNDEFINED){
 
-                request.body.userIdFromToken    = userIdFromToken;
-                request.body.userNameFromToken  = userNameFromToken;
-                request.body.refreshedToken     = refreshedToken;
+            const COMMON_DB_RESPONSE = await commonDBObject.updateUserLoginForRefreshToken(userIdFromToken, userNameFromToken,refreshedToken,token);
 
-                next();
-            }else {
-                logger.log('error', 'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : Execution end. : Error in Procedure execution while db update for refresh token : '+COMMON_DB_RESPONSE.procedureMessage);
-                return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json({
-                    success : CONSTANT_FILE_OBJ.APP_CONSTANT.ZERO,
-                    message : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
-                    result  : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
-                    token   : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
-                    error   : {
-                        errorCode       : CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED,
-                        errorMessage    : MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.INVALID_SESSION
-                    }
-                });
-            }
-        } else {
-            logger.log('error', 'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : Execution end. : Error in Procedure execution while db update for refresh token.');
-            return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json({
-                success : CONSTANT_FILE_OBJ.APP_CONSTANT.ZERO,
-                message : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
-                result  : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
-                token   : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
-                error   : {
-                    errorCode       : CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED,
-                    errorMessage    : MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.INVALID_SESSION
+            if(CONSTANT_FILE_OBJ.APP_CONSTANT.UNDEFINED != COMMON_DB_RESPONSE){
+                if (COMMON_DB_RESPONSE.procedureMessage === CONSTANT_FILE_OBJ.APP_CONSTANT.INVALID_SESSION) {
+
+                    // Case : Unable to update user login for refresh token
+                    logger.log('error', 'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : Execution end. : Error in db update for refresh token : '+COMMON_DB_RESPONSE.procedureMessage);
+                    return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json(unsuccessfulResponse(CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED, MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.INVALID_SESSION));
+
+                } else if (COMMON_DB_RESPONSE.status === CONSTANT_FILE_OBJ.APP_CONSTANT.ONE && COMMON_DB_RESPONSE.procedureMessage != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL && COMMON_DB_RESPONSE.procedureSuccess != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL && COMMON_DB_RESPONSE.procedureSuccess != CONSTANT_FILE_OBJ.APP_CONSTANT.FALSE){
+                    logger.log('info', 'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : Refresh token updated successfully.');
+
+                    /**
+                    * Validating function for the logged in user : START
+                    */
+                    if(validateFunction != CONSTANT_FILE_OBJ.APP_CONSTANT.ZERO){
+                        const GET_INFO_FOR_AUTHORIZED = await commonDBObject.getInfoFunctionAuthorized(userIdFromToken, userNameFromToken);            
+                        
+                        if(CONSTANT_FILE_OBJ.APP_CONSTANT.UNDEFINED == GET_INFO_FOR_AUTHORIZED || CONSTANT_FILE_OBJ.APP_CONSTANT.NULL == GET_INFO_FOR_AUTHORIZED){
+                            logger.log('error', 'User Id : '+  userIdFromToken +' : ValidateUpdateTokenMiddleware  : getInfoFunctionAuthorized : Execution end. : GET_INFO_FOR_AUTHORIZED is undefined or null.');
+                            return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json(unsuccessfulResponse(CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED, MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.INVALID_SESSION));
+                        }
+                        if (GET_INFO_FOR_AUTHORIZED.status != CONSTANT_FILE_OBJ.APP_CONSTANT.ONE) {
+                            logger.log('error', 'User Id : '+  userIdFromToken +' : ValidateUpdateTokenMiddleware : getInfoFunctionAuthorized : Execution end. : Error details :' + DB_RESPONSE.errorMsg);
+                            return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json(unsuccessfulResponse(CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED, MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.INVALID_SESSION));
+                        }
+                        if (GET_INFO_FOR_AUTHORIZED.status === CONSTANT_FILE_OBJ.APP_CONSTANT.ONE && GET_INFO_FOR_AUTHORIZED.procedureSuccess === CONSTANT_FILE_OBJ.APP_CONSTANT.FALSE) {
+                            logger.log('error', 'User Id : '+  userIdFromToken +' : ValidateUpdateTokenMiddleware : getInfoFunctionAuthorized : Execution end. : Error details : ' + DB_RESPONSE.procedureMessage);
+                            return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json(unsuccessfulResponse(CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED, MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.INVALID_SESSION));
+                        }
+                    
+
+                        let usersData     = GET_INFO_FOR_AUTHORIZED.recordset[CONSTANT_FILE_OBJ.APP_CONSTANT.ONE] != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL ? 
+                                            GET_INFO_FOR_AUTHORIZED.recordset[CONSTANT_FILE_OBJ.APP_CONSTANT.ONE].filter(ele => ele.UserGUID == userIdFromToken) : [];
+                                
+                        let DefaultRoleID = usersData && usersData.length ? usersData.map(ele =>ele.DefaultRoleID) : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+
+                        logger.log('info', 'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : DefaultRoleID   = ' + DefaultRoleID);
+
+                        //Check if User is not a Super Admin
+                        if(DefaultRoleID != CONSTANT_FILE_OBJ.APP_CONSTANT.ONE ){
+                            
+                            const IS_FUNCTION_AUTHORIZED = await getFunctionAuthorized(userIdFromToken,GET_INFO_FOR_AUTHORIZED,functionName);
+                            if(CONSTANT_FILE_OBJ.APP_CONSTANT.UNDEFINED == IS_FUNCTION_AUTHORIZED || CONSTANT_FILE_OBJ.APP_CONSTANT.NULL == IS_FUNCTION_AUTHORIZED){
+                                logger.log('error', 'User Id : '+  userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : Execution end. : IS_FUNCTION_AUTHORIZED is undefined or null.');
+                                return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json(unsuccessfulResponse(CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED, MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.INVALID_SESSION));
+                            }
+                            if(IS_FUNCTION_AUTHORIZED == CONSTANT_FILE_OBJ.APP_CONSTANT.UNAUTHORIZED_ACCESS){
+                                logger.log('error', 'User Id : '+  userIdFromToken +' : ValidateUpdateTokenMiddleware  : validateUpdateToken : Execution end. : User is not authorized for the function.'+ functionName);
+                                return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json(unsuccessfulResponse(refreshedToken,CONSTANT_FILE_OBJ.APP_CONSTANT.NULL, MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.UNAUTHORIZED_ACCESS));
+                            }
+
+                            logger.log('info', 'User ID : ' +  userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : User is authoruzed for the funtion'+ functionName);
+                        }
+
+                        logger.log('info',  'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : Execution End.');  
+                    } else {
+                        logger.log('info', 'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : validateFunction = ' +validateFunction);
+                    }  
+                    /**
+                     * Validating function for the logged in user : END
+                     */
+
+                    request.body.userIdFromToken    = userIdFromToken;
+                    request.body.userNameFromToken  = userNameFromToken;
+                    request.body.refreshedToken     = refreshedToken;
+    
+                    next();
+                }else {
+                    logger.log('error', 'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : Execution end. : Error in Procedure execution while db update for refresh token : '+COMMON_DB_RESPONSE.procedureMessage);
+                    return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json(unsuccessfulResponse(CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED, MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.INVALID_SESSION));
                 }
-            });
+            } else {
+                logger.log('error', 'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : Execution end. : Error in db update for refresh token.');
+                return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json(unsuccessfulResponse(CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED, MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.INVALID_SESSION));
+            } 
+        } else {
+            logger.log('error', 'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : Execution end. : Error Detail : userIdFromToken or roleId is null or undefined.');
+            return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json(unsuccessfulResponse(CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED, MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.INVALID_SESSION));
         }
     } catch (error) {
         logger.log('error', 'User Id : '+ userIdFromToken +' : ValidateUpdateTokenMiddleware : validateUpdateToken : Execution end. : Got unhandled error : Error Detail : '+ error);
-        
-        return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json({
-            success : CONSTANT_FILE_OBJ.APP_CONSTANT.ZERO,
-            message : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
-            result  : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
-            token   : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
-            error   : {
-                errorCode       : CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED,
-                errorMessage    : MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.INVALID_SESSION
-            }
-        });
+        return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json(unsuccessfulResponse(CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED, MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.INVALID_SESSION));
     }
 };
 
@@ -236,5 +263,108 @@ async function getCurrentRouteObject(requestUri){
     } else {
         logger.log('error', 'ValidateUpdateTokenMiddleware : getCurrentRouteObject : Execution end. : unable to find End point in route-methods.json file : End Point value is : ' + END_POINT);
         return CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+    }
+}
+
+
+function unsuccessfulResponse(refreshedToken,errorCode, errorMessage){
+    return {
+        success : CONSTANT_FILE_OBJ.APP_CONSTANT.ZERO,
+        message : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
+        result  : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
+        token   : refreshedToken,
+        error   : {
+            errorCode    : errorCode,
+            errorMessage : errorMessage
+        }
+    }
+}
+
+
+/**
+ * This function will check whether user is authorized or not.
+ */
+async function getFunctionAuthorized(userIdFromToken, GET_INFO_FOR_AUTHORIZED,functionName){
+    let moduleUser          = [];
+    let modules             = [];
+    let roles               = [];
+    let appFunctionData     = [];
+    let appModuleData       = [];
+    let roleAppFunctions    = [];
+    let moduleGUID          = CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+    let roleId              = CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+    let appFuntionID        = CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+    let appModuleID         = CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+    
+    //Results provided by DB for GET_INFO_FOR_AUTHORIZED
+    // 0. UserLogins 
+    // 1. Users 
+    // 2. Modules 
+    // 3. ModuleUserRoles 
+    // 4. Roles 
+    // 5. AppFunctions
+    // 6. AppModules
+    // 7. RoleAppFunctions
+
+    try {
+        logger.log('info', 'User ID : '+ userIdFromToken + ' : ValidateUpdateTokenMiddleware : getFunctionAuthorized : Execution started.');
+        // logger.log('info', 'User ID : '+ userIdFromToken + ' : ValidateUpdateTokenMiddleware : getFunctionAuthorized : ' + JSON.stringify(GET_INFO_FOR_AUTHORIZED));
+        
+        if(GET_INFO_FOR_AUTHORIZED.recordset[CONSTANT_FILE_OBJ.APP_CONSTANT.THREE] != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL){
+            //checking for module authorization for logged-in user
+            moduleUser = GET_INFO_FOR_AUTHORIZED.recordset[CONSTANT_FILE_OBJ.APP_CONSTANT.THREE].filter(ele => ele.UserGUID == userIdFromToken);
+            if(moduleUser != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL && moduleUser.length > CONSTANT_FILE_OBJ.APP_CONSTANT.ZERO){
+                moduleGUID  = moduleUser.map(ele => ele.ModuleGUID);
+                roleId      = moduleUser.map(ele => ele.RoleID);
+
+                modules     = GET_INFO_FOR_AUTHORIZED.recordset[CONSTANT_FILE_OBJ.APP_CONSTANT.TWO] != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL ? 
+                              GET_INFO_FOR_AUTHORIZED.recordset[CONSTANT_FILE_OBJ.APP_CONSTANT.TWO].filter(ele => moduleGUID.includes(ele.ModuleGUID)) : [];
+
+                //checking for role authorization for logged-in user          
+                roles       = GET_INFO_FOR_AUTHORIZED.recordset[CONSTANT_FILE_OBJ.APP_CONSTANT.FOUR] != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL ? 
+                              GET_INFO_FOR_AUTHORIZED.recordset[CONSTANT_FILE_OBJ.APP_CONSTANT.FOUR].filter(ele => roleId.includes(ele.RoleID)) : [] ;
+            
+                if(modules != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL && modules.length > CONSTANT_FILE_OBJ.APP_CONSTANT.ZERO &&
+                    roles != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL && roles.length > CONSTANT_FILE_OBJ.APP_CONSTANT.ZERO ){                       
+                        /*
+                        * Checking for function authorization for logged-in user based on roles and module assigned : START
+                        */
+                        appFunctionData = GET_INFO_FOR_AUTHORIZED.recordset[CONSTANT_FILE_OBJ.APP_CONSTANT.FIVE] != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL ?
+                                          GET_INFO_FOR_AUTHORIZED.recordset[CONSTANT_FILE_OBJ.APP_CONSTANT.FIVE].filter(ele => ele.AppFunctionName == functionName) : []; 
+                       
+                        if(appFunctionData != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL && appFunctionData.length > CONSTANT_FILE_OBJ.APP_CONSTANT.ZERO){
+
+                            appFuntionID    = appFunctionData.map(ele => ele.AppFunctionID);
+                            appModuleID     = appFunctionData.map(ele => ele.AppModuleID);
+                            appModuleData   = GET_INFO_FOR_AUTHORIZED.recordset[CONSTANT_FILE_OBJ.APP_CONSTANT.SIX] != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL ?
+                                              GET_INFO_FOR_AUTHORIZED.recordset[CONSTANT_FILE_OBJ.APP_CONSTANT.SIX].filter(ele =>  appModuleID.includes(ele.AppModuleID)) : [];
+                        
+                            if(appModuleData != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL && appModuleData.length > CONSTANT_FILE_OBJ.APP_CONSTANT.ZERO){ 
+
+                                roleAppFunctions = GET_INFO_FOR_AUTHORIZED.recordset[CONSTANT_FILE_OBJ.APP_CONSTANT.SEVEN] != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL ?
+                                                   GET_INFO_FOR_AUTHORIZED.recordset[CONSTANT_FILE_OBJ.APP_CONSTANT.SEVEN].filter(ele =>  appFuntionID.includes(ele.AppFunctionID)  && roleId.includes(ele.RoleID)) : [];
+                              
+                            }     
+                                
+                        }
+                        /*
+                        * Checking for function authorization for logged-in user based on roles and module assigned : END
+                        */                       
+                }        
+            }
+        }
+        logger.log('info', 'User ID : '+ userIdFromToken + ' : ValidateUpdateTokenMiddleware : getFunctionAuthorized : Execution end.');
+
+        if(roleAppFunctions != CONSTANT_FILE_OBJ.APP_CONSTANT.NULL && roleAppFunctions.length > CONSTANT_FILE_OBJ.APP_CONSTANT.ZERO){
+            logger.log('info', 'User ID : ' +  userIdFromToken +' : ValidateUpdateTokenMiddleware : getFunctionAuthorized : User is authoruzed for the funtion.');
+            return CONSTANT_FILE_OBJ.APP_CONSTANT.AUTHORIZED_ACCESS;
+        }else{
+            logger.log('info', 'User ID : ' +  userIdFromToken +' : ValidateUpdateTokenMiddleware : getFunctionAuthorized : User is not authoruzed for the funtion.');
+            return CONSTANT_FILE_OBJ.APP_CONSTANT.UNAUTHORIZED_ACCESS;
+        }
+
+    } catch (error) {
+        logger.log('error', 'User ID :'+userIdFromToken + ' : ValidateUpdateTokenMiddleware : getFunctionAuthorized : Execution end. : Got unhandled error. : Error details : ' + error);
+        return response.status(CONSTANT_FILE_OBJ.APP_CONSTANT.TWO_HUNDRED).json(unsuccessfulResponse(CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED, MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.INVALID_SESSION));
     }
 }

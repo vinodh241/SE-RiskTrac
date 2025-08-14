@@ -19,7 +19,8 @@ var logger = WINSTON.createLogger({
     datePattern       : 'YYYY-MM-DD',
     handleExceptions  : true,
     json              : true,
-    // maxSize           : CONSTANT_FILE_OBJ.APP_CONSTANT.ONE_MEGABYTE*APP_CONFIG.LOG_CONFIG.FILE_SIZE,
+    zippedArchive     : true,
+    maxSize           : CONSTANT_FILE_OBJ.APP_CONSTANT.ONE_MEGABYTE*APP_CONFIG.LOG_CONFIG.FILE_SIZE,
     colorize          : true,
     format            : WINSTON.format.combine(
       WINSTON.format.timestamp(),

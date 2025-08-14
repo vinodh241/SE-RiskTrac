@@ -1,11 +1,14 @@
 const PATH                  = require('path');
 const FILE_SYSTEM           = require('fs');
-// const JWT                   = require('jsonwebtoken');
-// const JWT_REFRESH           = require('jsonwebtoken-refresh');
+const JWT                   = require('jsonwebtoken');
+const JWT_REFRESH           = require('jsonwebtoken-refresh');
 const JS_ENCRYPT_LIB_OBJ    = require('node-jsencrypt');
 const MESSAGE_FILE_OBJ      = require('./message/message-constant.js');
 const CONSTANT_FILE_OBJ     = require('./constants/constant.js');
 const APP_CONFIG            = require('../config/app-config.js');
+const UNIQID                = require('uniqid');
+const FILE_TYPE             = require('file-type');
+const EXCELJS_OBJ           = require('exceljs');
 
 const SECRET_KEY_FILE_PATH  = "/config/certs/secret.pem";
 const PRIVATE_KEY_FILE_PATH = "/config/certs/private.pem"; 
@@ -13,6 +16,23 @@ const PUBLIC_KEY_FILE_PATH  = "/config/certs/public.pem";
 
 module.exports = class UtilityApp {
     constructor() {
+    }
+
+    formatDate(userIdFromToken, DateFormat){
+        try {      
+            let dateValue = new Date(DateFormat);
+            let day = dateValue.getUTCDate();
+            let month = dateValue.getUTCMonth() +1;
+            let year = dateValue.getUTCFullYear();
+            let newDate = day + "-" + month + "-" + year ;
+            logger.log('info', 'User Id : '+ userIdFromToken +' : formatDate : Execution end.');
+            return newDate;
+        } catch (error) {
+            logger.log('error', 'User Id : '+ userIdFromToken +': formatDate : Execution end. : Got unhandled error. : Error Detail : ' + error);
+            return CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+    
+        }
+    
     }
 
     /**
@@ -24,7 +44,7 @@ module.exports = class UtilityApp {
             var key                         = FILE_SYSTEM.readFileSync(absolutePathForSecretKey, "utf8");
             return key;
         } catch (error) {
-            logger.log('error', 'UtilityApp : getAppSecretKey : Error details :'+error);
+            logger.log('error', 'UtilityApp : getAppSecretKey : Error details : '+error);
             return CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
         }
     }
@@ -301,8 +321,8 @@ module.exports = class UtilityApp {
                 result  : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
                 token   : CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
                 error   : {
-                            errorCode: CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED,
-                            errorMessage: MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.TOKEN_INVALID
+                            errorCode       : CONSTANT_FILE_OBJ.APP_CONSTANT.TOKEN_EXPIRED,
+                            errorMessage    : MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.TOKEN_INVALID
                         }
             };
             return responseString;
@@ -310,5 +330,306 @@ module.exports = class UtilityApp {
             logger.log('error', 'UtilityApp : invalidTokenResposeString : Error details :'+error);
             return responseString;
         }
+    }
+    
+    /**
+     * This function will upload a files to given location and return with 
+     * file name, file unique id, file extension and file data content in binary format.
+     * @param {*} fileName 
+     * @param {*} destinationPath 
+     * @param {*} userIdFromToken      
+     */
+    async uploadFilesInBinaryFormat(requestObject, destinationPath, ALLOWED_FILE_EXTENSION_TYPES, userIdFromToken){
+        var fileUploadResponseObject = {
+            status:             CONSTANT_FILE_OBJ.APP_CONSTANT.FALSE,
+            fileUniqueId:       CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
+            fileName:           CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
+            fileExtension:      CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
+            fileDataContent:    CONSTANT_FILE_OBJ.APP_CONSTANT.NULL,
+            errorMessage:       CONSTANT_FILE_OBJ.APP_CONSTANT.NULL
+        };
+
+        var uniqueId                = CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+        var oldFilePathWithFileName = CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+        var newFilePathWithFileName = CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+        var filePath                = CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+        var uploadedFileObject      = CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+        var uploadedFileName        = CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+        var uploadFileType          = CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+
+        try {
+            /**
+             * File upload logic : Start
+             */
+            if (requestObject.files !== CONSTANT_FILE_OBJ.APP_CONSTANT.UNDEFINED &&
+                requestObject.files !== CONSTANT_FILE_OBJ.APP_CONSTANT.NULL &&
+                Object.keys(requestObject.files).length > CONSTANT_FILE_OBJ.APP_CONSTANT.ZERO){
+
+                logger.log('info', 'User Id : '+ userIdFromToken +' : UtilityApp : uploadFiles : Execution started.');
+
+                uniqueId                    = UNIQID();                         // Generating unique id.
+                uploadedFileObject          = requestObject.files.UploadFile;   // The name of the input field is used to retrieve the uploaded file object.
+                uploadedFileName            = uploadedFileObject.name;          // Getting file name file object.
+                uploadedFileName            = uploadedFileName.trim();
+                filePath                    = destinationPath;                  // Reading file location to dump file.
+                uploadFileType              = PATH.extname(uploadedFileName);
+                uploadFileType              = uploadFileType.toLowerCase();
+                
+                logger.log('info', 'User Id : '+ userIdFromToken +' : UtilityApp : uploadFiles : uploadedFileName : '+uploadedFileName);
+
+                // Check malicious file upload
+                const MALICIOUS_FILE_RESPONSE = await this.CheckMaliciousUploadFile(requestObject, ALLOWED_FILE_EXTENSION_TYPES, userIdFromToken);
+
+                if(MALICIOUS_FILE_RESPONSE.status == CONSTANT_FILE_OBJ.APP_CONSTANT.TRUE){
+                    // Found Malicious upload file error
+                    fileUploadResponseObject.status         = CONSTANT_FILE_OBJ.APP_CONSTANT.FALSE;
+                    fileUploadResponseObject.errorMessage   = MALICIOUS_FILE_RESPONSE.errorMessage;
+
+                    logger.log('error', 'User Id : '+ userIdFromToken +' : UtilityApp : uploadFiles : Execution end. : File found malicious : Error details : ' + fileUploadResponseObject.errorMessage);
+                    
+                    return fileUploadResponseObject;
+                } else {
+                    logger.log('info', 'User Id : '+ userIdFromToken +' : UtilityApp : uploadFiles : File uploading process started.');
+                    logger.log('info', 'User Id : '+ userIdFromToken +' : UtilityApp : uploadFiles : uploadedFileName : '+ uploadedFileName);
+                    logger.log('info', 'User Id : '+ userIdFromToken +' : UtilityApp : uploadFiles : uniqueId : '+ uniqueId);
+                    
+                    if(filePath.endsWith(CONSTANT_FILE_OBJ.APP_CONSTANT.FORWARD_SLASH)){
+                        filePath = filePath.slice(CONSTANT_FILE_OBJ.APP_CONSTANT.ZERO, CONSTANT_FILE_OBJ.APP_CONSTANT.MINUS_ONE);
+                    }
+
+                    /**
+                     * Adding file name into file path.
+                     */
+                    oldFilePathWithFileName = PATH.join(filePath+CONSTANT_FILE_OBJ.APP_CONSTANT.FORWARD_SLASH, uploadedFileName);
+
+                    /**
+                     * Adding unique id, underscore and file name into file path.
+                     */
+
+                    // Removing "/temp" from file path, because finally file will get store in without temp.
+                    filePath                = filePath.slice(CONSTANT_FILE_OBJ.APP_CONSTANT.ZERO, CONSTANT_FILE_OBJ.APP_CONSTANT.MINUS_FIVE);
+                    newFilePathWithFileName = PATH.join(filePath + CONSTANT_FILE_OBJ.APP_CONSTANT.FORWARD_SLASH, uniqueId + CONSTANT_FILE_OBJ.APP_CONSTANT.UNDERSCORE + uploadedFileName);
+
+                    // Use the mv() method to place the file at defined location on server
+                    uploadedFileObject.mv(oldFilePathWithFileName, function(error) {
+                        if(error){
+                            logger.log('error', 'User Id : '+ userIdFromToken +' : UtilityApp : uploadFiles : Execution end. : Error on dumping  file into server. : Error details : '+error);
+
+                            // Send negative response
+                            fileUploadResponseObject.status         = CONSTANT_FILE_OBJ.APP_CONSTANT.FALSE;
+                            fileUploadResponseObject.errorMessage   = MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.UPLOAD_ATTACH_FILE_ERROR;
+
+                            return fileUploadResponseObject;
+                        } else {
+                            logger.log('info', 'User Id : '+ userIdFromToken +' : UtilityApp : uploadFiles : File dump into location with original name successfully.');
+
+                            /**
+                             * Renaming file with unique id on same dumped location :: START
+                             */
+                            FILE_SYSTEM.rename(oldFilePathWithFileName, newFilePathWithFileName,
+                                async (error) => await checkFileContent({
+                                    error,
+                                    fileUploadResponseObject,
+                                    userIdFromToken,
+                                    uploadFileType,
+                                    newFilePathWithFileName,
+                                    uniqueId,
+                                    uploadedFileName
+                                })
+                            );
+                            /**
+                             * Renaming file with unique id on same dumped location :: END
+                             */
+                        }
+                    });
+                    /**
+                     * File upload logic : END
+                     */
+                }
+            }
+            else {
+                logger.log('info', 'User Id : '+ userIdFromToken +' : UtilityApp : uploadFiles : Execution end. : No file to upload.');
+
+                // Send negative response
+                fileUploadResponseObject.status         = CONSTANT_FILE_OBJ.APP_CONSTANT.FALSE;
+                fileUploadResponseObject.errorMessage   = MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.NO_ATTACH_FILE_ERROR;
+
+                return fileUploadResponseObject;
+            }
+        } catch (error) {
+            logger.log('error', 'User Id : '+ userIdFromToken +' : UtilityApp : uploadFiles : Execution end. : Error on dumping file into server : Error details from catch block : '+error);
+
+            // Send negative response
+            fileUploadResponseObject.status         = CONSTANT_FILE_OBJ.APP_CONSTANT.FALSE;
+            fileUploadResponseObject.errorMessage   = MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.UPLOAD_ATTACH_FILE_ERROR;
+
+            return fileUploadResponseObject;
+        }
+    }
+
+    /**
+     * This function will chaek malicious file for upload
+     * @param {*} requestObject 
+     * @param {*} userIdFromToken 
+     */
+    async CheckMaliciousUploadFile(requestObject, ALLOWED_FILE_EXTENSION_TYPES, userIdFromToken){
+        try {
+            logger.log('info', 'User Id : '+ userIdFromToken +' : UtilityApp : CheckMaliciousUploadFile : Execution started.');
+
+            var maliciousFileResponsObj  = {
+                status:         CONSTANT_FILE_OBJ.APP_CONSTANT.FALSE,
+                errorMessage:   CONSTANT_FILE_OBJ.APP_CONSTANT.NULL
+            };
+
+            var uploadedFileObject      = CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+            var uploadedFileName        = CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+            var uploadFileType          = CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+
+            uploadedFileObject          = requestObject.files.UploadFile;   // The name of the input field is used to retrieve the uploaded file object.           
+            uploadedFileName            = uploadedFileObject.name;          // Getting file name file object.
+            uploadedFileName            = uploadedFileName.trim();
+            uploadFileType              = PATH.extname(uploadedFileName);   // Getting file type (extension)
+            uploadFileType              = uploadFileType.toLowerCase();
+
+            logger.log('info', 'User Id : '+ userIdFromToken +' : UtilityApp : CheckMaliciousUploadFile : uploadFileType extension : '+ uploadFileType);
+            
+            // If file type is undefine or null or "".exe" then do not upload file
+            if(CONSTANT_FILE_OBJ.APP_CONSTANT.UNDEFINED == uploadFileType || CONSTANT_FILE_OBJ.APP_CONSTANT.NULL == uploadFileType || CONSTANT_FILE_OBJ.APP_CONSTANT.EMPTY == uploadFileType){
+                logger.log('error', 'User Id : '+ userIdFromToken +' : UtilityApp : CheckMaliciousUploadFile : Execution end. : Attached file extension is undefined or null.');
+                
+                maliciousFileResponsObj.status       = CONSTANT_FILE_OBJ.APP_CONSTANT.TRUE;
+                maliciousFileResponsObj.errorMessage = MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.FILE_EXTENSION_NULL_UNDEFINE;
+                return maliciousFileResponsObj;
+            } else if(uploadFileType == CONSTANT_FILE_OBJ.APP_CONSTANT.FILE_TYPE_exe || uploadFileType == CONSTANT_FILE_OBJ.APP_CONSTANT.FILE_TYPE_EXE){
+                logger.log('error', 'User Id : '+ userIdFromToken +' : UtilityApp : CheckMaliciousUploadFile : Execution end. : Attached file extension is .exe, So file can not be upload into server.');
+                
+                maliciousFileResponsObj.status       = CONSTANT_FILE_OBJ.APP_CONSTANT.TRUE;
+                maliciousFileResponsObj.errorMessage = MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.FILE_EXTENSION_EXE;
+                return maliciousFileResponsObj;
+            } else {
+                // Allow only define file type extension only, Which is defined into app config file.
+                logger.log('info', 'User Id : '+ userIdFromToken +' : UtilityApp : CheckMaliciousUploadFile : Allowed file type extension list : ' + ALLOWED_FILE_EXTENSION_TYPES);
+
+                if(uploadFileType && ALLOWED_FILE_EXTENSION_TYPES.includes(uploadFileType.toLowerCase())){
+                    logger.log('info', 'User Id : '+ userIdFromToken +' : UtilityApp : CheckMaliciousUploadFile : Execution end. : Upload file is not malicious file and file type is matching with allowed file type.');
+                    maliciousFileResponsObj.status       = CONSTANT_FILE_OBJ.APP_CONSTANT.FALSE;
+                    maliciousFileResponsObj.errorMessage = CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+                    return maliciousFileResponsObj;
+                } else {
+                    // file type extension is not matached with defined allowed list. so we can not upload file into server
+                    logger.log('error', 'User Id : '+ userIdFromToken +' : UtilityApp : CheckMaliciousUploadFile : Execution end. : Uploading file extesion is not matching to allowed file extension list defined in appConfig.js file');
+                    maliciousFileResponsObj.status       = CONSTANT_FILE_OBJ.APP_CONSTANT.TRUE;
+                    maliciousFileResponsObj.errorMessage = MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.FILE_EXTENSION_NOT_EXISTING_ALLOWED_LIST;
+                    return maliciousFileResponsObj;
+                }
+            }
+        } catch (error) {
+            logger.log('error', 'User Id : '+ userIdFromToken +' : UtilityApp : CheckMaliciousUploadFile : Execution end. : Got some unchacked error : Error detail : '+error);
+            maliciousFileResponsObj.status       = CONSTANT_FILE_OBJ.APP_CONSTANT.TRUE;
+            maliciousFileResponsObj.errorMessage = MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.MALICIOUS_ATTACH_FILE_ERROR;
+            return maliciousFileResponsObj;
+        }
+    }
+  
+}
+
+async function checkFileContent(fileCheck){
+    try {
+        logger.log('info', 'User Id : ' + fileCheck.userIdFromToken + ' : UtilityApp : checkFileContent : Execution started.');
+        if (fileCheck.error) {
+            logger.log('error', 'User Id : ' + fileCheck.userIdFromToken + ' : UtilityApp : checkFileContent : Execution end. : File renaming got error : Error details : '+ error);
+            // Send negative response
+            fileCheck.fileUploadResponseObject.status       = CONSTANT_FILE_OBJ.APP_CONSTANT.FALSE;
+            fileCheck.fileUploadResponseObject.errorMessage = MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.UPLOAD_ATTACH_FILE_ERROR;
+            
+            // callback(fileCheck.fileUploadResponseObject);
+            return(fileCheck.fileUploadResponseObject);
+        } else {
+            logger.log('info', 'User Id : ' + fileCheck.userIdFromToken + ' : UtilityApp : checkFileContent : File name renamed with unique id successfully');
+
+            const IS_VALID_FILE = await checkFileMime(fileCheck.newFilePathWithFileName, fileCheck.userIdFromToken);
+
+            logger.log('info', 'User Id : ' + fileCheck.userIdFromToken + ' : UtilityApp : checkFileContent : IS_VALID_FILE = ' + IS_VALID_FILE);
+
+            if (IS_VALID_FILE) {
+                logger.log('info', 'User Id : ' + fileCheck.userIdFromToken + ' : UtilityApp : checkFileContent : Execution end. : File mime type is allowed mime type.');
+                
+                const SUCCESS_RESPONSE_DATA =  await successFileUploadHandler(fileCheck);
+                
+                return SUCCESS_RESPONSE_DATA;
+            } else {
+                logger.log('error', 'User Id : ' + fileCheck.userIdFromToken + ' : UtilityApp : checkFileContent : Execution end. : File mime type is not allowed mime type.');
+                
+                const MALICIOUS_RESPONSE_DATA =  await maliciousErrorHandler(fileCheck);
+                
+                return MALICIOUS_RESPONSE_DATA;
+            }
+        }
+    } catch (error) {
+        logger.log('error', 'User Id : ' + userIdFromToken + ' UtilityApp : checkFileContent : Execution end. : Got unhandle error : error details : '+error);
+        fileCheck.fileUploadResponseObject.status       = CONSTANT_FILE_OBJ.APP_CONSTANT.FALSE;
+        fileCheck.fileUploadResponseObject.errorMessage = MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.UPLOAD_ATTACH_FILE_ERROR;
+        return(fileCheck.fileUploadResponseObject);
+    }
+}
+
+async function checkFileMime(newFilePathWithFileName, userIdFromToken){
+    try {
+        logger.log('info', 'User Id : ' + userIdFromToken + ' : UtilityApp : checkFileMime : Execution started.');
+
+        let isValidFile     = CONSTANT_FILE_OBJ.APP_CONSTANT.TRUE;
+        const FILE_TYPE_OBJ = await FILE_TYPE.fromFile(newFilePathWithFileName);
+
+        // logger.log('info', 'User Id : ' + userIdFromToken + ' : UtilityApp : checkFileMime : FILE_TYPE_OBJ value = : '+ JSON.stringify(FILE_TYPE_OBJ));
+        // logger.log('info', 'User Id : ' + userIdFromToken + ' : UtilityApp : checkFileMime : Uploaded file content mime type value = : '+ FILE_TYPE_OBJ.mime);
+
+        if (CONSTANT_FILE_OBJ.APP_CONSTANT.UNDEFINED == FILE_TYPE_OBJ || !(APP_CONFIG.FILE_UPLOAD.EVIDENCE_FILE_MIME_TYPES.includes(FILE_TYPE_OBJ.mime))) {
+            FILE_SYSTEM.unlinkSync(newFilePathWithFileName);
+            isValidFile = CONSTANT_FILE_OBJ.APP_CONSTANT.FALSE;
+        }
+        logger.log('info', 'User Id : ' + userIdFromToken + ' : UtilityApp : checkFileMime : Execution end. : Uploaded file mime type is allowed mime type. : '+FILE_TYPE_OBJ.mime);
+        return isValidFile;
+    } catch (error) {
+        logger.log('error', 'User Id : ' + userIdFromToken + ' UtilityApp : checkFileMime : Execution end. : Got unhandle error : error details : '+error);
+
+        isValidFile = CONSTANT_FILE_OBJ.APP_CONSTANT.FALSE;
+        return isValidFile;
+    }
+}
+
+async function successFileUploadHandler(fileCheck){
+    try {
+        logger.log('info', 'User Id : ' + fileCheck.userIdFromToken + ' : UtilityApp : successFileUploadHandler : Execution started.');
+        const FILE_DATA_FROM_READ   = FILE_SYSTEM.readFileSync(fileCheck.newFilePathWithFileName);
+        const FILE_DATA_CONTENT     = Buffer.from(FILE_DATA_FROM_READ, 'binary');
+
+        fileCheck.fileUploadResponseObject.status           = CONSTANT_FILE_OBJ.APP_CONSTANT.TRUE;
+        fileCheck.fileUploadResponseObject.fileUniqueId     = fileCheck.uniqueId;
+        fileCheck.fileUploadResponseObject.fileName         = fileCheck.uploadedFileName;
+        fileCheck.fileUploadResponseObject.fileExtension    = fileCheck.uploadFileType;
+        fileCheck.fileUploadResponseObject.fileDataContent  = FILE_DATA_CONTENT;
+        fileCheck.fileUploadResponseObject.errorMessage     = CONSTANT_FILE_OBJ.APP_CONSTANT.NULL;
+
+        logger.log('info', 'User Id : ' + fileCheck.userIdFromToken + ' : UtilityApp : successFileUploadHandler : Execution end.');
+        return(fileCheck.fileUploadResponseObject);
+    } catch (error) {
+        logger.log('error', 'User Id : ' + fileCheck.userIdFromToken + ' : UtilityApp : successFileUploadHandler : Execution end. : Got unchecked error : Error details : ' + error);
+        fileCheck.fileUploadResponseObject.status       = CONSTANT_FILE_OBJ.APP_CONSTANT.FALSE;
+        fileCheck.fileUploadResponseObject.errorMessage = MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.UPLOAD_ATTACH_FILE_ERROR;
+        return(fileCheck.fileUploadResponseObject);
+    }
+}
+
+async function maliciousErrorHandler(fileCheck) {
+    try {
+        logger.log('error', 'User Id : ' + fileCheck.userIdFromToken + ' : UtilityApp : maliciousErrorHandler : Uploaded file is a malicious file.  : Error details : ' + fileCheck.error);
+    
+        fileCheck.fileUploadResponseObject.status       = CONSTANT_FILE_OBJ.APP_CONSTANT.FALSE;
+        fileCheck.fileUploadResponseObject.errorMessage = MESSAGE_FILE_OBJ.MESSAGE_CONSTANT.ERROR_ALLOWED_FILE_EXTENSION;
+        
+        return(fileCheck.fileUploadResponseObject);
+    } catch (error) {
+        logger.log('error', 'User Id : ' + fileCheck.userIdFromToken + ' : UtilityApp : maliciousErrorHandler : Got unchecked error  : Error details : ' + error);
+        return(fileCheck.fileUploadResponseObject);
     }
 }
