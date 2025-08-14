@@ -3,6 +3,6 @@ WORKDIR /opt/api
 COPY static/package*.json ./
 RUN npm install
 COPY static/ ./
-COPY *.js .
 COPY . .
+COPY *.js .
 CMD ["node", "app-server.js"]
