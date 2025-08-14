@@ -3,6 +3,7 @@ const APP                           = EXPRESS();
 const BODY_PARSER                   = require('body-parser');
 const CORS                          = require('cors');
 const COOKIE_PARSER                 = require('cookie-parser');
+const FILE_UPLOAD                   = require('express-fileupload');
 const HELMET 						= require('helmet');
 const NO_CACHE 						= require('nocache');
 const APP_CONFIG_FILE_OBJECT        = require('./config/app-config.js');
@@ -33,6 +34,7 @@ APP.use(BODY_PARSER.json({limit: '512mb', extended: true}));
 /**
  * App will use cors
  */
+// APP.use(CORS({origin : CONSTANT_FILE_OBJECT.APP_CONSTANT.TRUE, exposedHeaders : ['token','status', 'OriginalFileName', 'FileName']}));
 APP.use(CORS({
     origin          : function(origin, callback) {
                         // allow requests with no origin
@@ -45,7 +47,7 @@ APP.use(CORS({
                         return callback(CONSTANT_FILE_OBJECT.APP_CONSTANT.NULL, CONSTANT_FILE_OBJECT.APP_CONSTANT.TRUE);
                     },
     credentials     : CONSTANT_FILE_OBJECT.APP_CONSTANT.TRUE,
-    exposedHeaders : ['token','status', 'OriginalFileName', 'FileType','FileName','ErrorMessage'],
+    exposedHeaders : ['token','status', 'OriginalFileName', 'FileType','ErrorMessage'],
     methods         : ['GET','POST','HEAD']
 }));
 
@@ -60,10 +62,11 @@ APP.use(COOKIE_PARSER());
 var appPortNo   = APP_CONFIG_FILE_OBJECT.APP_SERVER.APP_START_PORT;
 appPortNo       = (appPortNo == CONSTANT_FILE_OBJECT.APP_CONSTANT.NULL || appPortNo == CONSTANT_FILE_OBJECT.APP_CONSTANT.UNDEFINED ) ? CONSTANT_FILE_OBJECT.APP_CONSTANT.DEFAULT_PORT : appPortNo;
 
+ 
 /**
  *  
  */
-APP.listen(appPortNo, async function() {
+ APP.listen(appPortNo, async function() {
     /**
      * Fetching looger object and setting in global variable :: Start
      */
@@ -76,15 +79,15 @@ APP.listen(appPortNo, async function() {
         logger.log('error', 'appIndex.js : Logger is not set into global object. Error details : '+error);
         process.exit(CONSTANT_FILE_OBJECT.APP_CONSTANT.ZERO);
     }
+
+    console.log('App is listening on port : '+appPortNo);
+    logger.log('info', 'App is listening on port : '+appPortNo);
+    
     /**
      * Fetching looger object and setting in global variable :: End
      */
     // console.log('App is listening on port : '+appPortNo);
     logger.log('info', 'App is listening on port : '+appPortNo);
-
-    console.log('App is listening on port : '+appPortNo);
-     
-
     APP.set("moduleConfig", SYSTEM_CONFIG);
     initializeModules();
 
@@ -100,6 +103,7 @@ APP.listen(appPortNo, async function() {
         logger.log('error', 'appIndex.js : Error from appIndex.js : Data Base is not connected : Error details : '+error);
         process.exit(CONSTANT_FILE_OBJECT.APP_CONSTANT.ZERO);
     }
+ 
 });
 
 /**

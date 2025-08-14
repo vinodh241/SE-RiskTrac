@@ -1,7 +1,7 @@
 {
-  "name": "amlak-auth-api",
+  "name": "amlak-um-api",
   "version": "1.0.0",
-  "description": "AMLAK Auth module application.",
+  "description": "Amlak User management module application.",
   "main": "app-server.js",
   "bin": "app-server.js",
   "scripts": {
@@ -17,7 +17,6 @@
     ]
   },
   "dependencies": {
-    "activedirectory2": "2.1.0",
     "app-root-path": "3.1.0",
     "axios": "0.27.2",
     "body-parser": "1.20.0",

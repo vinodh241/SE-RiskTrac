@@ -14,35 +14,35 @@ GULP.task('move', function () {
 
   var task1 = GULP.src(['./../app/auth/*'])
   .pipe(UGLIFY())
-  .pipe( GULP.dest('./../dist/risk-trac-auth-api/app/auth'));
+  .pipe( GULP.dest('./../dist/risk-trac-um-api/app/auth'));
   
   var task2 = GULP.src(['./../app/user-management/*'])
   .pipe(UGLIFY())
-  .pipe( GULP.dest('./../dist/risk-trac-auth-api/app/user-management'));
+  .pipe( GULP.dest('./../dist/risk-trac-um-api/app/user-management'));
 
   var task3 = GULP.src(['./../config/**/*'])
-  .pipe( GULP.dest('./../dist/risk-trac-auth-api/config'));
+  .pipe( GULP.dest('./../dist/risk-trac-um-api/config'));
 
   var task4 = GULP.src(['./../data-access/**/*'])
   .pipe(UGLIFY())
-  .pipe( GULP.dest('./../dist/risk-trac-auth-api/data-access'));
+  .pipe( GULP.dest('./../dist/risk-trac-um-api/data-access'));
 
   var task5 = GULP.src(['./../log-files'])
-  .pipe( GULP.dest('./../dist/risk-trac-auth-api'));
+  .pipe( GULP.dest('./../dist/risk-trac-um-api'));
 
   var task6 = GULP.src(['./../node_modules/**/*'])
-  .pipe( GULP.dest('./../dist/risk-trac-auth-api/node_modules'));
+  .pipe( GULP.dest('./../dist/risk-trac-um-api/node_modules'));
   
   var task7 = GULP.src(['./../utility/**/*'])
   .pipe(UGLIFY())
-  .pipe( GULP.dest('./../dist/risk-trac-auth-api/utility'));
+  .pipe( GULP.dest('./../dist/risk-trac-um-api/utility'));
   
   var task8 = GULP.src(['./../app-server.js'])
   .pipe(UGLIFY())
-  .pipe( GULP.dest('./../dist/risk-trac-auth-api/'));
+  .pipe( GULP.dest('./../dist/risk-trac-um-api/'));
 
   var task9 = GULP.src(['./../*.json'])
-  .pipe( GULP.dest('./../dist/risk-trac-auth-api/'))
+  .pipe( GULP.dest('./../dist/risk-trac-um-api/'))
   
   
   
@@ -68,7 +68,7 @@ GULP.task('clean', function () {
 // ziping of folder structure
 GULP.task('zip', () =>
 GULP.src('./../dist/**/*')
-    .pipe(ZIP('risk-trac-auth-api.zip'))
+    .pipe(ZIP('risk-trac-um-api.zip'))
     .pipe( GULP.dest('./../dist/'))
 );
 
