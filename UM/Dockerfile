@@ -10,7 +10,6 @@
 # CMD ["node", "app-server.js"]
 
 FROM node:16.10.0
-
 WORKDIR /opt/api
 COPY package*.json ./
 RUN npm install
