@@ -11,8 +11,8 @@
 
 FROM node:16.10.0
 WORKDIR /opt/api
+RUN npm install 
 COPY static/ package*.json ./
-RUN npm ci
 COPY *.js .
 COPY . .
 CMD ["node", "app-server.js"]
