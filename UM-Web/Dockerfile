@@ -14,7 +14,7 @@ RUN npm run build -- --configuration production
 
 # Stage 2: Serve with Nginx
 FROM nginx:1.25-alpine
-
+RUN apk add --no-cache bash
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copy Angular dist output to nginx
