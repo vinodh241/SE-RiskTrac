@@ -12,4 +12,4 @@ COPY static/ package*.json ./
 RUN npm install
 COPY *.js .
 COPY . .
-CMD ["ng", "build"]
+CMD ["ng" , "serve","--port", "4300"]
