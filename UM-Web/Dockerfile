@@ -1,15 +1,14 @@
 # Stage 1: Build Angular UI
 FROM node:18 AS build
 
-WORKDIR /app
+WORKDIR /web
 
-# Copy package.json & package-lock.json
-COPY static/package*.json ./
-
+# Copy only Angular project folder
+COPY user-management/package*.json ./
 RUN npm install
 
-# Copy all project files (angular.json, tsconfig.json, src/, etc.)
-COPY . .
+# Copy the rest of Angular workspace
+COPY user-management/ .
 
 RUN npm run build -- --configuration production
 
@@ -18,9 +17,10 @@ FROM nginx:1.25-alpine
 
 RUN rm -rf /usr/share/nginx/html/*
 
+# Adjust dist path (replace with actual Angular app name)
 COPY --from=build /app/dist/user-management /usr/share/nginx/html
 
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY user-management/nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 5000
 CMD ["nginx", "-g", "daemon off;"]
