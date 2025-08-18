@@ -4,11 +4,11 @@ FROM node:18 AS build
 WORKDIR /web
 
 # Copy only Angular project folder
-COPY user-management/package*.json ./
+COPY static/ package*.json ./
 RUN npm install
-
+COPY *.js .
 # Copy Angular project files
-COPY user-management/ .
+COPY . .
 
 RUN npm run build -- --configuration production
 
