@@ -24,4 +24,5 @@ COPY --from=build /web/dist/user-management /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 5000
+RUN ng s --port 4300
 CMD ["nginx", "-g", "daemon off;"]
