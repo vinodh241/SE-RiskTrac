@@ -1,13 +1,8 @@
-# Stage 1: Build Angular UI
-FROM node:18 AS build
-
-WORKDIR /app
-
-# Install dependencies
-COPY package*.json ./
+FROM node:18.10.0
+WORKDIR /opt/web
+COPY static/ package*.json ./
 RUN npm install
-
-# Copy source code
+COPY *.js .
 COPY . .
 
 # Build Angular app
