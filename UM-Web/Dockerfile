@@ -18,7 +18,7 @@ FROM nginx:1.25-alpine
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copy Angular dist output to nginx
-COPY --from=build /app/dist/user-management /usr/share/nginx/html
+COPY --from=build /web/dist/user-management /usr/share/nginx/html
 
 # Copy nginx.conf (assuming it's next to Dockerfile, not inside user-management/)
 COPY nginx.conf /etc/nginx/nginx.conf
