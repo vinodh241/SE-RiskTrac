@@ -1,15 +1,30 @@
-FROM nginx
-RUN rm -rf /usr/share/nginx/html/index.html
-RUN rm -rf /etc/nginx/nginx.conf
-RUN rm -rf /etc/nginx/conf.d/default.conf
-ADD nginx.conf /etc/nginx/nginx.conf
-ADD static/ /usr/share/nginx/html/
+# Stage 1: Build Angular UI
+FROM node:18 AS build
 
+WORKDIR /app
 
-FROM node:16.10.0
-WORKDIR /opt/web
-COPY static/ package*.json ./
+# Install dependencies
+COPY package*.json ./
 RUN npm install
-COPY *.js .
+
+# Copy source code
 COPY . .
-CMD ["ng" , "serve","--port", "4300"]
+
+# Build Angular app
+RUN npm run build -- --configuration production
+
+# Stage 2: Serve with Nginx
+FROM nginx:1.25-alpine
+
+# Remove default nginx files
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy built Angular dist to nginx html folder
+COPY --from=build /app/dist/<your-app-name> /usr/share/nginx/html
+
+# Copy your custom nginx.conf
+COPY nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 5000
+
+CMD ["nginx", "-g", "daemon off;"]
