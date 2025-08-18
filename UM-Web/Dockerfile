@@ -4,7 +4,7 @@ FROM node:18 AS build
 WORKDIR /app
 
 # Copy package.json & package-lock.json
-COPY package*.json ./
+COPY static/package*.json ./
 
 RUN npm install
 
