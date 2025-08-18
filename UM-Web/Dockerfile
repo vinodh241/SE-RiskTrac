@@ -7,7 +7,7 @@ WORKDIR /web
 COPY user-management/package*.json ./
 RUN npm install
 
-# Copy the rest of Angular workspace
+# Copy Angular project files
 COPY user-management/ .
 
 RUN npm run build -- --configuration production
@@ -17,10 +17,11 @@ FROM nginx:1.25-alpine
 
 RUN rm -rf /usr/share/nginx/html/*
 
-# Adjust dist path (replace with actual Angular app name)
+# Copy Angular dist output to nginx
 COPY --from=build /app/dist/user-management /usr/share/nginx/html
 
-COPY user-management/nginx.conf /etc/nginx/nginx.conf
+# Copy nginx.conf (assuming it's next to Dockerfile, not inside user-management/)
+COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 5000
 CMD ["nginx", "-g", "daemon off;"]
