@@ -4,7 +4,8 @@ WORKDIR /web
 # Copy only Angular project folder
 RUN npm install -g @angular/cli
 COPY static/ package*.json ./
-RUN npm install
+RUN npm install --force
+
 COPY *.js .
 # Copy Angular project files
 COPY . .
