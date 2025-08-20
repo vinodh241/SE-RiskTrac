@@ -6,16 +6,16 @@
 export const environment = {
   production: false,
   domain: "secureyesdev.com",
-  umapiUrl: "http://10.0.1.21:46002", // DEV
+  umapiUrl: "http://10.0.1.32:6002", // DEV
   // umapiUrl: "http://localhost:46002", // DEV
   // umapiUrl: "http://10.0.1.6:8002", // QA
   // umapiUrl: "http://localhost:46002", // local API
-  hostUrl: "http://localhost:5000",
-  userManagementUrl: "http://localhost:5000/user-management",
-  ormUrl: "http://localhost:5000/orm",
-  bcmUrl: "http://localhost:5000/bcm",
-  dmsUrl: "http://localhost:5000/dms",
-  tppUrl: "http://localhost:5000/tpt"
+  hostUrl: "https://serisktrac.secureyes.net",
+  userManagementUrl: "https://serisktrac.secureyes.net/user-management",
+  ormUrl: "https://serisktrac.secureyes.net/orm",
+  bcmUrl: "https://serisktrac.secureyes.net/bcm",
+  dmsUrl: "https://serisktrac.secureyes.net/dms",
+  tppUrl: "https://serisktrac.secureyes.net/tpt"
 };
 
 /*
