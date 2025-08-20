@@ -1,6 +1,7 @@
 # Stage 1: Build Angular UI
 FROM node:18 AS build
 WORKDIR /web
+RUN npm install -g @angular/cli
 # Copy only Angular project folder
 COPY static/ package*.json ./
 RUN npm install
