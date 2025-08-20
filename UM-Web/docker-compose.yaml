@@ -1,0 +1,10 @@
+services:
+  UM-WEB:
+    image: umweb:v1
+    container_name: umweb
+
+  umweb:
+    image: um:v1
+    container_name: um
+    depends_on:
+      - mssql

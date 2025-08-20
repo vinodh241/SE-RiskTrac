@@ -14,8 +14,8 @@ const APP_SERVER = {
      * QA           - QA for QA environment
      * DEV          - DEV for DEV environment
      */
-    ENVIRONMENT_NAME        : "DEV",
-    APP_START_PORT          : 46002,         // Port for API server run on
+    ENVIRONMENT_NAME        : "QA",
+    APP_START_PORT          : 6002,         // Port for API server run on
     APP_AUTHENTICATION_MODE : 1,             /**
                                                 Values for APP_AUTHENTICATION_MODE
                                                 1 - AD (Active Directory) Authentication,
@@ -25,7 +25,7 @@ const APP_SERVER = {
     APP_ADMIN_USER_NAME     : "",
     APP_ADMIN_PASSWORD      : "",
     PATH                    : PATH_OBJ.join(__dirname, '../'),
-    ALLOWED_ORIGINS         : ["http://localhost:5000","http://localhost:46002"]       // Alowed origins list, else we will get CORS policy error.
+    ALLOWED_ORIGINS         : ["http://serisktrac.secureyes.net","http://localhost:46002"]       // Alowed origins list, else we will get CORS policy error.
 };
 
 /**
@@ -66,7 +66,7 @@ const LOG_CONFIG = {
 /**
  * If AMLAK Auth application deployed into local machine
  */
-const AUTH_SERVICE_URL = "http://localhost:46001";
+const AUTH_SERVICE_URL = "http://10.0.1.32:6001";
 
 /**
  * If AMLAK Auth application deployed into development VM machine
