@@ -6,5 +6,4 @@ services:
   umweb:
     image: um:v1
     container_name: um
-    depends_on:
-      - mssql
+   
