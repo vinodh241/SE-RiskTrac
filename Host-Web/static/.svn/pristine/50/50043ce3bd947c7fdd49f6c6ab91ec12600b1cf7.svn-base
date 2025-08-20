@@ -1,0 +1,20 @@
+.login-container {
+    background-image: url('/assets/login-bg.png');
+    background-size:100% 100%;
+    width:100vw;
+    height: 100vh;
+    background-repeat:no-repeat;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items:flex-end;
+}
+
+.login-content {
+    width: 18vw;
+    margin-right: 2%;
+}
+
+.mat-form-field {
+    width: 100%;
+}

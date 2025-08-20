@@ -5,17 +5,21 @@ networks:
     external: true  # Uncomment if you created the network outside
 
 services:
+  umapi:
+    image: um:v1
+    container_name: umapi
   umweb:
     image: umweb:v1
     container_name: umweb
 
-  umapi:
-    image: um:v1
-    container_name: umapi
-   
   ormapi:
     image: orm:v1
     container_name: ormapi
+  
+  ormweb:
+    image: ormweb:v1
+    container_name: ormweb
+
   bcmapi:
     image: bcm:v1
     container_name: bcmapi
@@ -23,3 +27,10 @@ services:
   authapi:
     image: auth:v1
     container_name: authapi
+
+  hostweb:
+    image: hostweb:v1
+    container_name: hostweb
+
+
+

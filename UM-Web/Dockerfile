@@ -7,7 +7,7 @@ RUN npm install
 COPY *.js .
 # Copy Angular project files
 COPY . .
-RUN npm run build -- --configuration production
+RUN ng build --base-href https://serisktrac.secureyes.net/user-management/
 
 
 

@@ -1,0 +1,19 @@
+<div class="login-container">
+    <img src="/assets/amlak-logo.png" style="width:18vw; margin: 2vw;">
+    <form [formGroup]="authForm" (ngSubmit)="onSubmit()" autocomplete="off" class="login-content">
+        <mat-form-field appearance="fill">
+            <mat-label>Username</mat-label>
+            <input matInput formControlName="username" autocomplete="off" (contextmenu)="onRightClick($event)" required>
+            <mat-error *ngIf="!authForm.controls['username'].valid">{{getErrorMessage()}}</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Password</mat-label>
+            <input matInput [type]="hide ? 'password' : 'text'" formControlName="password" autocomplete="off" (contextmenu)="onRightClick($event)"
+            onCopy="return false" onDrag="return false" onDrop="return false" onPaste="return false" required>
+            <mat-error  *ngIf="authForm.controls['password'].hasError('required')">Password is required</mat-error>
+        </mat-form-field>
+        <mat-error *ngIf="apierror">{{apierror}}</mat-error>
+        <button mat-raised-button color="primary" type="submit" [disabled]="!authForm.valid"
+            style="float: right;">Login</button>
+    </form>
+</div>
