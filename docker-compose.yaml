@@ -1,9 +1,25 @@
+networks:
+  default:
+    driver: bridge
+    name: risktrac
+    external: true  # Uncomment if you created the network outside
+
 services:
   UM-WEB:
     image: umweb:v1
     container_name: umweb
 
-  umweb:
+  umapi:
     image: um:v1
     container_name: um
    
+  ormapi:
+    image: orm:v1
+    container_name: orm
+  bcmapi:
+    image: bcm:v1
+    container_name: bcm
+
+  authapi:
+    image: auth:v1
+    container_name: auth
