@@ -16,9 +16,9 @@ services:
     image: orm:v1
     container_name: ormapi
   
-  ormweb:
-    image: ormweb:v1
-    container_name: ormweb
+  # ormweb:
+  #   image: ormweb:v1
+  #   container_name: ormweb
 
   bcmapi:
     image: bcm:v1
