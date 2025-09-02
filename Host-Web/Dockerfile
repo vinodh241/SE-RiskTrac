@@ -18,7 +18,7 @@ FROM nginx:1.25-alpine
 RUN apk add --no-cache bash
 RUN rm -rf /usr/share/nginx/html/*
 # Copy Angular dist output to nginx
-COPY --from=build /web/dist/user-management /usr/share/nginx/html
+COPY --from=build /web/dist/host /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
 EXPOSE 5000
 CMD ["nginx", "-g", "daemon off;"]
