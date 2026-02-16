@@ -2,7 +2,8 @@ networks:
   default:
     driver: bridge
     name: risktrac
-    #external: true  # Uncomment if you created the network outside
+    
+    # external: true  # Uncomment if you created the network outside
 
 services:
   umapi:
