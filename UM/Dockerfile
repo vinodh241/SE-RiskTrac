@@ -1,20 +1,34 @@
-# FROM node:16.10.0
-# # WORKDIR /opt/api
-# # COPY --chown=node:node *.json . 
-# # RUN npm install 
-# WORKDIR /opt/api
-# COPY UM/package*.json ./
-# RUN npm install
-# COPY *.js .
-# ADD static /opt/server/
-# CMD ["node", "app-server.js"]
+FROM node:16.10.0-alpine
 
-FROM node:16.10.0
+# Set working directory
 WORKDIR /opt/api
-COPY static/ package*.json ./
-RUN npm install
-COPY *.js .
-COPY . .
+
+# Copy package files first for better layer caching
+COPY static/package*.json ./
+
+# Install dependencies as root
+RUN npm install --production && \
+    npm cache clean --force
+
+# Copy application files
+COPY static/ ./
+
+# Create non-root user and set ownership
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001 && \
+    chown -R nodejs:nodejs /opt/api
+
+# Switch to non-root user
+USER nodejs
+
+# Expose port
+EXPOSE 6002
+
+# Health check (check if process is running)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:6002', (r) => {process.exit(r.statusCode ? 0 : 1)})" || exit 1
+
+# Start application
 CMD ["node", "app-server.js"]
 
 
