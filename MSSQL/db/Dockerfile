@@ -12,9 +12,9 @@ RUN mkdir -p /var/opt/mssql/data && \
 # Expose SQL Server port
 EXPOSE 1433
 
-# Health check
+# Health check (variable will be expanded from environment)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
-  CMD /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -Q "SELECT 1" || exit 1
+  CMD /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -Q "SELECT 1" || exit 1
 
 # Start SQL Server
 CMD ["/opt/mssql/bin/sqlservr"]

@@ -6,16 +6,14 @@ RUN rm -rf /usr/share/nginx/html/*
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Create non-root user
-RUN addgroup -g 1001 -S nginx && \
-    adduser -S nginx -u 1001 -G nginx && \
-    chown -R nginx:nginx /usr/share/nginx/html && \
+# Set proper permissions (nginx runs as root but drops privileges in nginx.conf)
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
     chown -R nginx:nginx /var/cache/nginx && \
     chown -R nginx:nginx /var/log/nginx && \
     chown -R nginx:nginx /etc/nginx/conf.d
 
-# Switch to non-root user
-USER nginx
+# Note: Nginx must run as root to bind to port 80, but drops privileges after binding
+# This is handled by the nginx.conf user directive
 
 # Expose port
 EXPOSE 80

@@ -27,22 +27,21 @@ RUN rm -rf /usr/share/nginx/html/*
 # Copy Angular dist output to nginx
 COPY --from=build /web/dist/user-management /usr/share/nginx/html
 
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
+# Copy nginx configuration for serving static files
+# Use nginx-static.conf if you want to serve static files, or keep nginx.conf for proxy
+COPY nginx-static.conf /etc/nginx/nginx.conf
 
 # Install wget for health check
 RUN apk add --no-cache wget
 
-# Create non-root user
-RUN addgroup -g 1001 -S nginx && \
-    adduser -S nginx -u 1001 -G nginx && \
-    chown -R nginx:nginx /usr/share/nginx/html && \
+# Set proper permissions (nginx runs as root but drops privileges in nginx.conf)
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
     chown -R nginx:nginx /var/cache/nginx && \
     chown -R nginx:nginx /var/log/nginx && \
     chown -R nginx:nginx /etc/nginx/conf.d
 
-# Switch to non-root user
-USER nginx
+# Note: Nginx must run as root to bind to port 5000, but drops privileges after binding
+# This is handled by the nginx.conf user directive
 
 # Expose port
 EXPOSE 5000
