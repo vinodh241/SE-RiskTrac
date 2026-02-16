@@ -34,9 +34,9 @@ services:
     image: hostweb:v1
     container_name: hostweb
 
-  bcmweb:
-    image: bcmweb:v1
-    container_name: bcmweb
+  # bcmweb:
+  #   image: bcmweb:v1
+  #   container_name: bcmweb
   
 
 
