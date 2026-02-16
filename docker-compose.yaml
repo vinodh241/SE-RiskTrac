@@ -2,10 +2,11 @@ networks:
   default:
     driver: bridge
     name: risktrac
-    
+
     # external: true  # Uncomment if you created the network outside
 
 services:
+
   umapi:
     image: um:v1
     container_name: umapi
