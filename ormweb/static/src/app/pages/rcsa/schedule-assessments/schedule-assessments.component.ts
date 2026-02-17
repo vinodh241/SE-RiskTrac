@@ -62,7 +62,7 @@ export class ScheduleAssessmentsComponent implements OnInit {
   Legend3Text: string = "";
   IsInprogress: boolean = true;
   // @ts-ignore
-  selectedYear: number;
+  selectedYears: number[] = [];
   iSCreateScheduleAssementEnabled: any;
   assessmentYears: any;
   assessmentCard: any;
@@ -78,6 +78,25 @@ export class ScheduleAssessmentsComponent implements OnInit {
   checkPrevInprogressData:any = [];  
   prevInprogressData :any ='';
   // isPowerUser:boolean=false;
+
+  // --- Quarter filter (multi-select) ---
+  selectedQuarters: string[] = [];
+  quarterOptions: { value: string, label: string }[] = [
+    { value: 'Quarter 1', label: 'Quarter 1' },
+    { value: 'Quarter 2', label: 'Quarter 2' },
+    { value: 'Quarter 3', label: 'Quarter 3' },
+    { value: 'Quarter 4', label: 'Quarter 4' }
+  ];
+
+  // --- Properties for ALL / Individual mode on list screen ---
+  listSelectionMode: string = 'ALL';
+  listFilterDepartmentIds: number[] = [];
+  listFilterUnitIds: number[] = [];
+  listDepartments: any[] = [];
+  listAllUnits: any[] = [];
+
+  /** Full unfiltered data for the selected year (used for client-side filtering) */
+  private allAssessments: any[] = [];
 
   // @ts-ignore
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -256,7 +275,14 @@ export class ScheduleAssessmentsComponent implements OnInit {
       this.configScoreRatingService.getScheduleAssessmentScreen(obj).subscribe(data => {
         next: {
           if (data.success == 1) {
-            this.process(data);
+            // Set permissions from initial response (no API call)
+            // NOTE: Do NOT call this.process(data) here — it fires loadListDepartmentsAndUnits
+            // in parallel with processAssessmentYear → getgriddata, causing a token refresh
+            // race condition ("Invalid Session"). fetchYearDataSequentially already handles
+            // permissions, department loading, and filter application sequentially.
+            if (data.result.recordset.SchedulePermission?.length > 0) {
+              this.iSCreateScheduleAssementEnabled = data.result.recordset.SchedulePermission[0].ISCreateScheduleAssessmentEnabled;
+            }
             this.processInProgressWidget(data);
             this.processAssessmentYear(data);
           } else {
@@ -270,7 +296,7 @@ export class ScheduleAssessmentsComponent implements OnInit {
   }
 
 
-  getgriddata(year: any): void {
+  getgriddata(): void {
     if (environment.dummyData) {
       let data = {
         "success": true,
@@ -336,15 +362,56 @@ export class ScheduleAssessmentsComponent implements OnInit {
       };
       this.process(data);
     } else {
-      ""
-      // let obj = { "scheduleYear": year };
-      // this.service.getAll(obj).subscribe(res => {
-      let obj = { "scheduleYear": year };
-      this.configScoreRatingService.getScheduleAssessmentScreen(obj).subscribe(res => {
-        next:
-        this.process(res);
-      });
+      if (!this.selectedYears || this.selectedYears.length === 0) return;
+      this.fetchYearDataSequentially(0, []);
     }
+  }
+
+  /** Fetch grid data for multiple selected years sequentially (one API call at a time).
+   *  Merges GetAssessmentSummary results from all years into a single list. */
+  private fetchYearDataSequentially(index: number, accumulated: any[]): void {
+    if (index >= this.selectedYears.length) {
+      // All years fetched — merge results and apply filters
+      this.getAssessmentSummary = accumulated;
+      this.allAssessments = [...accumulated];
+
+      if (this.listDepartments.length === 0) {
+        this.loadListDepartmentsAndUnits(() => {
+          this.applyClientSideFilters();
+        });
+      } else {
+        this.applyClientSideFilters();
+      }
+      return;
+    }
+
+    const year = this.selectedYears[index];
+    this.configScoreRatingService.getScheduleAssessmentScreen({ scheduleYear: year }).subscribe(res => {
+      if (res.success == 1) {
+        // Process permissions & in-progress widget from the first year's response
+        if (index === 0) {
+          if (res.result.recordset.SchedulePermission?.length > 0) {
+            this.iSCreateScheduleAssementEnabled = res.result.recordset.SchedulePermission[0].ISCreateScheduleAssessmentEnabled;
+          }
+          if (res.result.recordset.InProgressAssessment?.length) {
+            this.checkPrevInprogressData = res.result.recordset?.InProgressAssessment || [];
+            if (this.checkPrevInprogressData?.length && this.checkPrevInprogressData[0]?.IsInprogressAssessment == 1 && (new Date().getFullYear()) > this.checkPrevInprogressData[0]?.ScheduleYear) {
+              this.prevInprogressData = `Displaying current year data by default. Select the filter to view the previous year(s) data. Note: An ongoing assessment is available for ${this.checkPrevInprogressData[0].ScheduleYear}.`;
+            } else {
+              this.prevInprogressData = '';
+            }
+          } else {
+            this.prevInprogressData = '';
+          }
+        }
+        accumulated.push(...(res.result.recordset.GetAssessmentSummary || []));
+      } else {
+        if (res.error.errorCode == "TOKEN_EXPIRED")
+          this.utils.relogin(this._document);
+      }
+      // Fetch next year sequentially
+      this.fetchYearDataSequentially(index + 1, accumulated);
+    });
   }
 
   process(data: any): void {
@@ -355,29 +422,17 @@ export class ScheduleAssessmentsComponent implements OnInit {
         this.iSCreateScheduleAssementEnabled = assesmentconfig.ISCreateScheduleAssessmentEnabled;  
       }
 
-      if (data.result.recordset.GetAssessmentSummary.length > 0) {
-        this.getAssessmentSummary   = data.result.recordset.GetAssessmentSummary;
-        let docs  = data.result.recordset.GetAssessmentSummary;
-        //this.iSCreateScheduleAssementEnabled =true; //data.result.recordset.GetAssessmentSummary[0].ISCreateScheduleAssementEnabled;
-        if (docs) {
-          let id = 0;
-          docs.forEach((doc: any) => {
-            id++;
-            doc.RowNumber = id;
-          })
-          this.dataSource = new MatTableDataSource(docs);
-          this.dataSource.paginator = this.paginator
-          this.dataSource.sort = this.sort
-          this.showexportData = this.dataSource.filteredData.length > 0 ? true : false;
-          
-        }
+      // Store full unfiltered assessment list for client-side filtering
+      this.getAssessmentSummary = data.result.recordset.GetAssessmentSummary;
+      this.allAssessments = [...(data.result.recordset.GetAssessmentSummary || [])];
+
+      // Load departments & units for filter dropdowns (only once), then apply filters
+      if (this.listDepartments.length === 0) {
+        this.loadListDepartmentsAndUnits(() => {
+          this.applyClientSideFilters();
+        });
       } else {
-        this.getAssessmentSummary = data.result.recordset.GetAssessmentSummary;
-        let docs = data.result.recordset.GetAssessmentSummary;
-        this.dataSource = new MatTableDataSource(docs);
-        this.dataSource.paginator = this.paginator
-        this.dataSource.sort  = this.sort
-        this.showexportData   = this.dataSource.filteredData.length > 0 ? true : false;
+        this.applyClientSideFilters();
       }
 
       if(data.result.recordset.InProgressAssessment.length) {
@@ -718,20 +773,28 @@ isActionplan:boolean=false;
     if (data.success == 1) {
       if (data.result.recordset.AssessmentYears.length > 0) {
         this.assessmentYear = this.assessmentYears = data.result.recordset.AssessmentYears;
-      //   this.assessmentYear = 
-      //   [
-      //     {
-      //       "ScheduledYear": 2023
-      //   },{
-      //     "ScheduledYear": 2022
-      // },
-      // ]
-        this.selectedYear = localStorage.getItem("selectedYear") != "undefined" ? Number(localStorage.getItem("selectedYear")) : (new Date()).getFullYear();
 
-        this.selectedYear = Number.isNaN(this.selectedYear) ? (new Date()).getFullYear() : this.selectedYear;
-        if(localStorage.getItem("selectedYear") != "undefined"){
-          this.getgriddata(this.selectedYear);
+        // Restore multi-year selection from localStorage or default to current year
+        const storedYears = localStorage.getItem("selectedYears");
+        if (storedYears && storedYears !== "undefined") {
+          try {
+            const parsed = JSON.parse(storedYears);
+            this.selectedYears = Array.isArray(parsed) && parsed.length > 0 ? parsed : [(new Date()).getFullYear()];
+          } catch (e) {
+            this.selectedYears = [(new Date()).getFullYear()];
+          }
+        } else {
+          // Backward compatibility: check legacy single-year storage
+          const legacyYear = localStorage.getItem("selectedYear");
+          if (legacyYear && legacyYear !== "undefined") {
+            const yr = Number(legacyYear);
+            this.selectedYears = Number.isNaN(yr) ? [(new Date()).getFullYear()] : [yr];
+          } else {
+            this.selectedYears = [(new Date()).getFullYear()];
+          }
         }
+
+        this.getgriddata();
         this.actionForm.patchValue({ ddlyear: (new Date()).getFullYear() });
       }
     } else {
@@ -774,7 +837,7 @@ isActionplan:boolean=false;
     })
     assesment.afterClosed().subscribe(result => {
       if(result){
-        this.getgriddata(this.selectedYear);        
+        this.getgriddata();        
       }
     })
     //this.adddg = true;
@@ -795,7 +858,7 @@ isActionplan:boolean=false;
 
       assesment.afterClosed().subscribe(result => {
         if(result){
-          this.getgriddata(this.selectedYear);        
+          this.getgriddata();        
         }
       })
     }
@@ -819,8 +882,8 @@ isActionplan:boolean=false;
 
         event.source.checked = !event.source.checked;
       }
-      error:
-      console.log("err::", "error");
+      error: (err: any) =>
+      console.log("err::", err);
     });
   }
   saveSuccess(content: string): void {
@@ -845,8 +908,14 @@ isActionplan:boolean=false;
   }
 
   yearChange(): void {
-    localStorage.setItem("selectedYear", this.selectedYear+"");
-    this.getgriddata(this.selectedYear);
+    localStorage.setItem("selectedYears", JSON.stringify(this.selectedYears));
+    this.selectedQuarters = []; // reset quarters when years change
+    this.getgriddata();
+  }
+
+  /** Handle quarter filter change */
+  quarterChange(): void {
+    this.applyClientSideFilters();
   }
 
   getSnapDetails(data: any, info: any): void {
@@ -862,12 +931,105 @@ isActionplan:boolean=false;
     })
     assesment.afterClosed().subscribe(result => {
       if(result){
-        this.getgriddata(this.selectedYear);        
+        this.getgriddata();        
       }
     })
     //this.adddg = true;
   }
 
+
+  // =====================================================================
+  // Department / Unit filter logic for list screen
+  // =====================================================================
+
+  /** Load departments and units for list screen filters.
+   *  Accepts an optional callback to chain sequential API calls. */
+  loadListDepartmentsAndUnits(callback?: () => void): void {
+    this.service.getDepartmentsAndUnitsForSchedule().subscribe((res: any) => {
+      if (res.success == 1) {
+        this.listDepartments = res.result?.recordset?.departments || [];
+        this.listAllUnits = res.result?.recordset?.units || [];
+      }
+      // Execute callback AFTER this API call completes (sequential token refresh)
+      if (callback) {
+        callback();
+      }
+    });
+  }
+
+  /** Returns units filtered by the currently selected departments on the list screen.
+   *  Returns empty array when no departments are selected (Unit dropdown is disabled). */
+  get listFilteredUnits(): any[] {
+    if (!this.listFilterDepartmentIds || this.listFilterDepartmentIds.length === 0) return [];
+    return this.listAllUnits.filter((u: any) => this.listFilterDepartmentIds.includes(u.GroupID));
+  }
+
+  /** Handle department change on the list screen */
+  onListDepartmentChange(): void {
+    // Clear unit selections when all departments are deselected
+    if (!this.listFilterDepartmentIds || this.listFilterDepartmentIds.length === 0) {
+      this.listFilterUnitIds = [];
+    } else if (this.listFilterUnitIds.length > 0) {
+      // Prune unit selections that no longer belong to selected departments
+      const validUnitIds = this.listFilteredUnits.map((u: any) => u.UnitID);
+      this.listFilterUnitIds = this.listFilterUnitIds.filter(id => validUnitIds.includes(id));
+    }
+    this.applyClientSideFilters();
+  }
+
+  /** Handle unit change on the list screen */
+  onListUnitChange(): void {
+    this.applyClientSideFilters();
+  }
+
+  /** Apply client-side filters (Quarter, Department, Unit) and update the table data source.
+   *  Department/Unit filtering uses UnitIds and DepartmentIds returned from the line table
+   *  as comma-separated strings (e.g. "1,2,3") in each assessment row. */
+  applyClientSideFilters(): void {
+    let filtered = [...this.allAssessments];
+
+    // 1) Quarter filter (multi-select)
+    if (this.selectedQuarters && this.selectedQuarters.length > 0) {
+      filtered = filtered.filter((row: any) =>
+        row.SchedulePeriod && this.selectedQuarters.some(q => row.SchedulePeriod.startsWith(q))
+      );
+    }
+
+    // 2) Department filter - check if ANY of the assessment's departments match selected filter
+    if (this.listFilterDepartmentIds.length > 0) {
+      filtered = filtered.filter((row: any) => {
+        if (!row.DepartmentIds) return false;
+        const rowDeptIds = row.DepartmentIds.split(',').map((id: string) => parseInt(id.trim(), 10));
+        return this.listFilterDepartmentIds.some(filterId => rowDeptIds.includes(filterId));
+      });
+    }
+
+    // 3) Unit filter - check if ANY of the assessment's units match selected filter
+    if (this.listFilterUnitIds.length > 0) {
+      filtered = filtered.filter((row: any) => {
+        if (!row.UnitIds) return false;
+        const rowUnitIds = row.UnitIds.split(',').map((id: string) => parseInt(id.trim(), 10));
+        return this.listFilterUnitIds.some(filterId => rowUnitIds.includes(filterId));
+      });
+    }
+
+    // Re-number rows
+    let id = 0;
+    filtered.forEach((doc: any) => {
+      id++;
+      doc.RowNumber = id;
+    });
+
+    this.dataSource = new MatTableDataSource(filtered);
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+    this.showexportData = this.dataSource.filteredData.length > 0;
+  }
+
+  /** Reload list data from server (for year changes, etc.) */
+  reloadListData(): void {
+    this.getgriddata();
+  }
 
   canCreateEditAccess(): boolean {
     let result = false;
@@ -912,8 +1074,8 @@ isActionplan:boolean=false;
             else
               this.saveerror = res.error.errorMessage;
           }
-          error:
-          console.log("err::", "error");
+          error: (err: any) =>
+          console.log("err::", err);
         })
       }
     })

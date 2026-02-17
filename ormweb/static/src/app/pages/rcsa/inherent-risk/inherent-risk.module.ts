@@ -8,7 +8,8 @@ import { MatModule } from 'src/app/modules/mat/mat.module';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ColorPickerModule } from 'ngx-color-picker';
-import { FileUploadModule } from "ng2-file-upload";  
+import { FileUploadModule } from "ng2-file-upload";
+import { CoresharedModule } from 'src/app/core-shared/coreshared.module';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { FileUploadModule } from "ng2-file-upload";
     MatGridListModule,
     FlexLayoutModule,
     ColorPickerModule,
-    FileUploadModule
+    FileUploadModule,
+    CoresharedModule
   ],
   exports: [
     NewInherentRiskComponent,

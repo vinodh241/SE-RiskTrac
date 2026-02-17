@@ -352,3 +352,118 @@ body {
     font-size: 3vh;
     font-weight: 400;
 }
+
+// Mat Select Search Styles
+.mat-select-search-container {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: white;
+}
+
+.mat-select-search-input {
+  &:focus {
+    border-color: #3f51b5;
+    box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+  }
+  
+  &:hover {
+    border-color: rgba(0,0,0,0.3);
+  }
+}
+
+.mat-select-search-no-results {
+  user-select: none;
+  pointer-events: none;
+}
+
+// ============================================
+// Criticality Description Tooltip Styles
+// Used across ORM Incident module screens
+// ============================================
+.criticality-tooltip {
+  font-size: 13px !important;
+  line-height: 1.4;
+  max-width: 350px !important;
+  white-space: normal !important;
+  word-wrap: break-word;
+  padding: 10px 12px !important;
+  background-color: rgba(50, 50, 50, 0.95) !important;
+}
+
+// Common info icon styling for criticality descriptions
+.criticality-info-icon {
+  font-size: 16px;
+  height: 16px;
+  width: 16px;
+  margin-left: 4px;
+  color: #1976d2;
+  cursor: help;
+  vertical-align: middle;
+
+  &:hover {
+    color: #1565c0;
+  }
+}
+
+// ============================================
+// Angular Material Form Field fixes for tables
+// Fixes styling issues after Angular Material version upgrade
+// ============================================
+
+// Fix mat-form-field inside mat-table cells
+.mat-table {
+  .mat-cell {
+    // Ensure form fields don't overflow or cause layout issues
+    mat-form-field {
+      width: 100%;
+      
+      // Fix outline appearance spacing
+      &.mat-form-field-appearance-outline {
+        .mat-form-field-wrapper {
+          margin: 0;
+          padding: 0;
+        }
+        
+        .mat-form-field-infix {
+          padding: 0.5em 0;
+          border-top: 0;
+        }
+        
+        .mat-form-field-outline {
+          top: 0;
+        }
+      }
+      
+      // Fix legacy appearance spacing
+      &.mat-form-field-appearance-legacy {
+        .mat-form-field-wrapper {
+          padding-bottom: 0;
+        }
+        
+        .mat-form-field-infix {
+          padding: 0.25em 0;
+        }
+        
+        .mat-form-field-underline {
+          bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+// Ensure inline edit spans display properly
+.tablecolumnspan {
+  span {
+    display: inline-block;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+  }
+}
+
+// Fix mat-icon-button alignment in table cells
+.mat-table .mat-cell button.mat-icon-button {
+  line-height: normal;
+}

@@ -28,6 +28,7 @@ export interface sourceOfIdentifications {
 export interface criticality {
     CriticalityID: number | null;
     Name: string;
+    Description?: string;
     IsActive: number;
 }
 
@@ -159,90 +160,7 @@ export class IncidentService extends RestService {
         });
     }
 
-    getIncidentMaster(): void {
-        if (environment.dummyData) {
-            this.processIncidentMaster({
-                "success": 1,
-                "message": "Data fetch from DB successful.",
-                "result": {
-                    "incidentTypes": [
-                        {
-                            "TypeID": 802,
-                            "Name": "Bvsfgnuwv",
-                            "IsActive": 1
-                        }
-                    ],
-                    "sourceOfIdentifications": [
-                        {
-                            "SourceID": 256,
-                            "Name": "Ygafbjxtm Cuok Wdoj Sya",
-                            "IsActive": 1
-                        }
-                    ],
-                    "criticality": [
-                        {
-                            "CriticalityID": 945,
-                            "Name": "Lfawprezc Vbxr Kljkmgdxiu",
-                            "IsActive": 1
-                        }
-                    ],
-                    "operationalRiskLossEventCategory": [
-                        {
-                            "CategoryID": 815,
-                            "Name": "Dekknm Lulhkpxdwt",
-                            "IsActive": 1
-                        }
-                    ],
-                    "incidentReviewers": [
-                        {
-                            "ReviewerID": 873,
-                            "UserGUID": "XekailohHgiZzonuQzxdhdirkXaofnilyva",
-                            "IsActive": false
-                        },
-                        {
-                            "ApproverID": 694,
-                            "UserGUID": "XekailohHgiZzonuQzxdhdirkXaofnilyvb",
-                            "IsActive": true
-                        }
-                    ],
-                    "incidentApprovalUsers": [
-                        {
-                            "ApproverID": 695,
-                            "UserGUID": "XekailohHgiZzonuQzxdhdirkXaofnilyve",
-                            "IsActive": true
-                        },
-                        {
-                            "ReviewerID": 873,
-                            "UserGUID": "XekailohHgiZzonuQzxdhdirkXaofnilyva",
-                            "IsActive": false
-                        }
-                    ],
-                    "usersList": [
-                        {
-                            "UserGUID": "XekailohHgiZzonuQzxdhdirkXaofnilyve",
-                            "FullName": "User-1"
-                        },
-                        {
-                            "UserGUID": "XekailohHgiZzonuQzxdhdirkXaofnilyva",
-                            "FullName": "User-2"
-                        },
-                        {
-                            "UserGUID": "XekailohHgiZzonuQzxdhdirkXaofnilyvb",
-                            "FullName": "User-3"
-                        },
-                        {
-                            "UserGUID": "XekailohHgiZzonuQzxdhdirkXaofnilyvc",
-                            "FullName": "User-4"
-                        }
-                    ]
-                },
-                "error": {
-                    "errorCode": null,
-                    "errorMessage": null
-                },
-                "token": "eyJ0eXAiOiJKV"
-            })
-        } else {
+    getIncidentMaster(): void {         
             this.post("/operational-risk-management/incidents/get-incident-master-data", {}).subscribe(res => {
                 next:
                 if (res.success == 1) {
@@ -253,8 +171,7 @@ export class IncidentService extends RestService {
                     else
                         this.popupInfo("Unsuccessful", res.error.errorMessage)
                 }
-            });
-        }
+            });        
     }
 
     indexIncidentMaster(docs: any) {
@@ -274,17 +191,13 @@ export class IncidentService extends RestService {
             element['FullName'] = !!userName ? userName : "";
         });
         // docs = JSON.parse(JSON.stringify(docs.filter((ele: any) => ele.FullName != "")))
-        console.log("🚀 ~ file: incident.service.ts:272 ~ IncidentService ~ getMasterUserDetails ~ docs:", docs)
+        // // console.log("🚀 ~ file: incident.service.ts:272 ~ IncidentService ~ getMasterUserDetails ~ docs:", docs)
 
         return docs;
     }
 
     getMasterCheckerDetails(docs: any) {
         let userName = "";
-        // docs.forEach((element: any) => {
-        //     userName = this.checkerUsers.filter((ele: any) => ele.UserGUID == element.UserGUID).map((ele: any) => ele.FullName);
-        //     element['FullName'] = !!userName ? userName : "";
-        // });
         docs.forEach((element: any) => {
             const user = this.checkerUsers.find((ele: any) => ele.UserGUID === element.UserGUID);
 
@@ -299,7 +212,7 @@ export class IncidentService extends RestService {
             }
         });
         docs = JSON.parse(JSON.stringify(docs.filter((ele: any) => ele.FullName != "")))
-        console.log("🚀 ~ file: incident.service.ts:272 ~ IncidentService ~ getMasterUserDetails ~ docs:", docs)
+        // // console.log("🚀 ~ file: incident.service.ts:272 ~ IncidentService ~ getMasterUserDetails ~ docs:", docs)
         return docs;
     }
 
@@ -326,7 +239,7 @@ export class IncidentService extends RestService {
                 element['Unit'] = "";
             }
         });
-        console.log("this.filterUnitData",this.filterUnitData)
+        // console.log("this.filterUnitData",this.filterUnitData)
         return this.filterUnitData;
     }
 
@@ -343,7 +256,7 @@ export class IncidentService extends RestService {
                 element['Group'] = "";
             }
         });
-        console.log("this.filterGroupData",this.filterGroupData)
+        // console.log("this.filterGroupData",this.filterGroupData)
         return this.filterGroupData;
     }
 
@@ -354,7 +267,7 @@ export class IncidentService extends RestService {
 
     processIncidentMaster(response: any): void {
         this.master = response.result;
-        console.log(" this.master ", this.master )
+        // console.log(" this.master ", this.master )
         this.masterUsers = response.result.usersList;
         this.checkerUsers = response.result.AddingIncidentCheckersUsers
         this.masterReviewersAvl = this.filterMasterUsers(this.master.incidentReviewers, this.master.incidentApprovalUsers.filter((ele: any) => ele.IsActive));
@@ -375,14 +288,14 @@ export class IncidentService extends RestService {
         this.isMasterReviwersActive = this.isAllActive(this.masterIR.data);
         this.isMasterApproversActive = this.isAllActive(this.masterIA.data);
         this.isMasterCheckerActive = this.isAllActive(this.masterCA.data);
-        console.log("this.masterCA.data",this.masterCA.data)
-        console.log("this.ismasterchecker",this.isMasterCheckerActive)
+        // console.log("this.masterCA.data",this.masterCA.data)
+        // console.log("this.ismasterchecker",this.isMasterCheckerActive)
         this.isMasterReviwerAssigned = this.masterIR.data.length > 0;
         this.isMasterApproverAssigned = this.masterIA.data.length > 0;
         this.isMasterCheckerAssigned = this.masterCA.data.length > 0;
         this.filterUnitData =  (this.indexIncidentMaster(this.filterUnitUsers(this.masterAddingCheckersAvlUnit)));
         this.filterGroupData =  (this.indexIncidentMaster(this.filterGroupUsers(this.masterAddingCheckersAvlGroup)));
-        console.log("🚀 ~ file: incident.service.ts:369 ~ IncidentService ~ processIncidentMaster ~ this.filterGroupData:", this.filterGroupData)
+        // console.log("🚀 ~ file: incident.service.ts:369 ~ IncidentService ~ processIncidentMaster ~ this.filterGroupData:", this.filterGroupData)
         this.gotMaster.next(true);
     }
 
@@ -406,110 +319,17 @@ export class IncidentService extends RestService {
     }
 
     getIncidents(): void {
-        if (environment.dummyData) {
-            this.processIncidents({
-                "success": 1,
-                "message": "Data fetch from DB successful.",
-                "result": {
-                    "incidents": [
-                        {
-                            "IncidentID": 882,
-                            "IncidentCode": "AntWdwhuuixvePtbRtq",
-                            "ReportingDate": "2022-11-18T12:59:00.000Z",
-                            "IncidentDate": "2022-11-18T12:59:00.000Z",
-                            "IncidentTypeData": [
-                                {
-                                    "IncidentTypeLNID": 887,
-                                    "IncidentTypeID": 848,
-                                    "Name": "MpyijqaevVjkVtjjdgbwus"
-                                },
-                                {
-                                    "IncidentTypeLNID": 905,
-                                    "IncidentTypeID": 199,
-                                    "Name": "XcylyaKetnnnwJzvz"
-                                }
-                            ],
-                            "IncidentUnitData": [
-                                {
-                                    "IncidentUnitLNID": 75,
-                                    "IncidentUnitID": 468,
-                                    "UnitName": "TgwokvphjneHkvrcozhnrpMmjluqyqwq"
-                                },
-                                {
-                                    "IncidentUnitLNID": 829,
-                                    "IncidentUnitID": 622,
-                                    "UnitName": "WzxmhqbXydowccgtJkdzrhdowptWcwrcTehssykrfhh"
-                                }
-                            ],
-                            "CriticalityID": "OmPjnztlyrslxKapr",
-                            "CriticalityName": 684,
-                            "StatusID": 983,
-                            "StatusName": "IoxVryiuuf",
-                            "NoOfRecommendation": 10,
-                            "Open": 2,
-                            "ClaimClosed": 6,
-                            "Closed": 2
-                        },
-                        {
-                            "IncidentID": 648,
-                            "IncidentCode": "Svixxqbpyv",
-                            "ReportingDate": "2022-11-18T12:59:00.000Z",
-                            "IncidentDate": "2022-11-18T12:59:00.000Z",
-                            "IncidentTypeData": [
-                                {
-                                    "IncidentTypeLNID": 887,
-                                    "IncidentTypeID": 848,
-                                    "Name": "MpyijqaevVjkVtjjdgbwus"
-                                },
-                                {
-                                    "IncidentTypeLNID": 905,
-                                    "IncidentTypeID": 199,
-                                    "Name": "XcylyaKetnnnwJzvz"
-                                }
-                            ],
-                            "IncidentUnitData": [
-                                {
-                                    "IncidentUnitLNID": 75,
-                                    "IncidentUnitID": 468,
-                                    "UnitName": "TgwokvphjneHkvrcozhnrpMmjluqyqwq"
-                                },
-                                {
-                                    "IncidentUnitLNID": 829,
-                                    "IncidentUnitID": 622,
-                                    "UnitName": "WzxmhqbXydowccgtJkdzrhdowptWcwrcTehssykrfhh"
-                                }
-                            ],
-                            "CriticalityID": "Zhcwoucmwx",
-                            "CriticalityName": 751,
-                            "StatusID": 572,
-                            "StatusName": "WohVmbvoooghhGcnzskk",
-                            "NoOfRecommendation": 10,
-                            "Open": 2,
-                            "ClaimClosed": 6,
-                            "Closed": 2
-                        }
-                    ]
-                },
-                "error": {
-                    "errorCode": null,
-                    "errorMessage": null
-                },
-                "token": "GF35R0sw7i5tJG6VN0kLO4TlRnWdn9pLe2RpJYqOcaA"
-            })
-        } else {
-            this.post("/operational-risk-management/incidents/get-incidents", {}).subscribe(res => {
-                next:
-                if (res.success == 1) {
-                    this.processIncidents(res)
-                   
-                } else {
-                    if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
-                        this.utils.relogin(this._document);
-                    else
-                        this.popupInfo("Unsuccessful", res.error.errorMessage)
-                }
-            });
-        }
+        this.post("/operational-risk-management/incidents/get-incidents", {}).subscribe(res => {
+            next:
+            if (res.success == 1) {
+                this.processIncidents(res);
+            } else {
+                if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
+                    this.utils.relogin(this._document);
+                else
+                    this.popupInfo("Unsuccessful", res.error.errorMessage)
+            }
+        });
     }
 
     indexIncidents(docs: any) {
@@ -521,11 +341,8 @@ export class IncidentService extends RestService {
         });
         return docs
     }
-
-
     
     processIncidents(response: any): void {
-        console.log('response ---')
         this.incidents = response.result.incidents
         this.inAppRCSA = response.result.RCSAInApp
         this.inAppKRI = response.result.KRIInApp
@@ -550,203 +367,19 @@ export class IncidentService extends RestService {
 
 
     getIncident(incidentID: number): any {
-        let response = {}
-        if (environment.dummyData) {
-            this.processIncident({
-                "success": 1,
-                "message": "Data fetch from DB successful.",
-                "result": {
-                    "incidentData": [
-                        {
-                            "IncidentCode": "DqoyNfbp",
-                            "IncidentID": 898,
-                            "GroupID": 383,
-                            "GroupName": "CwepiftiAksLfrwntlAxWmhaxsaygxv",
-                            "UnitID": 637,
-                            "UnitName": "CwcwdtvIunhjzmzPxnxafdcly",
-                            "UserGUID": "KaatzPysekkcvApjdvtxdr",
-                            "LocationName": 622,
-                            "LocationTypeID": 998,
-                            "IncidentTeam": "BqezaPrnbpVosjwyw",
-                            "IncidentDate": "2022-11-18T12:59:00.000Z",
-                            "MobileNumber": 637,
-                            "EmailID": "OxxzyreqiheIozyfdzuqaRf",
-                            "Description": "MzwhukmDhgqk",
-                            "Recommendation": "Go",
-                            "Action": "SfngzlmhLe",
-                            "IncidentSourceID": 183,
-                            "LossAmount": 407,
-                            "ReportingDate": "2022-11-18T12:59:00.000Z",
-                            "AggPartyDetails": "PzgDzaehiuxDkiputszLyqexaxyd",
-                            "CriticalityID": 954,
-                            "RiskLossCategoryIDs": "BytgoKr",
-                            "EvidenceIDs": "ErnehoapwCjgaLpvrlyqfrwWdbw",
-                            "StatusID": 129,
-                            "StatusName": "Submitted by Reportee",
-                            "StatusCode": "1",
-                            "WorkflowActionBy": "Reviewer",
-                            "RiskApproverUserName": "BkOfzlimigfbrAilWipop",
-                            "RiskApprovalDate": "YhBjm",
-                            "RiskClosureUserName": "BjnvyxluCkeglwYxpbTdhztsotq",
-                            "RiskClosureDate": "UcFsd",
-                            "Comment": "EtxtxurthGiuigqct",
-                            "RCA": "TtiySrfonlgNscgtqyugjmBrfhvxvt",
-                            "IsReviewed": 1,
-                            "IsApproved": 1
-                        }
-                    ],
-                    "incidentTypesData": [
-                        {
-                            "TypeID": 100,
-                            "Name": "Uzbhjgyqvnr"
-                        },
-                        {
-                            "TypeID": 746,
-                            "Name": "QzfqftboceCsmjgbFztiamblwnuTxcZoqjdu"
-                        }
-                    ],
-                    "impactedUnitsData": [
-                        {
-                            "UnitID": 165,
-                            "Name": "QhieyubQdztvyy",
-                            "LossValue": 990
-                        },
-                        {
-                            "UnitID": 4,
-                            "Name": "Ixtzd",
-                            "LossValue": 616
-                        }
-                    ],
-                    "incidentWorkflowActionData": [
-                        {
-                            "StatusID": 818,
-                            "StatusCode": "CODE-2",
-                            "StatusName": "kjkjfdf",
-                            "NextWorkflowAction": "Reject Review"
-                        },
-                        {
-                            "StatusID": 819,
-                            "StatusCode": "CODE-2",
-                            "StatusName": "djfdlkfj",
-                            "NextWorkflowAction": "Submit to Approver"
-                        }
-                    ],
-                    "auditTrail": [
-                        {
-                            "CreatedDate": "2022-11-18T12:59:00.000Z",
-                            "Code": "BafbMmgOyckehdvjcCxyMqzyp",
-                            "Action": "LpvpThtosphusur",
-                            "FullName": "LjmueYwfgtXwsoanbbm",
-                            "Comment": "DmgdyahpBqoxnrqBhbvtozmsyjEwjpvpzmhhl"
-                        },
-                        {
-                            "CreatedDate": "2022-11-18T12:59:00.000Z",
-                            "Code": "IkwfIfnhjqAjqYibBokcpcpwob",
-                            "Action": "MwvbmrRgyyvbwvsQiuzwfr",
-                            "FullName": "TlHjVptdlqxrDmlkg",
-                            "Comment": "QeqsvrtCwgbsCfmoygbhcyPgxse"
-                        }
-                    ],
-                    "recommendations": [
-                        {
-                            "RecommendationID": 875,
-                            "IncidentID": 362,
-                            "RecommendationCode": "UlvCfqnhhufImcbgjj",
-                            "Description": "OkUnNugmihcqeohAhngtqtaVoh",
-                            "UnitID": 709,
-                            "UnitName": "DaktrpdJmyDjkjuueitzZtlu",
-                            "TargetDate": "2022-11-18T12:59:00.000Z",
-                            "IsApproved": 1,
-                            "StatusID": 704,
-                            "StatusCode": "TxmgnmqjbEjokxmltgps",
-                            "StatusName": "Hyjhmqwsv",
-                            "Action": "KiwlmxhvMvrXnhhlvp"
-                        },
-                        {
-                            "RecommendationID": 172,
-                            "IncidentID": 521,
-                            "RecommendationCode": "BgncozraiqNkgxerrzhzmJfmmmbdyntnYgwabyyvdeGexvjsac",
-                            "Description": "JvwaliluglfTo",
-                            "UnitID": 285,
-                            "UnitName": "Eidqnlp",
-                            "TargetDate": "2022-11-18T12:59:00.000Z",
-                            "IsApproved": 1,
-                            "StatusID": 150,
-                            "StatusCode": "UomdgkoPyyxmavlwrqQfhyidl",
-                            "StatusName": "BbtPoLdJmaxxeinhsNhcpbt",
-                            "Action": "SduhuoaxbKjyvsb"
-                        }
-                    ],
-                    "incidentEvidences": [
-                        {
-                            "EvidenceID": 187,
-                            "IncidentID": 685,
-                            "OriginalFileName": "DmyYcsoaOzidaUgnjmaVstzoafzyh",
-                            "FileType": "YoojgejkDoivomzbTrvcqzhvfWbxcwakcmvcFhvbzoaswp",
-                            "Remark": "Xpcocjald"
-                        },
-                        {
-                            "EvidenceID": 333,
-                            "IncidentID": 430,
-                            "OriginalFileName": "Buvgvysm",
-                            "FileType": "OcsuyRcnegzkojdVspgplymzJloei",
-                            "Remark": "GttuklhlBncrongwo"
-                        }
-                    ],
-                    "rcaEvidences": [
-                        {
-                            "EvidenceID": 790,
-                            "IncidentID": 885,
-                            "OriginalFileName": "XlghqVbncryyJfh",
-                            "FileType": "LsxSbuxCjonxhxarKlLpap",
-                            "Remarks": "LrlOsykefXzdmkYg"
-                        },
-                        {
-                            "EvidenceID": 124,
-                            "IncidentID": 584,
-                            "OriginalFileName": "FgCmqfigaeMwqpunxzvy",
-                            "FileType": "LnNbEbnzfleOrpn",
-                            "Remarks": "PcqDliwnguskrmOgwokbnwrw"
-                        }
-                    ],
-                    "recommendationEvidences": [
-                        {
-                            "EvidenceID": 735,
-                            "RecommendationID": 731,
-                            "OriginalFileName": "Gjeoqdtuvs",
-                            "FileType": "NqenKivwKkruRgcmq",
-                            "CreatedDate": "2022-11-18T12:59:00.000Z"
-                        },
-                        {
-                            "EvidenceID": 198,
-                            "RecommendationID": 615,
-                            "OriginalFileName": "Rbosifnb",
-                            "FileType": "GexEzfOqw",
-                            "CreatedDate": "2022-11-18T12:59:00.000Z"
-                        }
-                    ]
-                },
-                "error": {
-                    "errorCode": null,
-                    "errorMessage": null
-                },
-                "token": "GF35R0sw7i5tJG6VN0kLO4TlRnWdn9pLe2RpJYqOcaA"
-            })
-        } else {
-            let data = { "incidentID": incidentID }
-            this.post("/operational-risk-management/incidents/get-incident", { "data": data }).subscribe(res => {
-                next:
-                if (res.success == 1) {
-                    this.processIncident(res)
-                    this.getIncidentInfo(true)
-                } else {
-                    if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
-                        this.utils.relogin(this._document);
-                    else
-                        this.popupInfo("Unsuccessful", res.error.errorMessage)
-                }
-            });
-        }
+        let data = { "incidentID": incidentID }
+        this.post("/operational-risk-management/incidents/get-incident", { "data": data }).subscribe(res => {
+            next:
+            if (res.success == 1) {
+                this.processIncident(res)
+                this.getIncidentInfo(true)
+            } else {
+                if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
+                    this.utils.relogin(this._document);
+                else
+                    this.popupInfo("Unsuccessful", res.error.errorMessage)
+            }
+        });
     }
 
     setIncident(data: any): any {
@@ -804,7 +437,7 @@ export class IncidentService extends RestService {
         this.incEvidences = new MatTableDataSource(response.result.incidentEvidences)
         this.rcaEvidences = new MatTableDataSource(response.result.rcaEvidences)
         this.recEvidences = response.result.recommendationEvidences
-        console.log("isReviewEditable",this.isReviewEditable)
+        // console.log("isReviewEditable",this.isReviewEditable)
         this.isIncidentEditable = false
         this.isReviewEditable = false
         this.isReviewInEdit = false
@@ -838,113 +471,27 @@ export class IncidentService extends RestService {
         this.recEvidences = []
     }
 
-    getIncidentInfo(populate: boolean = false): void {
-        if (environment.dummyData) {
-            this.processIncidentInfo({
-                "success": 1,
-                "message": "Data fetch from DB successful.",
-                "result": {
-                    "groups": [
-                        {
-                            "GroupID": 732,
-                            "Name": "Qqozq"
-                        },
-                        {
-                            "GroupID": 548,
-                            "Name": "NvVyzjJzwhstxnvrn"
-                        }
-                    ],
-                    "units": [
-                        {
-                            "UnitID": 273,
-                            "Name": "VtuvmvyJwqecjubZvotkj"
-                        },
-                        {
-                            "UnitID": 227,
-                            "Name": "BuwxjwvrMtgcfxnvkxcWpwrorpqy"
-                        }
-                    ],
-                    "locationTypes": [
-                        {
-                            "LocationTypeID": 893,
-                            "Name": "QaXkcxfziliYhmwUtvzlti"
-                        },
-                        {
-                            "LocationTypeID": 392,
-                            "Name": "TspzdcfnsEpa"
-                        }
-                    ],
-                    "incidentTypes": [
-                        {
-                            "TypeID": 235,
-                            "Name": "YzwCg"
-                        },
-                        {
-                            "TypeID": 616,
-                            "Name": "VgHtpjwfxYr"
-                        }
-                    ],
-                    "incidentSources": [
-                        {
-                            "SourceID": 382,
-                            "Name": "XstxxjBdyycasipaDmsbzelgotdDrxpmDdt"
-                        },
-                        {
-                            "SourceID": 952,
-                            "Name": "MzIdncqKjzoqXalxwj"
-                        }
-                    ],
-                    "incidentCriticalities": [
-                        {
-                            "CriticalityID": 647,
-                            "Name": "Imjwjbo"
-                        },
-                        {
-                            "CriticalityID": 554,
-                            "Name": "Xsfsit"
-                        }
-                    ],
-                    "lossCatagories": [
-                        {
-                            "CategoryID": 773,
-                            "Name": "QsszjuuBzbjwjzoMzcizasczSoktuktSekkririarh"
-                        },
-                        {
-                            "CategoryID": 597,
-                            "Name": "VbgzqxnLuiklhfdccCrtdzhh"
-                        }
-                    ],
-                    "users": [
-                        {
-                            "UserGUID": "QsszjuuB-zbjwjzoMzci-zasczSoktuktSekkri-riarh",
-                            "FullName": "Harish Kumar Garg"
-                        },
-                        {
-                            "UserGUID": "QsszjuuB-zbjwjzoMzci-zasczSoktuktSekkri-riarh",
-                            "FullName": "Harish Kumar Garg"
-                        }
-                    ]
-                },
-                "error": {
-                    "errorCode": null,
-                    "errorMessage": null
-                },
-                "token": "GF35R0sw7i5tJG6VN0kLO4TlRnWdn9pLe2RpJYqOcaA"
-            })
+getIncidentInfo(populate: boolean = false): void {
+  this.post("/operational-risk-management/incidents/get-incident-info", {})
+    .subscribe(
+      (res: any) => {
+        if (res && res.success == 1) {
+          this.processIncidentInfo(res, populate);
         } else {
-            this.post("/operational-risk-management/incidents/get-incident-info", {}).subscribe(res => {
-                next:
-                if (res.success == 1) {
-                    this.processIncidentInfo(res, populate);
-                } else {
-                    if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
-                        this.utils.relogin(this._document);
-                    else
-                        this.popupInfo("Unsuccessful", res.error.errorMessage)
-                }
-            });
+          if (res?.error?.errorCode === "TOKEN_EXPIRED") {
+            this.utils.relogin(this._document);
+          } else {
+            this.popupInfo("Unsuccessful", res?.error?.errorMessage || "Unknown error");
+          }
         }
-    }
+      },
+      (err: any) => {
+        // network / server error
+        this.popupInfo("Error", err?.message || "Request failed");
+      }
+    );
+}
+
 
     processIncidentInfo(response: any, populate: boolean = false): void {
         this.info = this.getSelectedIncidentTypes(response.result);
@@ -956,12 +503,83 @@ export class IncidentService extends RestService {
     populateIncident(): void {
         this.incident.ReporteeUser = this.info?.users.filter((obj: any) => obj.UserGUID == this.incident.UserGUID).map((ele: any) => ele.FullName);
         this.incident.Identification = this.info.incidentSources.filter((obj: any) => obj.SourceID == this.incident.IncidentSourceID).map((ele: any) => ele.Name);
-        console.log('this.incident.Identification: ', this.incident.Identification);
+        // console.log('this.incident.Identification: ', this.incident.Identification);
         this.incident.Criticality = this.info.incidentCriticalities.filter((obj: any) => obj.CriticalityID == this.incident.CriticalityID).map((ele: any) => ele.Name);
-        console.log('this.incident.Criticality: ', this.incident.Criticality);
+        // console.log('this.incident.Criticality: ', this.incident.Criticality);
 
         // this.getSelectedIncidentTypes();
         // this.getEventLossCats();
+    }
+
+    /**
+     * Get criticality description by ID or Name (DB-driven, no hardcoding)
+     * Looks up from available criticality data sources
+     * @param identifier - CriticalityID (number) or CriticalityName (string)
+     * @returns Description string or empty string if not found
+     */
+    getCriticalityDescription(identifier: number | string): string {
+        if (!identifier) return '';
+        
+        // Try to find from info.incidentCriticalities first (most commonly available)
+        let criticalities = this.info?.incidentCriticalities || [];
+        
+        // Fallback to masterCriticality if info not available
+        if (!criticalities.length && this.masterCriticality?.data) {
+            criticalities = this.masterCriticality.data;
+        }
+        
+        // Fallback to incidentCriticalities
+        if (!criticalities.length && this.incidentCriticalities) {
+            criticalities = this.incidentCriticalities;
+        }
+        
+        if (!criticalities.length) return '';
+        
+        let found: any = null;
+        
+        if (typeof identifier === 'number') {
+            // Lookup by CriticalityID
+            found = criticalities.find((c: any) => c.CriticalityID === identifier);
+        } else {
+            // Lookup by Name (case-insensitive)
+            const searchName = identifier.toLowerCase().trim();
+            found = criticalities.find((c: any) => 
+                c.Name && c.Name.toLowerCase().trim() === searchName
+            );
+        }
+        
+        return found?.Description || '';
+    }
+
+    /**
+     * Silently load criticality master data for dashboard tooltips
+     * Does NOT trigger session timeout or error popups
+     * Safe to call from dashboard components
+     */
+    loadCriticalityDataSilent(): void {
+        // Only load if not already loaded
+        if (this.info?.incidentCriticalities?.length > 0 || this.masterCriticality?.data?.length > 0) {
+            return;
+        }
+        
+        this.post("/operational-risk-management/incidents/get-incident-info", {})
+            .subscribe(
+                (res: any) => {
+                    if (res && res.success == 1) {
+                        // Only store the criticality data, don't process full incident info
+                        if (res.result?.incidentCriticalities) {
+                            if (!this.info) {
+                                this.info = {};
+                            }
+                            this.info.incidentCriticalities = res.result.incidentCriticalities;
+                        }
+                    }
+                    // Silently ignore errors - no popups, no redirects
+                },
+                (err: any) => {
+                    // Silently ignore errors
+                }
+            );
     }
 
     getSelectedIncidentTypes(data: any): void {
@@ -1115,31 +733,4 @@ export class IncidentService extends RestService {
         }
         return new Blob(byteArrays, { type: contentType });
     }
-
-
-    // deleteFile(row: any, eviName: any) {
-    //     let data = { "evidenceID": row.EvidenceID }
-    //     this.post(`/operational-risk-management/incidents/delete-${eviName}-evidence`, { data }).subscribe(res => {
-    //         if (res.success == 1) {
-    //             if (eviName == 'Incident') {
-    //                 const index = this.incEvidences.data.indexOf(row.EvidenceID);
-    //                 this.incEvidences.data.splice(index, 1);
-    //                 this.incEvidences.data = [...this.incEvidences.data];
-    //             } else if (eviName == 'RCA') {
-    //                 const index = this.rcaEvidences.data.indexOf(row.EvidenceID);
-    //                 this.rcaEvidences.data.splice(index, 1);
-    //                 this.rcaEvidences.data = [...this.rcaEvidences.data];
-    //             } else {
-    //                 const index = this.recEvidences.indexOf(row.EvidenceID);
-    //                 this.recEvidences.splice(index, 1);
-    //                 this.recEvidences = [...this.recEvidences];
-    //             }
-    //         } else {
-    //             // if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
-    //             //     this.utils.relogin(this._document);
-    //             // else
-    //             //     this.popupInfo("Unsuccessful", res.error.errorMessage);
-    //         }
-    //     });
-    // }
 }

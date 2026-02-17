@@ -6,9 +6,9 @@
     <div class="actions-container">
         <div class="left-action">
             <div>
-                <label class="dropdown-label">Group</label>
+                <label class="dropdown-label">Department</label>
                 <mat-form-field appearance="standard">
-                    <mat-select [(ngModel)]="kriService.kriHistoricalSelectedGroup"
+                    <mat-select matSelectSearch placeholder="Search department..." [(ngModel)]="kriService.kriHistoricalSelectedGroup"
                         (selectionChange)="onGroupChange()">
                         <mat-option value="">All</mat-option>
                         <mat-option *ngFor="let group of getGroupList()" [value]="group.GroupID">{{group.GroupName}}
@@ -19,7 +19,7 @@
             <div>
                 <label class="dropdown-label">Unit</label>
                 <mat-form-field appearance="standard">
-                    <mat-select [disabled]="!kriService.kriHistoricalSelectedGroup"
+                    <mat-select matSelectSearch placeholder="Search unit..." [disabled]="!kriService.kriHistoricalSelectedGroup"
                         [(ngModel)]="kriService.kriHistoricalSelectedUnit" (selectionChange)="onUnitChange()">
                         <mat-option value="">All</mat-option>
                         <mat-option *ngFor="let unit of getUnitList()" [value]="unit.UnitID">{{unit.UnitName}}
@@ -31,7 +31,7 @@
             <div>
                 <label class="dropdown-label">Year</label>
                 <mat-form-field appearance="standard">
-                    <mat-select [(ngModel)]="kriService.kriHistoricalSelectedYear"
+                    <mat-select matSelectSearch placeholder="Search year..." [(ngModel)]="kriService.kriHistoricalSelectedYear"
                         (selectionChange)="onYearChange()">
                         <mat-option *ngFor="let year of getYearList()" [value]="year.Years">{{year.Years}}</mat-option>
                     </mat-select>
@@ -67,7 +67,7 @@
             </ng-container>
 
             <ng-container matColumnDef="GroupName">
-                <th mat-header-cell *matHeaderCellDef> Group Name </th>
+                <th mat-header-cell *matHeaderCellDef> Department Name </th>
                 <td mat-cell *matCellDef="let element"> {{element.GroupName}} </td>
             </ng-container>
 
@@ -75,6 +75,11 @@
                 <th mat-header-cell *matHeaderCellDef> Unit Name </th>
                 <td mat-cell *matCellDef="let element"> {{element.UnitName}} </td>
             </ng-container>
+
+            <ng-container matColumnDef="KriCode">
+                <th mat-header-cell *matHeaderCellDef> KRI Code </th>
+                <td mat-cell *matCellDef="let element"> {{element.KriCode}} </td>
+            </ng-container>            
 
             <ng-container matColumnDef="KeyRiskIndicator">
                 <th mat-header-cell *matHeaderCellDef> Key Risk Indicator </th>
@@ -99,7 +104,7 @@
                             <span *ngIf="!isMeasuredValueView" [style.background]="data.ColorCode"
                                 class="threshold-value">{{data.ThresholdValue}}</span>
                                 <span style="display:none;">,</span>
-                            <span *ngIf="!([undefined, null, ''].includes(data.Measurement))">{{data.Measurement}}%</span>
+                            <span *ngIf="!([undefined, null, ''].includes(data.Measurement))">{{data.Measurement | kriThresholdSuffix : element.ThresholdType}}</span>
                         </div>
                     </ng-container>
                 </td>
@@ -110,12 +115,16 @@
             </ng-container>
 
             <ng-container matColumnDef="header-row-second-group">
-                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2">Group</th>
+                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2">Department</th>
             </ng-container>
 
             <ng-container matColumnDef="header-row-third-group">
                 <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2">Unit</th>
             </ng-container>
+
+            <ng-container matColumnDef="header-row-six-group">
+                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2">KRI Code</th>
+            </ng-container>            
 
             <ng-container matColumnDef="header-row-fourth-group">
                 <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2"> Key Risk Indicator</th>
@@ -130,7 +139,7 @@
             </ng-container>
 
             <tr mat-header-row
-                *matHeaderRowDef="['header-row-first-group','header-row-second-group', 'header-row-third-group','header-row-fourth-group', 'header-row-fifth-group', 'header-row-last-group']">
+                *matHeaderRowDef="['header-row-first-group','header-row-second-group', 'header-row-third-group','header-row-six-group','header-row-fourth-group', 'header-row-fifth-group', 'header-row-last-group']">
             </tr>
             <tr mat-header-row *matHeaderRowDef="monthsColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns.concat(monthsColumns);"></tr>

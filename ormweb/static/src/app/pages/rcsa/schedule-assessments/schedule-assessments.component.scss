@@ -207,4 +207,75 @@ div.summaryinfo {
     transition: width 2s;
     border-radius: 0.5vh;
     color: white;
+    white-space: nowrap;
+}
+
+.leftPlusIcon {
+    left: -15%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-16%);
+}
+
+/* =====================================================================
+   ALL vs Individual mode filter on list screen
+   ===================================================================== */
+
+/* Selection Mode Toggle on list screen */
+.list-selection-mode-section {
+    display: flex;
+    align-items: center;
+    margin-left: 24px;
+    margin-right: 16px;
+}
+
+.selection-mode-toggle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+
+    .toggle-label {
+        font-size: 0.85rem;
+        color: #737373;
+        cursor: pointer;
+        user-select: none;
+
+        &.active {
+            color: #000;
+            font-weight: 500;
+        }
+    }
+
+    .toggle-track {
+        position: relative;
+        width: 48px;
+        height: 24px;
+        background: #c3c3c3;
+        border-radius: 12px;
+        cursor: pointer;
+        flex-shrink: 0;
+
+        .toggle-handle {
+            position: absolute;
+            top: 50%;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #0B65A0;
+            transform: translateY(-50%);
+            transition: left 0.2s ease;
+
+            &.individual {
+                left: calc(100% - 21px);
+            }
+        }
+    }
+}
+
+/* Department & Unit filter dropdowns on list screen */
+.list-filter-field {
+    margin-left: 12px;
+    max-width: 180px;
 }

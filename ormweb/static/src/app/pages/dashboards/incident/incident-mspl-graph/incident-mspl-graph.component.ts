@@ -51,7 +51,7 @@ export class IncidentMsplGraphComponent implements OnInit {
                     '-' +
                     currentDate.getFullYear().toString().substr(2, 2); // Get the current quarter
 
-                this.allData = this.RawData?.filter(
+                this.allData = (Array.isArray(this.RawData) ? this.RawData : []).filter(
                     (data: any) => data.Quater === quarterFilter &&  (data.StatusID != 1 && data.StatusID != 11 && data.StatusID != 12 && data.StatusID != 17 && data.StatusID != 18 && data.StatusID != 13 &&
                          data.StatusID != 14 && data.StatusID != 15 &&
                          data.StatusID != 16)

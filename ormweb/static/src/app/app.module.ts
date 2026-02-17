@@ -1,9 +1,11 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ColorPickerModule } from "ngx-color-picker";
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FooterComponent } from './includes/footer/footer.component';
@@ -41,9 +43,13 @@ import { MasterRcsaModule } from './pages/rcsa/master/master-rcsa/master-rcsa.mo
 import { KriSendEmailReminderDialogComponent } from './pages/dashboards/kri/kri-measurement/kri-send-email-reminder-dialog/kri-send-email-reminder-dialog.component';
 import { RiskRegisterComponent } from './pages/risk-register/risk-register.component';
 import { RiskRegisterAssessmentWiseComponent } from './pages/rcsa/schedule-assessments/risk-register-assessment-wise/risk-register-assessment-wise.component';
-// import { KriMeasurementReviewComponent } from './pages/kri-measurement-review/kri-measurement-review.component';
-// import { KriMeasurementMykriComponent } from './pages/kri-measurement-mykri/kri-measurement-mykri.component';
+import { TemplateDialogComponent } from './includes/utilities/popups/TemplateDialog/template-dialog.component';
+import { environment } from 'src/environments/environment';
 
+// AoT requires an exported function for factories
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
 
 @NgModule({
   declarations: [
@@ -66,8 +72,7 @@ import { RiskRegisterAssessmentWiseComponent } from './pages/rcsa/schedule-asses
     KriSendEmailReminderDialogComponent,
     RiskRegisterComponent,
     RiskRegisterAssessmentWiseComponent,
-    // KriMeasurementReviewComponent,
-    // KriMeasurementMykriComponent,
+    TemplateDialogComponent
   ],
   imports: [
     FormsModule,
@@ -79,6 +84,14 @@ import { RiskRegisterAssessmentWiseComponent } from './pages/rcsa/schedule-asses
     HttpClientModule,
     ColorPickerModule,
     FileUploadModule,
+    TranslateModule.forRoot({
+      defaultLanguage: environment.defaultLanguage,
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient]
+      }
+    }),
 
     MatGridListModule,
     FlexLayoutModule,
@@ -92,7 +105,7 @@ import { RiskRegisterAssessmentWiseComponent } from './pages/rcsa/schedule-asses
     CoresharedModule,
     MasterRcsaModule
   ],
-  providers: [DatePipe,  { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'fill' } }],
+  providers: [DatePipe, { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'fill' } }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

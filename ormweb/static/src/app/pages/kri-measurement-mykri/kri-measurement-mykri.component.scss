@@ -82,7 +82,7 @@
 
 .reporting-frequency-class {
     display:flex;
-    justify-content:end;
+    justify-content: flex-end;
 }
 
 .reporting-text-span {
@@ -420,3 +420,24 @@ tr.mat-header-row {
     align-items: center;
     margin-left: 1vh;
 }
+
+.reportingAlign {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    width: -webkit-fill-available;
+    padding-inline: 0.5vw;
+}
+
+.reportItems {
+    width: calc(40% - 0.5vw);
+    /* padding-top: 14px; */
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+.reportItems:last-child {
+    width: calc(20% - 0.5vw);
+}
+

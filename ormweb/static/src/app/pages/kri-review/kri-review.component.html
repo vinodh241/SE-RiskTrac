@@ -20,13 +20,13 @@
                 <!-- <h1 class="pghead pr-2">Key Risk Indicator  |  KRI Measurement</h1> -->
                 <div class="d-flex justify-content-strart align-items-center pgheadfields">
                     <div class="input-field row" style="left: 22px !important">
-                        <div class="col-3 text-right px-0" for="group" style="margin-top: 10px">Group</div>
+                        <div class="col-3 text-right px-0" for="group" style="margin-top: 10px">Department</div>
                         <div class="col-9 pl-1">
                             <mat-form-field class="dropdown-class" style="background: #ffffff;
                                 width: 11rem;
                                 height: 36px;
                                 margin-top: 10px;">
-                                <mat-select (selectionChange)="filterGroups($event)" [(ngModel)]="groupSelected">
+                                <mat-select matSelectSearch placeholder="Search department..." (selectionChange)="filterGroups($event)" [(ngModel)]="groupSelected">
                                     <!-- <mat-option value=""></mat-option> -->
                                     <mat-option *ngFor="let group of kriService?.kriMeasurementGroups" [value]="group.GroupID">
                                         {{group.GroupName}}
@@ -42,7 +42,7 @@
                                 width: 11rem;
                                 height: 36px;
                                 margin-top: 10px;">
-                                <mat-select [disabled]="groupSelected=='all'" (selectionChange)="filterUnits($event)" [(ngModel)]="unitSelected">
+                                <mat-select matSelectSearch placeholder="Search unit..." [disabled]="groupSelected=='all'" (selectionChange)="filterUnits($event)" [(ngModel)]="unitSelected">
                                     <!-- <mat-option value=""></mat-option> -->
                                     <mat-option *ngFor="let unit of getUnitsNames(kriService?.kriMeasurementUnits)" [value]="unit.UnitID">
                                         {{unit.UnitName}}
@@ -104,8 +104,8 @@
                                             <div class="w-100 toptbl pb-2 c-menu__item">
                                                 <table class="w-100">
                                                     <tbody>
-                                                        <tr (click)="measured('Measured')" [ngClass]="{'selected-row': selectedRow=== 'Measured'}">
-                                                          <td style="margin: 0; padding: 0;">Measured</td>
+                                                        <tr (click)="measured('Measured')" [ngClass]="{'selected-row': selectedRow === 'Measured'}">
+                                                          <td style="margin: 0; padding: 0;">Measureds</td>
                                                           <td class="text-right" style="margin: 0; padding: 0;">{{ this.measuredData('Measured') }}</td>
                                                         </tr>
                                                         <tr (click)="measured('Not Measured')" [ngClass]="{'selected-row': selectedRow=== 'Not Measured'}">
@@ -227,7 +227,7 @@
 
                                                 <ng-container matColumnDef="Target">
                                                     <th mat-header-cell *matHeaderCellDef [ngStyle]="{'display': 'none'}">Target</th>
-                                                    <td mat-cell *matCellDef="let row"> {{row.Target}}%</td>
+                                                    <td mat-cell *matCellDef="let row"> {{row.Target | kriThresholdSuffix : row.ThresholdType}}</td>
                                                 </ng-container>
                                                 <ng-container matColumnDef="Kritype">
                                                     <th mat-header-cell *matHeaderCellDef [ngStyle]="{'display': 'none'}">KRI Type</th>
@@ -239,35 +239,35 @@
                                                         [ngStyle]="{'border-top': 'none','border-right':'none'}" [style.background-color]="this.kriService.kriThresholds[0].ColorCode">
                                                             1
                                                     </th>
-                                                    <td [style.background-color]="this.kriService.kriThresholds[0].ColorCode" mat-cell *matCellDef="let row">{{row.Target==0?">":"<"}} {{row.ThresholdValue1}}% </td>
+                                                    <td [style.background-color]="this.kriService.kriThresholds[0].ColorCode" mat-cell *matCellDef="let row">{{row.Target==0?">":"<"}} {{row.ThresholdValue1 | kriThresholdSuffix : row.ThresholdType}} </td>
                                                 </ng-container>
                                                 <ng-container matColumnDef="tvalue-2">
                                                     <th mat-header-cell *matHeaderCellDef class="text-align-center " style="bottom: 19px"
                                                         [ngStyle]="{'border-top': 'none','border-left':'none','border-right':'none'}" [style.background-color]="this.kriService.kriThresholds[1].ColorCode">
                                                             2
                                                     </th>
-                                                    <td [style.background-color]="this.kriService.kriThresholds[1].ColorCode" mat-cell *matCellDef="let row">{{row.Target==0?"<=":">="}}{{row.ThresholdValue2}}%</td>
+                                                    <td [style.background-color]="this.kriService.kriThresholds[1].ColorCode" mat-cell *matCellDef="let row">{{row.Target==0?"<=":">="}}{{row.ThresholdValue2 | kriThresholdSuffix : row.ThresholdType}}</td>
                                                 </ng-container>
                                                 <ng-container matColumnDef="tvalue-3">
                                                     <th mat-header-cell *matHeaderCellDef class="text-align-center " style="bottom: 19px"
                                                         [ngStyle]="{'border-top': 'none','border-left':'none','border-right':'none'}" [style.background-color]="this.kriService.kriThresholds[2].ColorCode">
                                                             3
                                                     </th>
-                                                    <td [style.background-color]="this.kriService.kriThresholds[2].ColorCode" mat-cell *matCellDef="let row">{{row.Target==0?"<=":">="}}{{row.ThresholdValue3}}%</td>
+                                                    <td [style.background-color]="this.kriService.kriThresholds[2].ColorCode" mat-cell *matCellDef="let row">{{row.Target==0?"<=":">="}}{{row.ThresholdValue3 | kriThresholdSuffix : row.ThresholdType}}</td>
                                                 </ng-container>
                                                 <ng-container matColumnDef="tvalue-4">
                                                     <th mat-header-cell *matHeaderCellDef class="text-align-center" style="bottom: 19px"
                                                         [ngStyle]="{'border-top': 'none','border-left':'none','border-right':'none'}" [style.background-color]="this.kriService.kriThresholds[3].ColorCode">
                                                             4
                                                     </th>
-                                                    <td [style.background-color]="this.kriService.kriThresholds[3].ColorCode" mat-cell *matCellDef="let row">{{row.Target==0?"<=":">="}}{{row.ThresholdValue4}}% </td>
+                                                    <td [style.background-color]="this.kriService.kriThresholds[3].ColorCode" mat-cell *matCellDef="let row">{{row.Target==0?"<=":">="}}{{row.ThresholdValue4 | kriThresholdSuffix : row.ThresholdType}} </td>
                                                 </ng-container>
                                                 <ng-container matColumnDef="tvalue-5">
                                                     <th mat-header-cell *matHeaderCellDef class="text-align-center" [style.background-color]="this.kriService.kriThresholds[4].ColorCode" style="bottom: 19px"
                                                         [ngStyle]="{'border-top': 'none','border-left':'none'}">
                                                             5
                                                     </th>
-                                                    <td [style.background-color]="this.kriService.kriThresholds[4].ColorCode" mat-cell *matCellDef="let row">{{row.ThresholdValue5}}% </td>
+                                                    <td [style.background-color]="this.kriService.kriThresholds[4].ColorCode" mat-cell *matCellDef="let row">{{row.ThresholdValue5 | kriThresholdSuffix : row.ThresholdType}} </td>
                                                 </ng-container>
                                                 <ng-container matColumnDef="period">
                                                     <th mat-header-cell *matHeaderCellDef class="text-align-center"
@@ -286,9 +286,9 @@
                                                     <td mat-cell *matCellDef="let row">
                                                         <mat-form-field class="editable">
                                                             <div style="display: flex;">
-                                                                <input matInput type="number" min="0" max="100" [(ngModel)]="row.Measurement"
+                                                                <input matInput type="number" [attr.min]="row.ThresholdType === 'PERCENTAGE' ? 0 : null" [attr.max]="row.ThresholdType === 'PERCENTAGE' ? 100 : null" [(ngModel)]="row.Measurement"
                                                                 [disabled]="row.KRI_Status == 'Measured' || row.KRI_Status == 'Not Measured'"
-                                                                    (keyup)="onChangeMeasurement(row)" autocomplete="off">%
+                                                                    (keyup)="onChangeMeasurement(row)" autocomplete="off"><span *ngIf="showMeasurementPercent(row)">%</span>
                                                             </div>
                                                         </mat-form-field>
                                                     </td>
@@ -357,7 +357,7 @@
                                                                             T-{{getPreviousScoring(row).indexOf(data)+1}}</td>
                                                                         <td class="tooltip-table">{{data.Period}}</td>
                                                                         <td class="tooltip-table">{{utils.formatDate(data.Date)}}</td>
-                                                                        <td class="tooltip-table">{{data.Measurement}}%</td>
+                                                                        <td class="tooltip-table">{{data.Measurement | kriThresholdSuffix : row.ThresholdType}}</td>
                                                                         <td class="tooltip-table">
                                                                             <div class="krivalue-container">
                                                                                 <div [style.background-color]="data.ColorCode" class="krivalue">

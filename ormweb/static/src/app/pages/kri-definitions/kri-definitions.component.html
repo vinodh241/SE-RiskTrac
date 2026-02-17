@@ -62,32 +62,61 @@
                 <td mat-cell *matCellDef="let row"> {{row.KriCode}} </td>
             </ng-container>
             <ng-container matColumnDef="group">
-                <th mat-header-cell *matHeaderCellDef [ngStyle]="{'display': 'none'}">Group</th>
+                <th mat-header-cell *matHeaderCellDef [ngStyle]="{'display': 'none'}">Department</th>
                 <td mat-cell *matCellDef="let row"> {{row.GroupName}} </td>
             </ng-container>
             <ng-container matColumnDef="unit">
                 <th mat-header-cell *matHeaderCellDef [ngStyle]="{'display': 'none'}">Unit</th>
                 <td mat-cell *matCellDef="let row"> {{row.UnitName}} </td>
             </ng-container>
+
+            <!-- NEW: Inherent Risk column (inserted after Unit) -->
+            <ng-container matColumnDef="InherentRisk">
+                <th mat-header-cell *matHeaderCellDef [ngStyle]="{'display': 'none'}">Inherent Risk</th>
+                <td mat-cell *matCellDef="let row">
+                    <span [matTooltip]="row.InherentRisk" [matTooltipDisabled]="!row.InherentRisk || row.InherentRisk.length <= 20"
+                        class="truncate-text">
+                        {{ row.InherentRisk?.length > 20 ? (row.InherentRisk | slice:0:20) + '...' : row.InherentRisk }}
+                    </span>
+                </td>
+            </ng-container>           
+
+            <!-- Key Risk Indicator Column -->
             <ng-container matColumnDef="Indicator">
-                <th mat-header-cell *matHeaderCellDef [ngStyle]="{'display': 'none'}">Key Risk Indicator</th>
-                <td mat-cell *matCellDef="let row"> {{row.KeyRiskIndicator}} </td>
+                <th mat-header-cell *matHeaderCellDef [ngStyle]="{'display': 'none'}">
+                    Key Risk Indicator
+                </th>            
+                <td mat-cell *matCellDef="let row">
+                    <span [matTooltip]="row.KeyRiskIndicator"
+                        [matTooltipDisabled]="!row.KeyRiskIndicator || row.KeyRiskIndicator.length <= 40"
+                        class="truncate-text Indicator">
+                        {{ row.KeyRiskIndicator?.length > 40 ? (row.KeyRiskIndicator | slice:0:40) + '...' : row.KeyRiskIndicator }}
+                    </span>
+                </td>
             </ng-container>
             <ng-container matColumnDef="Measurmentfrequency">
-                <th mat-header-cell *matHeaderCellDef [ngStyle]="{'display': 'none'}">Measurment Frequency</th>
+                <th mat-header-cell *matHeaderCellDef [ngStyle]="{'display': 'none'}">Measurment<br>Frequency</th>
                 <td mat-cell *matCellDef="let row"> {{row.MeasurementFrequencyName}} </td>
             </ng-container>
             <ng-container matColumnDef="Reportingfrequency">
-                <th mat-header-cell *matHeaderCellDef [ngStyle]="{'display': 'none'}">Reporting Frequency</th>
+                <th mat-header-cell *matHeaderCellDef [ngStyle]="{'display': 'none'}">Reporting<br>Frequency</th>
                 <td mat-cell *matCellDef="let row"> {{row.ReportingFrequencyName}} </td>
             </ng-container>
             <ng-container matColumnDef="Target">
                 <th mat-header-cell *matHeaderCellDef [ngStyle]="{'display': 'none'}">Target</th>
-                <td mat-cell *matCellDef="let row"> {{row.Target}}% </td>
+                <td mat-cell *matCellDef="let row"> {{ row.Target | kriThresholdSuffix : row.ThresholdType }} </td>
             </ng-container>
+            <!-- KRI Type Column -->
             <ng-container matColumnDef="Kritype">
-                <th mat-header-cell *matHeaderCellDef [ngStyle]="{'display': 'none'}">KRI Type</th>
-                <td mat-cell *matCellDef="let row"> {{row.KriTypeName}} </td>
+                <th mat-header-cell *matHeaderCellDef [ngStyle]="{'display': 'none'}">
+                    KRI<br>Type
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    <span [matTooltip]="row.KriTypeName" [matTooltipDisabled]="!row.KriTypeName || row.KriTypeName.length <= 10"
+                        class="truncate-text Kritype">
+                        {{ row.KriTypeName?.length > 10 ? (row.KriTypeName | slice:0:10) + '...' : row.KriTypeName }}
+                    </span>
+                </td>
             </ng-container>
             <ng-container matColumnDef="thresholdvalue-1">
                 <th mat-header-cell *matHeaderCellDef class="text-align-center"
@@ -102,7 +131,7 @@
                 <td mat-cell *matCellDef="let row">
                     <!-- <span *ngIf="row.ThresholdValue1 >= row.ThresholdValue2"> >= {{row.ThresholdValue1}}% </span>
                     <span *ngIf="row.ThresholdValue1 <= row.ThresholdValue2"> <= {{row.ThresholdValue1}}%</span> -->
-                    <span>{{row.ThresholdValue1 <= row.ThresholdValue2 ? '>=' : '<=' }} {{row.ThresholdValue1}}%</span>
+                    <span>{{row.ThresholdValue1 <= row.ThresholdValue2 ? '>=' : '<=' }} {{ row.ThresholdValue1 | kriThresholdSuffix : row.ThresholdType }}</span>
                 </td>
             </ng-container>
             <ng-container matColumnDef="thresholdvalue-2">
@@ -114,9 +143,9 @@
                             2
                         </div>
                     </div>
-                </th>>
+                </th>
                 <td mat-cell *matCellDef="let row">
-                    <span>{{row.ThresholdValue2 <= row.ThresholdValue3 ? '>=' : '<=' }} {{row.ThresholdValue2}}%</span>
+                    <span>{{row.ThresholdValue2 <= row.ThresholdValue3 ? '>=' : '<=' }} {{ row.ThresholdValue2 | kriThresholdSuffix : row.ThresholdType }}</span>
                   </td>
 
             </ng-container>
@@ -131,7 +160,7 @@
                     </div>
                 </th>
                 <td mat-cell *matCellDef="let row">
-                    <span>{{row.ThresholdValue3 <= row.ThresholdValue4 ? '>=' : '<=' }} {{row.ThresholdValue3}}%</span>
+                    <span>{{row.ThresholdValue3 <= row.ThresholdValue4 ? '>=' : '<=' }} {{ row.ThresholdValue3 | kriThresholdSuffix : row.ThresholdType }}</span>
                     <!-- <span *ngIf="row.ThresholdValue2 >= row.ThresholdValue3"> >= {{row.ThresholdValue3}}% </span>
                     <span *ngIf="row.ThresholdValue2 < row.ThresholdValue3"> <= {{row.ThresholdValue3}}%</span> -->
                   </td>
@@ -149,7 +178,7 @@
                 <td mat-cell *matCellDef="let row">
                     <!-- <span *ngIf="row.ThresholdValue3 >= row.ThresholdValue4"> >= {{row.ThresholdValue4}}% </span>
                     <span *ngIf="row.ThresholdValue3 < row.ThresholdValue4"> <= {{row.ThresholdValue4}}%</span> -->
-                    <span>{{row.ThresholdValue4 <= row.ThresholdValue5 ? '>=' : '<=' }} {{row.ThresholdValue4}}%</span>
+                    <span>{{row.ThresholdValue4 <= row.ThresholdValue5 ? '>=' : '<=' }} {{ row.ThresholdValue4 | kriThresholdSuffix : row.ThresholdType }}</span>
                   </td>
             </ng-container>
             <ng-container matColumnDef="thresholdvalue-5">
@@ -162,7 +191,7 @@
                         </div>
                     </div>
                 </th>
-                <td mat-cell *matCellDef="let row"> ={{row.ThresholdValue5}}%
+                <td mat-cell *matCellDef="let row"> ={{ row.ThresholdValue5 | kriThresholdSuffix : row.ThresholdType }}
 
                 </td>
             </ng-container>
@@ -175,48 +204,52 @@
                     <button (click)="deleteList(row.MetricID)" mat-icon-button *ngIf="row.StatusID!=5">
                         <mat-icon aria-hidden="false" aria-label="Delete" fontIcon="delete"></mat-icon>
                     </button>
-                </td>>
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="header-row-1">
-                <th mat-header-cell *matHeaderCellDef style="text-align: center;" [attr.rowspan]="2" [attr.colspan]="1">#</th>>
+                <th mat-header-cell *matHeaderCellDef style="text-align: center;" [attr.rowspan]="2" [attr.colspan]="1">#</th>
             </ng-container>
             <ng-container matColumnDef="header-row-9">
-                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">KRI Code</th>>
+                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">KRI Code</th>
             </ng-container>
             <ng-container matColumnDef="header-row-2">
-                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">Group</th>>
+                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">Department</th>
             </ng-container>
             <ng-container matColumnDef="header-row-3">
-                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">Unit</th>>
+                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">Unit</th>
             </ng-container>
+            <!-- NEW: header for Inherent Risk -->
+            <ng-container matColumnDef="header-row-3a">
+            <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">Inherent Risk</th>
+            </ng-container>            
             <ng-container matColumnDef="header-row-4">
-                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">Key Risk Indicator</th>>
+                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">Key Risk Indicator</th>
             </ng-container>
             <ng-container matColumnDef="header-row-5">
-                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">Measurement Frequency</th>>
+                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">Measurement<br>Frequency</th>
             </ng-container>
             <ng-container matColumnDef="header-row-6">
-                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">Reporting Frequency</th>>
+                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">Reporting<br>Frequency</th>
             </ng-container>
             <ng-container matColumnDef="header-row-7">
-                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">Target</th>>
+                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">Target</th>
             </ng-container>
             <ng-container matColumnDef="header-row-8">
-                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">KRI Type</th>>
+                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">KRI Type</th>
             </ng-container>
             <ng-container matColumnDef="header-row-second-group">
                 <th mat-header-cell *matHeaderCellDef style="text-align: center;" [attr.colspan]="5"
-                    [ngStyle]="{'border-bottom':'none'}">Threshold Value </th>>
+                    [ngStyle]="{'border-bottom':'none'}">Threshold Value </th>
             </ng-container>
             <ng-container matColumnDef="header-row-third-group">
-                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1">Action</th>>
+                <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" [attr.colspan]="1" style="min-width: 7em;">Action</th>
             </ng-container>
 
             <tr mat-header-row
-                *matHeaderRowDef="['header-row-1','header-row-9','header-row-2','header-row-3','header-row-4','header-row-5','header-row-6','header-row-7','header-row-8', 'header-row-second-group', 'header-row-third-group']">
-            </tr>>
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>>
+                *matHeaderRowDef="['header-row-1','header-row-9','header-row-2','header-row-3','header-row-3a','header-row-4','header-row-5','header-row-6','header-row-7','header-row-8', 'header-row-second-group', 'header-row-third-group']">
+            </tr>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;">
             <tr>
         </table>

@@ -7,6 +7,7 @@ import { MatModule } from 'src/app/modules/mat/mat.module';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ColorPickerModule } from 'ngx-color-picker';
+import { CoresharedModule } from 'src/app/core-shared/coreshared.module';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { ColorPickerModule } from 'ngx-color-picker';
     MatModule,
     MatGridListModule,
     FlexLayoutModule,
-    ColorPickerModule
+    ColorPickerModule,
+    CoresharedModule
   ],
   exports:[MasterInherentRiskComponent]
 })

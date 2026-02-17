@@ -84,17 +84,17 @@ export class ProcessComponent implements OnInit {
                 "result": {
                     "recordset": [
                         {
-                            "Name": "Low Risk",
+                            "Name": "Low",
                             "IsActive": "1",
                             "ProcessID": 1
                         },
                         {
-                            "Name": "Moderate Risk",
+                            "Name": "Moderate",
                             "IsActive": "0",
                             "ProcessID": 2
                         },
                         {
-                            "Name": "High Risk",
+                            "Name": "High",
                             "IsActive": "0",
                             "ProcessID": 3
                         }
@@ -177,8 +177,8 @@ export class ProcessComponent implements OnInit {
                 else
                     this.saveerror = res.error.errorMessage;
             }
-            error:
-            console.log("err::", "error");
+            error: (err: any) =>
+            console.log("err::", err);
         });
     }
 
@@ -217,8 +217,8 @@ export class ProcessComponent implements OnInit {
                     else
                         this.saveerror = res.error.errorMessage;
                 }
-                error:
-                console.log("err::", "error");
+                error: (err: any) =>
+                console.log("err::", err);
             });
         }
 
@@ -276,8 +276,8 @@ export class ProcessComponent implements OnInit {
                 else
                     this.saveerror = res.error.errorMessage;
             }
-            error:
-            console.log("err::", "error");
+            error: (err: any) =>
+            console.log("err::", err);
         });
         console.log(obj);
     }

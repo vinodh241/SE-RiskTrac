@@ -91,7 +91,14 @@
                     </ng-container>
                     <ng-container matColumnDef="criticality">
                         <th mat-header-cell *matHeaderCellDef> Criticality </th>
-                        <td mat-cell *matCellDef="let row;"> {{row.CriticalityName}} </td>
+                        <td mat-cell *matCellDef="let row;"> 
+                            {{row.CriticalityName}}
+                            <mat-icon *ngIf="getCriticalityDescription(row.CriticalityName)" 
+                                class="criticality-info-icon"
+                                [matTooltip]="getCriticalityDescription(row.CriticalityName)"
+                                matTooltipPosition="right"
+                                matTooltipClass="criticality-tooltip">info_outline</mat-icon>
+                        </td>
                     </ng-container>
                     <ng-container matColumnDef="incidentStatus">
                         <th mat-header-cell *matHeaderCellDef> Incident Status </th>

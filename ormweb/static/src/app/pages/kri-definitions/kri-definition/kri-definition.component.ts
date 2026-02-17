@@ -6,6 +6,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { DOCUMENT } from '@angular/common';
 import { UtilsService } from 'src/app/services/utils/utils.service';
 import { InfoComponent } from 'src/app/includes/utilities/popups/info/info.component';
+import { KRI_THRESHOLD_TYPE } from 'src/app/core-shared/commonFunctions';
 
 @Component({
     selector: 'app-kri-definition',
@@ -22,16 +23,19 @@ export class KriDefinitionComponent implements OnInit {
     thresholdValue5: any;
     target: any[] = [{ Idx: 1, value: '0%', target: 0 }, { Idx: 2, value: '100%', target: 100 }];
     saveerror: any;
-    isMax= false;
+    isMax = false;
     kriData: any = this.data.row
     units: any;
     maxValue: any;
     minValue: any;
     defineKRIForm!: FormGroup
-    allMasterEmail: any=[];
+    allMasterEmail: any = [];
     emailFrequency: any;
-    isError:boolean =false;
-    equalsCheck: boolean =false;
+    isError: boolean = false;
+    equalsCheck: boolean = false;
+    inherentRisks:any[] = [];
+    /** Threshold type for display: PERCENTAGE shows '%', NUMBER shows value only. Default PERCENTAGE for existing KRIs. */
+    thresholdType: 'PERCENTAGE' | 'NUMBER' = 'PERCENTAGE';
     constructor(
         public service: KriService,
         public utils: UtilsService,
@@ -47,31 +51,45 @@ export class KriDefinitionComponent implements OnInit {
         this.defineKRIForm = this.fb.group({
             groupID: ["", Validators.required],
             unitID: ["", Validators.required],
+            inherentRisk: [""],
             keyRiskIndicator: ["", Validators.required],
             measurementFrequencyID: ["", Validators.required],
             typeID: ["", Validators.required],
             value4: ["", Validators.required],
             value3: ["", Validators.required],
             value2: ["", Validators.required],
-            minimum:  ["", Validators.required],
+            minimum: ["", Validators.required],
             maximum: ["", Validators.required]
         })
-        this.service.getKriMaster()
-        this.service.gotMaster.subscribe(value => {
-            if(value)
-         this.allMasterEmail = this.service.master.emailData
-         
-        if(this.allMasterEmail.length){
-            this.emailFrequency = this.allMasterEmail.filter((ele:any) => this.data.reportingFrequencies.FrequencyID == ele.EmailFrequencyID  )
-        }
-   
-        })
-         this.defineKRIForm.get("maximum")?.value
-         this.defineKRIForm.get("minimum")?.value
+
+        // Run init as async flow
+        this.initData();
+
+        this.defineKRIForm.get("maximum")?.value
+        this.defineKRIForm.get("minimum")?.value
         this.getEdited()
         this.minimize()
         this.defineKRIForm.get('maximum')?.valueChanges.subscribe(() => this.onMinMaxRange());
         this.defineKRIForm.get('minimum')?.valueChanges.subscribe(() => this.onMinMaxRange());
+    }
+
+    private async initData() {
+        await this.service.getKriMaster();
+        this.service.gotMaster.subscribe(value => {
+            if (value) {
+                this.allMasterEmail = this.service.master.emailData;
+                this.inherentRisks = this.service.inherentRisks;
+                // console.log('this.inherentRisks::', this.inherentRisks);
+
+                if (this.allMasterEmail.length) {
+                    this.emailFrequency = this.allMasterEmail.filter(
+                        (ele: any) =>
+                            this.data.reportingFrequencies.FrequencyID === ele.EmailFrequencyID
+                    );
+                }
+            }
+        });
+
     }
 
     onMinMaxRange() {
@@ -97,6 +115,11 @@ export class KriDefinitionComponent implements OnInit {
         } else {
             this.selection = 1
         }
+        if (this.kriData?.ThresholdType === KRI_THRESHOLD_TYPE.NUMBER) {
+            this.thresholdType = 'NUMBER';
+        } else {
+            this.thresholdType = 'PERCENTAGE';
+        }
     }
 
     getKriCode(): any {
@@ -108,8 +131,14 @@ export class KriDefinitionComponent implements OnInit {
         }
     }
 
+
+
     filteredAddUnits() {
         return this.data.units.filter((unit: any) => unit.GroupID === this.defineKRIForm.value.groupID);
+    }
+
+    filteringEditUnits(): any {
+        return this.data.units.filter((unit: any) => unit.GroupID === this.filterGroupsId(this.defineKRIForm.value.groupID));
     }
 
     filterGroupsId(data: any): any {
@@ -117,8 +146,17 @@ export class KriDefinitionComponent implements OnInit {
         return groupId[0].GroupID
     }
 
-    filteringEditUnits(): any {
-        return this.data.units.filter((unit: any) => unit.GroupID === this.filterGroupsId(this.defineKRIForm.value.groupID));
+    filteredAddInherentRisk() {
+        return this.inherentRisks.filter((inherentRisk: any) => inherentRisk.UnitID === this.defineKRIForm.value.unitID);
+    }
+
+    filteringEditInherentRisk() {
+        return this.inherentRisks.filter((inherentRisk: any) => inherentRisk.UnitID === this.filterUnitsId(this.defineKRIForm.value.unitID));
+    }
+
+    filterUnitsId(data: any): any {
+        let unitId: any[] = this.data.units.filter((unit: any) => unit.UnitID === this.defineKRIForm.value.unitID);
+        return unitId[0].UnitID
     }
 
     colors: any = {
@@ -151,32 +189,52 @@ export class KriDefinitionComponent implements OnInit {
     getIncrement(data: any): any {
         return data + 1
     }
-    getMin(min: any,max:any): any {
+    getMin(min: any, max: any): any {
         let val = min < max ? min : max;
         // console.log(' getMin  val:   '+val)
         return val;
     }
-    getMax(min: any,max:any): any {
+    getMax(min: any, max: any): any {
         let val = min > max ? min : max;
         // console.log(' getMax  val:   '+val)
         return val;
+    }
+
+    /** Effective min for threshold values: 0 when Percentage, else min of target range. */
+    getThresholdMin(): number {
+        if (this.thresholdType === 'PERCENTAGE') {
+            return 0;
+        }
+        const min = this.defineKRIForm.get('minimum')?.value;
+        const max = this.defineKRIForm.get('maximum')?.value;
+        return Number(this.getMin(min, max));
+    }
+
+    /** Effective max for threshold values: 100 when Percentage, else max of target range. */
+    getThresholdMax(): number {
+        if (this.thresholdType === 'PERCENTAGE') {
+            return 100;
+        }
+        const min = this.defineKRIForm.get('minimum')?.value;
+        const max = this.defineKRIForm.get('maximum')?.value;
+        return Number(this.getMax(min, max));
     }
 
     getDecrement(data: any): any {
         return data - 1
     }
 
-    getError(max: any, min: any, val: any): any {        
+    getError(max: any, min: any, val: any): any {
         if (min < max) {
             if (val < min || val > max) {
                 return 'Please enter the value in the range (' + min + '-' + max + ')';
             }
         }
-        if (min > max) { 
+        if (min > max) {
             if (val > min || val < max) {
                 return 'Please enter the value in the range (' + max + '-' + min + ')';
             }
-        }       
+        }
     }
 
     showError(): any {
@@ -184,7 +242,7 @@ export class KriDefinitionComponent implements OnInit {
         let t4 = this.showErrorThreshold4();
         let t2 = this.showErrorThreshold2();
         let resp = ((t2 || t3 || t4))
-        console.log('✌️resp --->', resp);
+        // console.log('✌️resp --->', resp);
         return resp;
     }
 
@@ -196,49 +254,59 @@ export class KriDefinitionComponent implements OnInit {
                 this.defineKRIForm.get('value3')?.value >= this.defineKRIForm.get('value2')?.value) ||
             (this.defineKRIForm.get('minimum')?.value < this.defineKRIForm.get('maximum')?.value &&
                 this.defineKRIForm.get('value3')?.touched &&
-               
+
                 this.defineKRIForm.get('value3')?.value <= this.defineKRIForm.get('value2')?.value);
         return threshold3Error;
 
     }
 
-    showErrorForEqualvalues(min:any, max:any): any {     
-        if (min == max ) {
+    showErrorForEqualvalues(min: any, max: any): any {
+        if (min == max) {
             this.equalsCheck = true;
-            return 'Min and Max values cannot be the same'   ;       
-        } 
-        else if (min < 0 || max < 0 || min > 100 || max >100  ) {
+            return 'Min and Max values cannot be the same';
+        }
+        const minNum = min !== '' && min !== null && min !== undefined ? Number(min) : NaN;
+        const maxNum = max !== '' && max !== null && max !== undefined ? Number(max) : NaN;
+        // Min must be <= Max for both NUMBER and PERCENTAGE
+        if (!isNaN(minNum) && !isNaN(maxNum) && minNum > maxNum) {
             this.equalsCheck = true;
-            return 'Please enter the values in the range of 0 - 100';       
-        }   
-        else {
+            return 'Minimum Target must be less than or equal to Maximum Target';
+        }
+        if (this.thresholdType === 'NUMBER') {
             this.equalsCheck = false;
             return '';
-        }               
+        }
+        // PERCENTAGE: also enforce 0–100 range
+        if (min < 0 || max < 0 || min > 100 || max > 100) {
+            this.equalsCheck = true;
+            return 'Please enter the values in the range of 0 - 100';
+        }
+        this.equalsCheck = false;
+        return '';
     }
-    
+
     showErrorThreshold2(): any {
         const minimum = this.defineKRIForm.get('minimum')?.value;
         const maximum = this.defineKRIForm.get('maximum')?.value;
         const value2 = this.defineKRIForm.get('value2')?.value;
-    
-        const threshold2Error = 
+
+        const threshold2Error =
             (minimum > maximum && this.defineKRIForm.get('value2')?.touched && value2 >= this.defineKRIForm.get('value1')?.value) ||
             (minimum < maximum && this.defineKRIForm.get('value2')?.touched && value2 <= this.defineKRIForm.get('value1')?.value);
-        
+
         return threshold2Error;
     }
-    
+
     showErrorThreshold4(): any {
         const minimum = this.defineKRIForm.get('minimum')?.value;
         const maximum = this.defineKRIForm.get('maximum')?.value;
         const value4 = this.defineKRIForm.get('value4')?.value;
         const value3 = this.defineKRIForm.get('value3')?.value;
-    
+
         const threshold4Error =
             (minimum > maximum && this.defineKRIForm.get('value4')?.touched && value4 >= value3) ||
             (minimum < maximum && this.defineKRIForm.get('value4')?.touched && value4 <= value3) || maximum == value4;
-        
+
         return threshold4Error;
     }
 
@@ -259,12 +327,14 @@ export class KriDefinitionComponent implements OnInit {
             "thresholdValue3": this.defineKRIForm.value.value3,
             "thresholdValue2": this.defineKRIForm.value.value2,
             "thresholdValue1": this.defineKRIForm.value.minimum,
-            "emailfrequencyID": this.emailFrequency[0].EmailFrequencyID
+            "emailfrequencyID": this.emailFrequency[0].EmailFrequencyID,
+            "InherentRiskID"  : this.defineKRIForm.value.inherentRisk,
+            "thresholdType"    : this.thresholdType
         }
         this.service.setKri(data)
     }
 
-    cancelPopup():any{
+    cancelPopup(): any {
         this.dialog.closeAll();
     }
 }

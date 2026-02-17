@@ -5,7 +5,6 @@ import { RestService } from '../../rest/rest.service';
   providedIn: 'root'
 })
 export class GroupService extends RestService {
-
   getActive() {
     return this.post("/rcsa/group/get-all-active-group-data", {});
   }

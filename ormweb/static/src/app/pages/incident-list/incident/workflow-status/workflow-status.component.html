@@ -101,5 +101,6 @@
         <mat-grid-tile colspan="9"><label style="width: 100%;font-weight: bold;">Next Workflow Action By:<span style="margin-left: 2vh;font-weight: 400;"> {{service.incident?.WorkflowActionBy}}</span></label></mat-grid-tile>
         <mat-grid-tile colspan="1"><label style="width: 100%;"></label></mat-grid-tile>
     </mat-grid-list>
-    <p style="color: #AAAAAA;" *ngIf="service.incident?.StatusCode==6 && disable(0) && service.incident.Approver">The button is enabled when all recommendations are closed</p>
+    <!-- ZRA-113: Dynamic message based on who can close the incident (Reviewer or Approver from DB) -->
+    <p style="color: #AAAAAA;" *ngIf="service.incident?.StatusCode==6 && disable(0) && (service.incident.Reviewer || service.incident.Approver)">The button is enabled when all recommendations are closed</p>
 </mat-card>

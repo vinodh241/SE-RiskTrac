@@ -18,11 +18,7 @@
                 <label>Year<span style="color: red;">*</span></label>
                 <mat-form-field appearance="outline">
                     <mat-label>Year</mat-label>
-                    <!-- <mat-select [disabled]="copy.mode==='edit'" [formControl]="year"> -->
-                        <!-- <mat-option selected="true" [value]="changeData()">{{changeData()}}</mat-option> -->
-                        <!-- <mat-option *ngFor="let y of years" [value]="y">{{y}}</mat-option> -->
-                    <!-- </mat-select> -->
-                    <mat-select [formControl]="year"  [disabled]="copy.StatusID == 2 || copy.StatusID == 3  || copy.StatusID == 4 ">
+                    <mat-select matSelectSearch placeholder="Search year..." [formControl]="year"  [disabled]="copy.StatusID == 2 || copy.StatusID == 3  || copy.StatusID == 4 ">
                         <mat-option *ngFor="let y of years" [value]="y.Year">{{y.Year}}</mat-option>
                     </mat-select>
                 </mat-form-field>
@@ -32,12 +28,7 @@
                 <label>Quarter<span style="color: red;">*</span></label>
                 <mat-form-field appearance="outline">
                     <mat-label>Quarter</mat-label>
-                    <!-- <mat-select [disabled]="copy.mode==='edit'" [formControl]="quater" (selectionChange)="resetValue()"> -->
-                        <!-- <mat-option>None</mat-option> -->
-                        <!-- <mat-option *ngFor="let q of quatersz" [value]="q.Quater">{{q.Quater}}</mat-option> -->
-                    <!-- </mat-select> -->
-                    <mat-select [formControl]="quater" (selectionChange)="resetValue($event)" [disabled]="copy.StatusID ==2 || copy.StatusID ==3 || copy.StatusID ==4">
-                        <!-- <mat-option>None</mat-option> -->
+                    <mat-select matSelectSearch placeholder="Search quarter..." [formControl]="quater" (selectionChange)="resetValue($event)" [disabled]="copy.StatusID ==2 || copy.StatusID ==3 || copy.StatusID ==4">
                         <mat-option *ngFor="let q of filterquarter" [value]="q.Quater">{{q.Quater}}</mat-option>
                     </mat-select>
                 </mat-form-field>

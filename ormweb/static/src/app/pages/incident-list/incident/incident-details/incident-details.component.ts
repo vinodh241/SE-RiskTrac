@@ -15,10 +15,6 @@ import { environment } from 'src/environments/environment';
     styleUrls: ['./incident-details.component.scss']
 })
 export class IncidentDetailsComponent implements OnInit, OnDestroy {
-    // myFilter = (d: Date | null): boolean => {
-    //     const day = (d || new Date()).getDay();
-    //     return day !== 0 && day !== 6;
-    //   }
     @Output() close: EventEmitter<boolean> = new EventEmitter();
     maxDate!: Date;
     incidentForm = this.fb.group({
@@ -31,8 +27,11 @@ export class IncidentDetailsComponent implements OnInit, OnDestroy {
         incidentTitle: ['', Validators.required],
         recommendedAction: ['', Validators.required],
         actionTaken: ['', Validators.required],
-        rca : ['', Validators.required],
-        lossAmount: [''],
+        rca: ['', Validators.required],
+        DirectLoss: [0],
+        IndirectLoss: [0],
+        Recoveries: [0],
+        lossAmount: [0],
         identificationDate: [''],
         partyDetails: [''],
         criticality: ['', Validators.required],
@@ -41,10 +40,19 @@ export class IncidentDetailsComponent implements OnInit, OnDestroy {
         lossCategory: ['']
     });
     reportingDate!: string;
-    incident: any = { "IncidentCode": "", "GroupID": -1 };
+    // incident: any = { "IncidentCode": "", "GroupID": -1 };
+    incident: any = { DirectLoss: 0, IndirectLoss: 0, Recoveries: 0, lossAmount: 0, IncidentCode: "", GroupID: -1 };
+
     isUnitValid = true;
-    isSaved:boolean = false
-    currency: any= environment.currency || '';
+    isSaved: boolean = false
+    currency: any = environment.currency || '';
+    
+    // Unit allocation state
+    selectedUnitId: number | null = null;
+    newLossPercent: number | null = null;
+    editingIndex: number | null = null;
+    editingLossValue: number | null = null;
+    totalExceeds100: boolean = false;
 
     constructor(
         private fb: FormBuilder,
@@ -58,7 +66,7 @@ export class IncidentDetailsComponent implements OnInit, OnDestroy {
         service.gotInfo.subscribe(value => {
             if (value == true) {
                 let units = service.info?.units.filter((unit: any) => unit.UnitID == service.info.currentUserData[0].UnitIDs[0])
-                console.log("🚀 ~ IncidentDetailsComponent ~ service.info:", service.info)
+                // console.log("🚀 ~ IncidentDetailsComponent ~ service.info:", service.info)
                 if (this.incident.IncidentCode == "" && units.length > 0) {
                     this.incident.GroupID = units[0].GroupID
                     this.incident.UnitID = units[0].UnitID
@@ -70,6 +78,8 @@ export class IncidentDetailsComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.reportingDate = formatDate(Date.now(), 'dd-MMM-yyyy', 'en');
+        // Check total on initialization
+        setTimeout(() => this.checkTotalExceeds100(), 100);
     }
 
     ngOnDestroy(): void {
@@ -88,9 +98,9 @@ export class IncidentDetailsComponent implements OnInit, OnDestroy {
         this.isSaved = true
         let evidenceIDs: number[] = []
         if (!this.validateLossValue()) {
-            this.popupInfo();
+            this.popupInfo(`Please select the impacted units along with the loss percentage, Total Loss% should be 100`);;
         }
-        else{
+        else {
             if (this.service.incEvidences && this.service.incEvidences.data.length > 0) {
                 this.service.incEvidences.data.forEach(evd => {
                     evidenceIDs.push(evd.EvidenceID)
@@ -120,6 +130,9 @@ export class IncidentDetailsComponent implements OnInit, OnDestroy {
                 "rca": this.incidentForm.value.rca,
                 "incidentTypeIDs": this.service.info.incidentTypes.filter((type: any) => type.checked).map((type: any) => type.TypeID).toString() || null,
                 "incidentSourceID": this.incidentForm.value.incidentSource,
+                "DirectLoss": this.incidentForm.value.DirectLoss,
+                "IndirectLoss": this.incidentForm.value.IndirectLoss,
+                "Recoveries": this.incidentForm.value.Recoveries,
                 "lossAmount": this.incidentForm.value.lossAmount,
                 "identificationDate": this.incidentForm.value.identificationDate,
                 "aggPartyDetails": this.incidentForm.value.partyDetails,
@@ -143,6 +156,9 @@ export class IncidentDetailsComponent implements OnInit, OnDestroy {
             unit.checked = false
             unit.LossValue = null
         })
+        // Reset unit allocation form state
+        this.clearAddForm();
+        this.cancelEdit();
     }
 
     edit() {
@@ -165,52 +181,44 @@ export class IncidentDetailsComponent implements OnInit, OnDestroy {
             })
         })
         this.incident = JSON.parse(JSON.stringify(this.service.incident))
+      //  // console.log('edit-this.incident::', this.incident);
         this.service.isIncidentEditable = true
+        
+        // Reset unit allocation form state
+        this.clearAddForm();
+        this.cancelEdit();
+        
+        // Validate unit allocation after restoring data
+        this.isUnitValid = this.validateLossValue();
     }
 
     getLossTotal(): number {
         let lossTotal = 0
         if (this.service.info) {
-            let losses = this.service.info.units.map((loss: any) => Number(loss.LossValue) || 0)
+            // Only sum LossValue from checked units
+            let losses = this.service.info.units
+                .filter((loss: any) => loss.checked)
+                .map((loss: any) => Number(loss.LossValue) || 0)
             lossTotal = losses.reduce((sum: number, val: number) => sum + val, 0)
-            // if(this.incidentForm.value.lossAmount == undefined || this.incidentForm.value.lossAmount == ''){
-            //     this.isUnitValid = true;
-            // }
-            // else{
-            //     if(lossTotal == 100){
-            //         this.isUnitValid = true;
-            //     }
-            //     else{
-            //         this.isUnitValid = false;
-            //     }
-            // }
+        }
+        return lossTotal
+    }
+    
+    getLossTotalWithoutCheck(): number {
+        // Helper method to get total without triggering check (to avoid recursion)
+        let lossTotal = 0
+        if (this.service.info) {
+            let losses = this.service.info.units
+                .filter((loss: any) => loss.checked)
+                .map((loss: any) => Number(loss.LossValue) || 0)
+            lossTotal = losses.reduce((sum: number, val: number) => sum + val, 0)
         }
         return lossTotal
     }
 
-    validateLossValue(): boolean {
-        let checks = []
-        let vLossValue: boolean;
-        let lossTotal = 0
-        if (this.service.info) {
-            checks = this.service.info.units.filter((loss: any) => loss.checked)
-            let losses = this.service.info.units.map((loss: any) => Number(loss.LossValue) || 0)
-            lossTotal = losses.reduce((sum: number, val: number) => sum + val, 0)
-        }
-        if (this.incident.LossAmount && Number(this.incident.LossAmount) > 0)
-            vLossValue = lossTotal == 100
-        else {
-            // if (checks.length > 0)
-            //     this.isUnitValid = lossTotal == 100
-            // else
-            vLossValue = true
-        }
-        return vLossValue
-    }
-
     filteredUnits(groupID: any) {
-        // console.log('groupID: ', groupID);
-        // console.log("this.incidentForm.value.unitName",this.incidentForm.value.unitName)
+        // // console.log('groupID: ', groupID);
+        // // console.log("this.incidentForm.value.unitName",this.incidentForm.value.unitName)
         return this.service.info?.units.filter((unit: any) => unit.GroupID == groupID)
     }
 
@@ -236,51 +244,320 @@ export class IncidentDetailsComponent implements OnInit, OnDestroy {
         this.close.emit(true);
     }
 
-    onChangeSAR() {
+    onChangeSAR(changedField?: string) {
+        // Ensure values are non-negative
+        let direct = this._clampToNonNegative(Number(this.incidentForm.value.DirectLoss || 0));
+        let indirect = this._clampToNonNegative(Number(this.incidentForm.value.IndirectLoss || 0));
+        let recoveries = this._clampToNonNegative(Number(this.incidentForm.value.Recoveries || 0));
+        let manualLoss = this._clampToNonNegative(Number(this.incidentForm.value.lossAmount || 0));
+
+        // Clamp negative → 0 and sync form values
+        this._syncField('DirectLoss', direct);
+        this._syncField('IndirectLoss', indirect);
+        this._syncField('Recoveries', recoveries);
+        this._syncField('lossAmount', manualLoss);
+
+        // Recoveries should not exceed Direct + Indirect
+        const sum = direct + indirect;
+        if (recoveries > sum) {
+            recoveries = sum;
+            this._syncField('Recoveries', recoveries);
+            this.popupInfo(`Recoveries cannot exceed Direct + Indirect Loss (${sum}). Value adjusted.`);
+        }
+
+        // Recalculate LossAmount
+        let calculatedLoss = sum - recoveries;
+        if (calculatedLoss < 0) calculatedLoss = 0;
+
+        // If user changed lossAmount manually, validate
+        if (changedField === 'lossAmount') {
+            if (manualLoss !== calculatedLoss) {
+                this.popupInfo(`Loss Amount must equal (Direct + Indirect) - Recoveries. Adjusted from ${manualLoss} to ${calculatedLoss}.`);
+            }
+        }
+
+        // Always update to calculatedLoss
+        this._syncField('lossAmount', calculatedLoss);
+
+        // Re-validate unit allocation when loss amounts change
         if (!this.validateLossValue()) {
-            this.popupInfo();
+            this.isUnitValid = false;
+            if (calculatedLoss > 0) {
+                this.popupInfo(`Please select the impacted units along with the loss percentage, Total Loss% should be 100`);
+            }
+        } else {
+            this.isUnitValid = true;
         }
     }
 
-    // popupInfo() {
-    //     const timeout = 3000; // 3 seconds
-    //     const confirm = this.dialog.open(AlertComponent, {
-    //       id: "InfoComponent",
-    //       disableClose: false,
-    //       minWidth: "300px",
-    //       panelClass: "my-dialog",
-    //       data: {
-    //         title: '',
-    //         content: `Please select the impacted units along
-    //         with the loss percentage, Total Loss% should be 100`
-    //       }
-    //     });
+    /** Helper to clamp negative values to zero */
+    private _clampToNonNegative(val: number): number {
+        return val < 0 || isNaN(val) ? 0 : val;
+    }
 
-    //     confirm.afterOpened().subscribe((result) => {
-    //       setTimeout(() => {
-    //         confirm.close();
-    //         // this.router.navigate(['']);
-    //       }, timeout)
-    //     });
-    //   }
+    /** Helper to sync form + incident object */
+    private _syncField(field: string, value: number) {
+        this.incident[field] = value;
+        if (this.incidentForm.get(field)) {
+            this.incidentForm.get(field)!.setValue(value, { emitEvent: false });
+        }
+    }
 
-    popupInfo() {
+
+    validateLossValue(): boolean {
+        let checks = []
+        let vLossValue: boolean;
+        let lossTotal = 0
+        if (this.service.info) {
+            checks = this.service.info.units.filter((loss: any) => loss.checked)
+            // Only sum LossValue from checked units
+            let losses = this.service.info.units
+                .filter((loss: any) => loss.checked)
+                .map((loss: any) => Number(loss.LossValue) || 0)
+            lossTotal = losses.reduce((sum: number, val: number) => sum + val, 0)
+        }
+        // Check form's lossAmount value (which is calculated from DirectLoss + IndirectLoss - Recoveries)
+        const lossAmount = Number(this.incidentForm.value.lossAmount) || Number(this.incident.LossAmount) || 0;
+        if (lossAmount > 0)
+            vLossValue = lossTotal == 100
+        else {
+            vLossValue = true
+        }
+        return vLossValue
+    }
+
+    popupInfo(content: string) {
         const dialogRef = this.dialog.open(AlertComponent, {
             width: '250px',
             panelClass: "dark",
             data: {
                 title: '',
-                content: `Please select the impacted units along
-                with the loss percentage, Total Loss% should be 100`
+                content: content
             }
-          });
+        });
 
-          dialogRef.afterClosed().subscribe(result => {
-            console.log('The dialog was closed');
-          });
-      }
-      selectedUnit(event: any, incident: any) {
-        console.log("Clicked mat-select", event, incident);
+        dialogRef.afterClosed().subscribe(result => {
+            // console.log('The dialog was closed');
+        });
+    }
+    selectedUnit(event: any, incident: any) {
+        // console.log("Clicked mat-select", event, incident);
         incident.UnitID = ""
+    }
+
+    // Unit allocation methods
+    getAvailableUnits(): any[] {
+        if (!this.service.info?.units) return [];
+        return this.service.info.units.filter((unit: any) => !unit.checked);
+    }
+
+    getAllocatedUnits(): any[] {
+        if (!this.service.info?.units) return [];
+        return this.service.info.units.filter((unit: any) => unit.checked);
+    }
+
+    canAddUnit(): boolean {
+        if (!this.selectedUnitId || this.newLossPercent === null || this.newLossPercent === undefined) {
+            return false;
+        }
+        const lossValue = Number(this.newLossPercent);
+        if (isNaN(lossValue) || lossValue <= 0) {
+            return false;
+        }
+        
+        // Check if adding this value would exceed 100%
+        const currentTotal = this.getLossTotalWithoutCheck();
+        const newTotal = currentTotal + lossValue;
+        return newTotal <= 100;
+    }
+    
+    getTotalLossPercentage(): number {
+        return this.getLossTotal();
+    }
+    
+    checkTotalExceeds100(): boolean {
+        const total = this.getLossTotalWithoutCheck();
+        this.totalExceeds100 = total > 100;
+        return this.totalExceeds100;
+    }
+    
+    validateNewLossPercent(): void {
+        // This method is called on input change to provide real-time feedback
+        // The canAddUnit() method already checks if total would exceed 100%
+        if (this.newLossPercent !== null && this.newLossPercent !== undefined) {
+            const lossValue = Number(this.newLossPercent);
+            if (!isNaN(lossValue) && lossValue > 0) {
+                const currentTotal = this.getLossTotalWithoutCheck();
+                const newTotal = currentTotal + lossValue;
+                // Validation is handled by canAddUnit() and mat-error in template
+            }
+        }
+        // Update total exceeds check
+        this.checkTotalExceeds100();
+    }
+    
+    validateEditLossPercent(index: number): void {
+        // Real-time validation for edit mode
+        // The wouldExceed100OnEdit() method checks if saving would exceed 100%
+        this.checkTotalExceeds100();
+    }
+    
+    wouldExceed100OnEdit(index: number): boolean {
+        if (this.editingIndex === null || this.editingLossValue === null || this.editingLossValue === undefined) {
+            return false;
+        }
+        
+        const lossValue = Number(this.editingLossValue);
+        if (isNaN(lossValue) || lossValue < 0) {
+            return false;
+        }
+        
+        const allocatedUnits = this.getAllocatedUnits();
+        if (index >= 0 && index < allocatedUnits.length) {
+            const unit = allocatedUnits[index];
+            const currentTotal = this.getLossTotalWithoutCheck();
+            const currentUnitLoss = Number(unit.LossValue) || 0;
+            const newTotal = currentTotal - currentUnitLoss + lossValue;
+            return newTotal > 100;
+        }
+        return false;
+    }
+
+    addUnit(): void {
+        if (!this.canAddUnit() || !this.service.info?.units) {
+            const lossValue = Number(this.newLossPercent);
+            if (!isNaN(lossValue) && lossValue > 0) {
+                const currentTotal = this.getLossTotalWithoutCheck();
+                const newTotal = currentTotal + lossValue;
+                if (newTotal > 100) {
+                    this.popupInfo(`Cannot add unit. Total Loss % would exceed 100% (Current: ${currentTotal}% + New: ${lossValue}% = ${newTotal}%)`);
+                }
+            }
+            return;
+        }
+
+        const unit = this.service.info.units.find((u: any) => u.UnitID === this.selectedUnitId);
+        if (unit) {
+            unit.checked = true;
+            unit.LossValue = Number(this.newLossPercent);
+            this.clearAddForm();
+            
+            // Check if total exceeds 100%
+            this.checkTotalExceeds100();
+            
+            // Trigger validation check
+            if (!this.validateLossValue()) {
+                this.isUnitValid = false;
+            } else {
+                this.isUnitValid = true;
+            }
+        }
+    }
+
+    clearAddForm(): void {
+        this.selectedUnitId = null;
+        this.newLossPercent = null;
+    }
+
+    startEdit(index: number): void {
+        const allocatedUnits = this.getAllocatedUnits();
+        if (index >= 0 && index < allocatedUnits.length) {
+            this.editingIndex = index;
+            this.editingLossValue = allocatedUnits[index].LossValue;
+        }
+    }
+
+    saveEdit(index: number): void {
+        if (this.editingIndex === null || this.editingLossValue === null || this.editingLossValue === undefined) {
+            return;
+        }
+
+        const lossValue = Number(this.editingLossValue);
+        if (isNaN(lossValue) || lossValue < 0) {
+            this.popupInfo('Loss % must be a valid number');
+            return;
+        }
+
+        const allocatedUnits = this.getAllocatedUnits();
+        if (index >= 0 && index < allocatedUnits.length) {
+            const unit = allocatedUnits[index];
+            
+            // Check if editing would exceed 100%
+            const currentTotal = this.getLossTotalWithoutCheck();
+            const currentUnitLoss = Number(unit.LossValue) || 0;
+            const newTotal = currentTotal - currentUnitLoss + lossValue;
+            
+            if (newTotal > 100) {
+                this.popupInfo(`Cannot save. Total Loss % would exceed 100% (Current Total: ${currentTotal}%, Changing ${currentUnitLoss}% to ${lossValue}% = ${newTotal}%)`);
+                return;
+            }
+            
+            // Find the unit in service.info.units and update it
+            const serviceUnit = this.service.info.units.find((u: any) => u.UnitID === unit.UnitID);
+            if (serviceUnit) {
+                serviceUnit.LossValue = lossValue;
+            }
+        }
+
+        this.editingIndex = null;
+        this.editingLossValue = null;
+
+        // Check if total exceeds 100%
+        this.checkTotalExceeds100();
+
+        // Trigger validation check
+        if (!this.validateLossValue()) {
+            this.isUnitValid = false;
+        } else {
+            this.isUnitValid = true;
+        }
+    }
+
+    cancelEdit(): void {
+        this.editingIndex = null;
+        this.editingLossValue = null;
+    }
+
+    removeUnit(index: number): void {
+        const allocatedUnits = this.getAllocatedUnits();
+        if (index < 0 || index >= allocatedUnits.length) return;
+
+        const unit = allocatedUnits[index];
+        
+        // If currently editing this row, cancel edit first
+        if (this.editingIndex === index) {
+            this.cancelEdit();
+        }
+
+        // Find the unit in service.info.units and uncheck it
+        const serviceUnit = this.service.info.units.find((u: any) => u.UnitID === unit.UnitID);
+        if (serviceUnit) {
+            serviceUnit.checked = false;
+            serviceUnit.LossValue = null;
+        }
+
+        // Check if total exceeds 100%
+        this.checkTotalExceeds100();
+
+        // Trigger validation check
+        if (!this.validateLossValue()) {
+            this.isUnitValid = false;
+        } else {
+            this.isUnitValid = true;
+        }
+    }
+
+    /**
+     * Get the description for a criticality level by its ID
+     * Used to display info tooltips in the incident details view
+     */
+    getCriticalityDescription(criticalityId: number): string {
+        if (!criticalityId || !this.service.info?.incidentCriticalities) {
+            return '';
+        }
+        const criticality = this.service.info.incidentCriticalities.find(
+            (c: any) => c.CriticalityID === criticalityId
+        );
+        return criticality?.Description || '';
     }
 }

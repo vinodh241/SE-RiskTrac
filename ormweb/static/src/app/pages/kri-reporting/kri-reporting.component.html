@@ -6,9 +6,9 @@
     <div class="actions-container">
         <div class="left-action">
             <div class="form-group">
-                <label class="dropdown-label">Group</label>
+                <label class="dropdown-label">Department</label>
                 <mat-form-field appearance="standard">
-                    <mat-select [(ngModel)]="kriService.kriReportedSelectedGroup" (selectionChange)="onGroupChange()">
+                    <mat-select matSelectSearch placeholder="Search department..." [(ngModel)]="kriService.kriReportedSelectedGroup" (selectionChange)="onGroupChange()">
                         <mat-option value="">All</mat-option>
                         <mat-option *ngFor="let group of getGroupList()" [value]="group.GroupID">{{group.GroupName}}
                         </mat-option>
@@ -18,7 +18,7 @@
             <div class="form-group">
                 <label class="dropdown-label">Unit</label>
                 <mat-form-field appearance="standard">
-                    <mat-select [disabled]="!kriService.kriReportedSelectedGroup"
+                    <mat-select matSelectSearch placeholder="Search unit..." [disabled]="!kriService.kriReportedSelectedGroup"
                         [(ngModel)]="kriService.kriReportedSelectedUnit" (selectionChange)="onUnitChange()"
                         aria-multiline="true">
                         <mat-option value="">All</mat-option>
@@ -120,8 +120,7 @@
                                         <span
                                             [ngClass]="{'threshold-value': item.includes('ThresholdValue'), 'measurement-value': i == 2}"
                                             [ngStyle]="{'background-color': item.includes('ThresholdValue')? element['ColorCode']: ''}">
-                                            {{(i == 1)? (utils.formatDate(element[item])): element[item]}}
-                                            {{(i == 2) && !([undefined, null, ''].includes(element[item]))? '%': ''}}
+                                            {{(i == 1)? (utils.formatDate(element[item])): (i == 2) ? (element[item] | kriThresholdSuffix : element.ThresholdType) : element[item]}}
                                         </span>
                                     </td>
                                 </ng-container>
@@ -137,7 +136,7 @@
                                                 {{((i == 1) || (i == 2) || (i == 3))?  ((element[item] <= (element[thresholdColumns[i + 1]] + 1))? '>=' : '<=') : '' }}
                                                 {{(i == 4) ? '=' : '' }}
                                             </ng-container>
-                                        </ng-container>{{element[item]}}<span *ngIf="element[item] != undefined">%</span>
+                                        </ng-container><ng-container *ngIf="element[item] != undefined">{{element[item] | kriThresholdSuffix : element.ThresholdType}}</ng-container>
                                     </td>
                                 </ng-container>
 

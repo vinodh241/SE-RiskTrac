@@ -86,7 +86,7 @@ export class NotificationsService extends RestService {
         // this.userAlertsData = response.result.UserAlerts;
         // this.notificationsdata = [...this.userAlertsData]
         // this.notificationsdata = response.result;
-        console.log("data in servoce", this.inAppUserNotificationData);
+        // console.log("data in servoce", this.inAppUserNotificationData);
         this.makeNotifications()
     }
 

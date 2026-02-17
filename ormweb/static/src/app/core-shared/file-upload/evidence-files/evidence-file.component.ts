@@ -49,7 +49,7 @@ export class EvidenceFileComponent implements OnInit {
     }
 
     getEvidenceDetails() {
-        console.log("this.uploadFilename", this.uploadFilename)
+        // console.log("this.uploadFilename", this.uploadFilename)
 
         // this.uploadFile.delete('UploadFile');
         if (this.uploader.queue.length > 1) {

@@ -136,7 +136,7 @@ export class KriMeasurementComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        console.log("headers", this.displayedColumns);
+        // console.log("headers", this.displayedColumns);
         this.kriService.getKriMeasurementsNewData(1);
         this.submited = false;
         // if (this.submited == true) {
@@ -243,18 +243,18 @@ export class KriMeasurementComponent implements OnInit {
     }
 
     filterGroups(data: any): any {
-        console.log("data in if", data.value);
+        // console.log("data in if", data.value);
         if (data.value == 'all') {
             this.dataSource.data = this.kriService?.kriMeasurments;
             this.completedata = this.kriService?.kriMeasurments;
             setTimeout(() => this.dataSource.paginator = this.paginator);
         }
         else {
-            console.log("inside else part");
+            // console.log("inside else part");
             let list: any = []
             let service = this.kriService?.kriMeasurments
             this.groupID = data.value
-            console.log("groupId in groups", this.groupID);
+            // console.log("groupId in groups", this.groupID);
             for (let i of this.kriService?.kriMeasurments) {
                 if (i.GroupID == data.value) {
                     list.push(i)
@@ -381,8 +381,8 @@ export class KriMeasurementComponent implements OnInit {
     }
 
     onChangeRemarks(row: any): void {
-        console.log("Remarks: " + row.Remarks)
-        console.log("Measurement: " + row.Measurement)
+        // console.log("Remarks: " + row.Remarks)
+        // console.log("Measurement: " + row.Measurement)
         if (row.Measurement == '' || row.Measurement == null || row.Measurement == undefined || row.Remarks == '' || row.Remarks == null || row.Remarks == undefined) {
             row.StatusName = "Not Measured";
         } else {
@@ -680,7 +680,7 @@ export class KriMeasurementComponent implements OnInit {
                 dbt += 1
             }
         }
-        if (data = null || dbt <= 0) {
+        if (data == null || dbt <= 0) {
             bol = true
         } else {
             bol = false
@@ -725,7 +725,6 @@ export class KriMeasurementComponent implements OnInit {
         let listData: any = []
         let service = this.completedata;
         for (let i in service) {
-            console.log(service[i])
             if (service[i].StatusName === data && service[i].MeasurementFrequency === frequency) {
                 listData.push(service[i])
                 setTimeout(() => this.dataSource.paginator = this.paginator);
@@ -738,7 +737,7 @@ export class KriMeasurementComponent implements OnInit {
     }
 
     measurementFrequencyData(data: any) {
-        console.log(data)
+        // console.log(data)
         this.model = ''
         this.dataSource.filter = " "
         if (this.dataSource.paginator)
@@ -986,8 +985,8 @@ export class KriMeasurementComponent implements OnInit {
                         else
                             this.saveerror = res.error.errorMessage;
                     }
-                    error:
-                    console.log("err::", "error");
+                    error: (err: any) =>
+                    console.log("err::", err);
                 })
             }
         })
@@ -1039,15 +1038,15 @@ export class KriMeasurementComponent implements OnInit {
                         else
                             this.saveerror = res.error.errorMessage;
                     }
-                    error:
-                    console.log("err::", "error");
+                    error: (err: any) =>
+                    console.log("err::", err);
                 })
             }
         })
     }
 
     openDialog(): void {
-        console.log("insdie");
+        // console.log("insdie");
         const dialog = this.dialog.open(KriSendEmailReminderDialogComponent, {
             disableClose: true,
             maxWidth: '50vw',
@@ -1059,7 +1058,7 @@ export class KriMeasurementComponent implements OnInit {
     }
 
     approvedRejectedDetails(event: any, value: string, rowData: any) {
-        console.log("insdie event", event, event.target.checked);
+        // console.log("insdie event", event, event.target.checked);
         if (value == 'rejected') {
             this.dataSource.data.forEach((metric: any) => {
                 if (metric.MetricID == rowData.MetricID) {
@@ -1079,7 +1078,7 @@ export class KriMeasurementComponent implements OnInit {
     saveReviewerDetails(): void {
         let sample: any[] = []
         this.dataSource.data.forEach((metric: any) => {
-            console.log("measurementid", metric)
+            // console.log("measurementid", metric)
             sample.push({
                 "metricID": metric.MetricID,
                 "measurementID": metric.MeasurementIDData,
@@ -1094,7 +1093,7 @@ export class KriMeasurementComponent implements OnInit {
             ],
             "userGUID": "70B7F09A-758A-ED11-BAC5-000C29A8F9E1",
         }
-        console.log("insdie save details", data);
+        // console.log("insdie save details", data);
         this.isReviewedStatus = false;
     }
 

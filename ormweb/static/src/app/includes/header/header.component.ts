@@ -34,15 +34,15 @@ export class HeaderComponent implements OnInit {
     isRiskManagementUnit: boolean = false;
     isPowerUserRole: boolean = false;
     activePage: string = localStorage?.getItem('activePage') || '';
-    totalCount:any
+    totalCount: any
     triggerNotificationService: boolean = false;
     reviewFlag: boolean = false;
     @ViewChild('menuContacts') menuContacts: any;
-    InAppUnreadCount:any
+    InAppUnreadCount: any
     unreadItems: any;
     headerFlag: boolean = false;
     @ViewChild('dropdownMenu') dropdownMenu: ElementRef | undefined;
-    logoutflag:boolean = false;
+    logoutflag: boolean = false;
 
     // @ViewChild(MatMenuTrigger)
     // trigger!: MatMenuTrigger;
@@ -59,7 +59,7 @@ export class HeaderComponent implements OnInit {
         private activatedRoute: ActivatedRoute,
         @Inject(DOCUMENT) private document: any,
         private location: Location,
-        private configScoreRatingService : ConfigScoreRatingService
+        private configScoreRatingService: ConfigScoreRatingService
     ) {
         this.headerFlag = false;
     }
@@ -82,12 +82,12 @@ export class HeaderComponent implements OnInit {
             }
         }
         this.role = localStorage.getItem('rorm') || '';
-        console.log('currentUrl', this.activePage);
+        // console.log('currentUrl', this.activePage);
 
 
-            setTimeout(()=> {
-                this.getNotificationData();
-            },2000);
+        setTimeout(() => {
+            this.getNotificationData();
+        }, 2000);
 
         this.isFunctionalAdmin = this.utilsService.isFunctionalAdmin();
         this.isStandardUser = this.utilsService.isStandardUser();
@@ -182,7 +182,7 @@ export class HeaderComponent implements OnInit {
     }
 
 
-    isActiveForSetting():boolean {
+    isActiveForSetting(): boolean {
         return ['report-setting', 'risk-metric-levels'].includes(this.activePage);
     }
 
@@ -192,82 +192,82 @@ export class HeaderComponent implements OnInit {
         this.router.navigate(['risk-metric-levels']);
     }
 
-    isActiveForRA():boolean {
-        return ['risk-assessments-submitted','risk-assessments-historical','review-risk-assessments','submit-risk-assessments','manage-risk-assessments','risk-appetite-templates','risk-appetite-documents'].includes(this.activePage);
+    isActiveForRA(): boolean {
+        return ['risk-assessments-submitted', 'risk-assessments-historical', 'review-risk-assessments', 'submit-risk-assessments', 'manage-risk-assessments', 'risk-appetite-templates', 'risk-appetite-documents'].includes(this.activePage);
     }
 
     kriMaster(): void {
         localStorage.setItem('activePage', 'kri-master');
-         this.activePage = 'kri-master'
+        this.activePage = 'kri-master'
         localStorage.setItem('activeMenu', 'measurement');
         this.router.navigate(['kri-master']);
     }
 
     kriDefinition(): void {
         localStorage.setItem('activePage', 'kri-definitions');
-         this.activePage = 'kri-definitions'
+        this.activePage = 'kri-definitions'
         this.router.navigate(['kri-definitions']);
     }
 
     kriMesurementMykri(): void {
         localStorage.setItem('activeePage', 'kri-measurement-mykri');
-         this.activePage = 'kri-measurement-mykri'
+        this.activePage = 'kri-measurement-mykri'
         this.router.navigate(['kri-measurement-mykri']);
     }
 
     kriMeasurementReview(): void {
         localStorage.setItem('activePage', 'kri-measurement-review');
-         this.activePage = 'kri-measurement-review'
+        this.activePage = 'kri-measurement-review'
         this.router.navigate(['kri-measurement-review']);
     }
 
     kriScoring(): void {
         localStorage.setItem('activePage', 'kri-measurement-mykri');
-         this.activePage = 'kri-measurement-mykri'
+        this.activePage = 'kri-measurement-mykri'
         this.router.navigate(['kri-measurement-mykri']);
     }
 
     kriHistorical(): void {
         localStorage.setItem('activePage', 'kri-historical');
-         this.activePage = 'kri-historical'
+        this.activePage = 'kri-historical'
         this.router.navigate(['kri-historical']);
     }
 
     kriReporting(): void {
         localStorage.setItem('activePage', 'kri-reporting');
-         this.activePage = 'kri-reporting'
+        this.activePage = 'kri-reporting'
         this.router.navigate(['kri-reporting']);
     }
     kriReview(): void {
         localStorage.setItem('activePage', 'kri-review');
-         this.activePage = 'kri-review'
+        this.activePage = 'kri-review'
         this.router.navigate(['kri-review']);
     }
 
     kriHistoricalReporting(): void {
         localStorage.setItem('activePage', 'kri-historical-reporting');
-         this.activePage = 'kri-historical-reporting'
+        this.activePage = 'kri-historical-reporting'
         this.router.navigate(['kri-historical-reporting']);
     }
 
-    isActiveForKRI():boolean {
-        return ['kri-master','kri-historical-reporting', 'kri-review','kri-historical','kri-measurement-mykri','kri-measurement-review','kri-measurement-mykri','kri-definitions','kri-master','kri-reporting'].includes(this.activePage);
+    isActiveForKRI(): boolean {
+        return ['kri-master', 'kri-historical-reporting', 'kri-review', 'kri-historical', 'kri-measurement-mykri', 'kri-measurement-review', 'kri-measurement-mykri', 'kri-definitions', 'kri-master', 'kri-reporting'].includes(this.activePage);
     }
 
     incidentMaster(): void {
         localStorage.setItem('activePage', 'incident-maste');
-         this.activePage = 'incident-maste'
+        this.activePage = 'incident-maste'
         this.router.navigate(['incident-master']);
     }
 
     incidentList(): void {
         localStorage.setItem('activePage', 'incident-list');
-         this.activePage = 'incident-list'
+        this.activePage = 'incident-list'
         this.router.navigate(['incident-list']);
     }
 
 
-    isActiveForIncident():boolean {
+    isActiveForIncident(): boolean {
         return ['incident-list', 'incident-maste'].includes(this.activePage);
     }
 
@@ -297,10 +297,16 @@ export class HeaderComponent implements OnInit {
         this.router.navigate(['master-residual-risk-rating']);
     }
     inherentRisk(): void {
-        console.log('inherent');
+        // console.log('inherent');
         localStorage.setItem('activePage', 'inherent-risk');
         this.activePage = 'inherent-risk';
         this.router.navigate(['inherent-risk']);
+    }
+    controlLibrary(): void {
+        // console.log('controlLibrary');
+        localStorage.setItem('activePage', 'control-library');
+        this.activePage = 'control-library';
+        this.router.navigate(['control-library']);
     }
     scheduleAssessments(): void {
         localStorage.setItem('activePage', 'schedule-assessments');
@@ -310,7 +316,7 @@ export class HeaderComponent implements OnInit {
     }
 
     isActiveForRcsa(): boolean {
-        return ['master-Rcsa', 'master-inherent-risk', 'master-control-environment','master-residual-risk-rating','inherent-risk','schedule-assessments','self-assessments'].includes(this.activePage);
+        return ['master-Rcsa', 'master-inherent-risk', 'master-control-environment', 'master-residual-risk-rating', 'inherent-risk', 'control-library', 'schedule-assessments', 'self-assessments'].includes(this.activePage);
     }
 
 
@@ -321,14 +327,14 @@ export class HeaderComponent implements OnInit {
         this.router.navigate(['self-assessments']);
     }
     home(): void {
-        console.log('home');
+        // console.log('home');
         this.router.navigate(['']);
     }
     dashboard(): void {
-        console.log('dashboard');
+        // console.log('dashboard');
         localStorage.setItem('activePage', 'dashboard');
         this.activePage = 'dashboard'
-        console.log('this.activePage: ', this.activePage);
+        // console.log('this.activePage: ', this.activePage);
         this.router.navigate(['dashboard-overall']);
     }
     reports(): void {
@@ -393,7 +399,7 @@ export class HeaderComponent implements OnInit {
     }
 
     reloadCurrentRoute() {
-        console.log('reload');
+        // console.log('reload');
         const currentUrl = this.router.url;
         this.router
             .navigateByUrl('/', { skipLocationChange: true })
@@ -432,31 +438,31 @@ export class HeaderComponent implements OnInit {
         if (!this.isRiskManagementUnit) {  //       && (this.activePage != 'dashboard' || this.activePage != 'dashboard-overall') ) {
             this.notificationService.getInAppNotification().subscribe((res) => {
                 if (res.success == 1) {
-                    this.headerFlag  = true;
-                    let inAppData = [...res.result.INCInApp,...res.result.RAInApp,...res.result.RCSAInApp,...res.result.RAInApp]
+                    this.headerFlag = true;
+                    let inAppData = [...res.result.INCInApp, ...res.result.RAInApp, ...res.result.RCSAInApp, ...res.result.RAInApp]
                     this.processDetails(inAppData);
                 }
             });
-        } else if (this.isRiskManagementUnit ) { // && (this.activePage == 'dashboard' || this.activePage == '' || this.activePage == 'dashboard-overall' || this.activePage == 'manage-risk-assessments')){
+        } else if (this.isRiskManagementUnit) { // && (this.activePage == 'dashboard' || this.activePage == '' || this.activePage == 'dashboard-overall' || this.activePage == 'manage-risk-assessments')){
             this.dashboardService.gotOverallDashboardMaster.subscribe((res) => {
-                console.log('res:  '+res)
-                if (res){
-                    this.headerFlag  = true;
-                    let inAppResp = [...this.dashboardService.inAppRCSA,...this.dashboardService.inAppINC,...this.dashboardService.inAppRA,...this.dashboardService.inAppKRI]
+                // console.log('res:  ' + res)
+                if (res) {
+                    this.headerFlag = true;
+                    let inAppResp = [...this.dashboardService.inAppRCSA, ...this.dashboardService.inAppINC, ...this.dashboardService.inAppRA, ...this.dashboardService.inAppKRI]
                     this.processDetails(inAppResp)
-                } else{
-                    this.headerFlag  = true;
+                } else {
+                    this.headerFlag = true;
                     this.unreadItems = localStorage.getItem('Unread-Items')
-                    console.log('Unread Items', this.unreadItems)
+                    // console.log('Unread Items', this.unreadItems)
                 }
             });
         }
-        else{
+        else {
             this.notificationService.getInAppNotification().subscribe((res) => {
                 if (res.success == 1) {
-                    this.headerFlag  = true;
-                    console.log('res.success : ' + res.success)
-                    let inAppData = [...res.result.INCInApp,...res.result.RAInApp,...res.result.RCSAInApp,...res.result.RAInApp]
+                    this.headerFlag = true;
+                    // console.log('res.success : ' + res.success)
+                    let inAppData = [...res.result.INCInApp, ...res.result.RAInApp, ...res.result.RCSAInApp, ...res.result.RAInApp]
                     this.processDetails(inAppData);
                 }
             });
@@ -465,7 +471,7 @@ export class HeaderComponent implements OnInit {
 
     processDetails(merg: any) {
         this.unreadItems = merg.filter((ob: any) => ob.IsRead === false);
-        console.log('Count of unread items: ' + this.unreadItems.length);
+        // console.log('Count of unread items: ' + this.unreadItems.length);
         this.unreadItems = this.unreadItems.length;
         localStorage.setItem('Unread-Items', this.unreadItems)
     }
@@ -477,7 +483,7 @@ export class HeaderComponent implements OnInit {
     riskRegister() {
         localStorage.setItem('activePage', 'risk-register');
         this.activePage = 'risk-register';
-        this.router.navigate(['risk-register',{ ScheduleAssessmentID : 0 }]);
+        this.router.navigate(['risk-register', { ScheduleAssessmentID: 0 }]);
 
         // let id = this.configScoreRatingService.scheduleAssessmentIDS;
         // if(Number(id) > 0) {
@@ -489,25 +495,25 @@ export class HeaderComponent implements OnInit {
         //         queryParams: { ScheduleAssessmentID: 0 },
         //         queryParamsHandling: 'merge'
         //     });
-            // this.document.location.reload()
+        // this.document.location.reload()
         // }
 
 
     }
 
-    
-  logoutUser(event: MouseEvent): void {
-    event.stopPropagation(); // Prevent click from propagating to the document
 
-    this.logoutflag = !this.logoutflag;
-  }
+    logoutUser(event: MouseEvent): void {
+        event.stopPropagation(); // Prevent click from propagating to the document
 
-  // Close the dropdown if clicked outside
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    if (this.logoutflag && !this.dropdownMenu?.nativeElement.contains(event.target)) {
-      this.logoutflag = false;
+        this.logoutflag = !this.logoutflag;
     }
-  }
+
+    // Close the dropdown if clicked outside
+    @HostListener('document:click', ['$event'])
+    onDocumentClick(event: MouseEvent): void {
+        if (this.logoutflag && !this.dropdownMenu?.nativeElement.contains(event.target)) {
+            this.logoutflag = false;
+        }
+    }
 
 }

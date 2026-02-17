@@ -6,11 +6,15 @@ import { MatModule } from 'src/app/modules/mat/mat.module';
 import { FileUploadModule } from "ng2-file-upload";
 import { FileUploadComponent } from './file-upload/file-upload.component';
 import { EvidenceFileComponent } from './file-upload/evidence-files/evidence-file.component';
+import { MatSelectSearchDirective } from './directives/mat-select-search.directive';
+import { KriThresholdSuffixPipe } from './pipes/kri-threshold-suffix.pipe';
 
 @NgModule({
   declarations: [
     FileUploadComponent,
-    EvidenceFileComponent
+    EvidenceFileComponent,
+    MatSelectSearchDirective,
+    KriThresholdSuffixPipe
   ],
   imports: [
     CommonModule,
@@ -19,7 +23,9 @@ import { EvidenceFileComponent } from './file-upload/evidence-files/evidence-fil
   ],
   exports: [
     FileUploadComponent,
-    EvidenceFileComponent
+    EvidenceFileComponent,
+    MatSelectSearchDirective,
+    KriThresholdSuffixPipe
   ]
 })
 export class CoresharedModule { }

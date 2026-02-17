@@ -39,7 +39,7 @@ export class IncidentGraphComponent implements OnInit {
                 this.dashboardservice.gotYearQuater.subscribe((value) => {
                     this.yearData = this.dashboardservice.yearValue;
                     this.quaterSelectedValue = this.dashboardservice.quaterValue;
-                    this.allData = this.RawData.filter(
+                    this.allData = (Array.isArray(this.RawData) ? this.RawData : []).filter(
                         (data: any) =>  (data.StatusID != 1 && data.StatusID != 11 && data.StatusID != 12 && data.StatusID != 17 && data.StatusID != 18 && data.StatusID != 13 &&
                              data.StatusID != 14 && data.StatusID != 15 &&
                              data.StatusID != 16)

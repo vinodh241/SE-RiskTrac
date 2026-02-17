@@ -7,9 +7,9 @@
     <div class="actions-container">
         <div class="left-action">
             <div class="form-group">
-                <label class="dropdown-label">Group</label>
+                <label class="dropdown-label">Department</label>
                 <mat-form-field appearance="standard">
-                    <mat-select [(ngModel)]="kriService.kriHistoricalReportedSelectedGroup"
+                    <mat-select matSelectSearch placeholder="Search department..." [(ngModel)]="kriService.kriHistoricalReportedSelectedGroup"
                         (selectionChange)="onGroupChange()">
                         <mat-option value="">All</mat-option>
                         <mat-option *ngFor="let group of getGroupList()" [value]="group.GroupID">{{group.GroupName}}
@@ -21,7 +21,7 @@
             <div class="form-group">
                 <label class="dropdown-label">Unit</label>
                 <mat-form-field appearance="standard">
-                    <mat-select [disabled]="!kriService.kriHistoricalReportedSelectedGroup"
+                    <mat-select matSelectSearch placeholder="Search unit..." [disabled]="!kriService.kriHistoricalReportedSelectedGroup"
                         [(ngModel)]="kriService.kriHistoricalReportedSelectedUnit" (selectionChange)="onUnitChange()">
                         <mat-option value="">All</mat-option>
                         <mat-option *ngFor="let unit of getUnitList()" [value]="unit.UnitID">{{unit.UnitName}}
@@ -33,7 +33,7 @@
             <div class="form-group">
                 <label class="dropdown-label">Year</label>
                 <mat-form-field appearance="standard">
-                    <mat-select [(ngModel)]="kriService.kriHistoricalReportedSelectedYear"
+                    <mat-select matSelectSearch placeholder="Search year..." [(ngModel)]="kriService.kriHistoricalReportedSelectedYear"
                         (selectionChange)="onYearChange($event.value)">
                         <mat-option *ngFor="let year of getYearList()" [value]="year.Years">{{year.Years}}</mat-option>
                     </mat-select>
@@ -84,7 +84,7 @@
                             <ng-container *ngFor="let item of displayedColumns" [matColumnDef]="item">
                                 <th mat-header-cell *matHeaderCellDef></th>
                                 <td mat-cell *matCellDef="let element">
-                                    {{element[item]}}</td>
+                                    {{ item === 'Target' ? (element.Target | kriThresholdSuffix : element.ThresholdType) : element[item] }}</td>
                             </ng-container>
 
                             <ng-container *ngFor="let item of getPeriodColumns(data.Metrics.filteredData)"
@@ -113,9 +113,7 @@
 
                                         {{item.includes('Date')? (getPeriodColumnValue(element.previousData, item) |
                                         date  : 'dd MMM yyyy') :
-                                        getPeriodColumnValue(element.previousData, item)}}
-
-                                        {{ item.includes('Measurement') && !['', undefined, null].includes(getPeriodColumnValue(element.previousData, item)) && getPeriodColumnValue(element.previousData, item) !== 'NA' ? '%' : '' }}
+                                        (item.includes('Measurement') ? (getPeriodColumnValue(element.previousData, item) | kriThresholdSuffix : element.ThresholdType) : getPeriodColumnValue(element.previousData, item))}}
 
 
 
@@ -131,7 +129,7 @@
                                         [attr.rowspan]="2">
                                         {{i == 0? 'KRI Code': i == 1? 'Indicator': i == 2? 'Measurement Frequency': i ==
                                         3?
-                                        'Defined Quater': i==4? 'Target ': i==5? 'KRI Type': 'KRI Status'}}</th>
+                                        'Defined Quarter': i==4? 'Target ': i==5? 'KRI Type': 'KRI Status'}}</th>
                                 </ng-container>
                             </ng-container>
                             <ng-container *ngFor="let header of getPeriodHeaders(data.Metrics.filteredData)"

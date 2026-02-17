@@ -140,4 +140,36 @@
     cursor: pointer !important;
     // opacity: 0.5 !important;
   }
+
+/* Filter row containing all dropdown filters */
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0 4vh;
+    padding: 0 0 4px 0;
+    gap: 4px 0;
+}
+
+.list-filter-field {
+    margin-left: 12px;
+    max-width: 180px;
+    font-size: 13px;
+}
+
+.clear-filters-btn {
+    margin-left: 12px;
+    height: 36px;
+    font-size: 13px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+}
   

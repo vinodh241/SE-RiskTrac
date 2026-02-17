@@ -235,7 +235,14 @@
                     </div>
 
                 </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{row.CriticalityName}} </mat-cell>
+                <mat-cell *matCellDef="let row"> 
+                    {{row.CriticalityName}}
+                    <mat-icon *ngIf="row.CriticalityDescription" 
+                        class="criticality-info-icon"
+                        [matTooltip]="row.CriticalityDescription"
+                        matTooltipPosition="right"
+                        matTooltipClass="criticality-tooltip">info_outline</mat-icon>
+                </mat-cell>
             </ng-container>
             <ng-container matColumnDef="IncidentStatus">
                 <mat-header-cell *matHeaderCellDef class="col-header">

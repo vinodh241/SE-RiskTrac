@@ -5,7 +5,6 @@ import { DashboardService } from 'src/app/services/dashboard/dashboard.service';
 import { RestService } from 'src/app/services/rest/rest.service';
 import { UtilsService } from 'src/app/services/utils/utils.service';
 
-
 @Component({
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
@@ -16,7 +15,7 @@ export class DashboardComponent implements OnInit {
     date: any = "";
     year: any;
     quarter: any;
-    yearsList: any [] =[];
+    yearsList: any[] = [];
     quartersList: any = [];
     quarterFilter: any;
     yearFilter: any
@@ -24,57 +23,47 @@ export class DashboardComponent implements OnInit {
     yearData: any;
     startDate: any;
     endDate: any;
-    isRiskManagementUnit:boolean=false;
+    isRiskManagementUnit: boolean = false;
     role = "";
-    overAll:boolean = true
+    overAll: boolean = true
     constructor(private dashboardService: DashboardService,
-        private utilsService:UtilsService,
+        private utilsService: UtilsService,
         private router: Router,
         private location: Location,
         private rest: RestService,
     ) {
-        // this.role = localStorage.getItem('rorm') || "";
-        // this.isRiskManagementUnit=this.utilsService.isRiskManagementUnit();
-        // if ((this.role == 'PU' || this.role == 'SU' || this.role == 'FA') && !this.isRiskManagementUnit) {
-        //     this.router.navigate(['incident-list']);
-        // }
         this.router.events.subscribe((val) => {
-            if(this.location.path() != ''){
-            if(this.location.path() == '/dashboard-overall'){
-                this.dashboardService.dashboardLeftmenu = 'overall';
-            }else if(this.location.path() == '/dashboard-risk-appetite'){
-                this.dashboardService.dashboardLeftmenu = 'risk-appetite';
-            }else if(this.location.path() == '/dashboard-rcsa'){
-                this.dashboardService.dashboardLeftmenu = 'rcsa';
-            }else if(this.location.path() == '/dashboard-kri'){
-                this.dashboardService.dashboardLeftmenu = 'kri';
-            }else if(this.location.path() == '/dashboard-incident'){
-                this.dashboardService.dashboardLeftmenu = 'incident';
+            if (this.location.path() != '') {
+                if (this.location.path() == '/dashboard-overall') {
+                    this.dashboardService.dashboardLeftmenu = 'overall';
+                } else if (this.location.path() == '/dashboard-risk-appetite') {
+                    this.dashboardService.dashboardLeftmenu = 'risk-appetite';
+                } else if (this.location.path() == '/dashboard-rcsa') {
+                    this.dashboardService.dashboardLeftmenu = 'rcsa';
+                } else if (this.location.path() == '/dashboard-kri') {
+                    this.dashboardService.dashboardLeftmenu = 'kri';
+                } else if (this.location.path() == '/dashboard-incident') {
+                    this.dashboardService.dashboardLeftmenu = 'incident';
+                }
             }
-            }
-          });
-
+        });
     }
 
     ngOnInit(): void {
-
         this.getQuarter(new Date());
-
         var currentDate = new Date();
         var currentYear = currentDate.getFullYear();
         for (var i = 0; i < 7; i++) {
             this.yearsList.push(currentYear - i);
         }
         this.rest.openWait("Fetching Data ...")
-        setTimeout(()=>{
+        setTimeout(() => {
             this.rest.closeWait()
-            if(localStorage.getItem("selectQ") != undefined && localStorage.getItem("selectQ") != null &&
-            localStorage.getItem("selectY") != undefined && localStorage.getItem("selectY") != null){
+            if (localStorage.getItem("selectQ") != undefined && localStorage.getItem("selectQ") != null &&
+                localStorage.getItem("selectY") != undefined && localStorage.getItem("selectY") != null) {
                 this.checkYear(Number(localStorage.getItem("selectY")));
                 this.checkQuarter(Number(localStorage.getItem("selectQ")));
-                // this.quarterFilter = Number(localStorage.getItem("selectQ"));
-                // this.yearFilter = Number(localStorage.getItem("selectY"));
-            }else{
+
             }
             localStorage.removeItem("selectQ")
             localStorage.removeItem("selectY")
@@ -82,29 +71,26 @@ export class DashboardComponent implements OnInit {
     }
 
     @HostListener('window:popstate', ['$event'])
-    onPopState(event:any) {
-
+    onPopState(event: any) {
         this.router.events.subscribe((val) => {
-            if(this.location.path() != ''){
-            if(this.location.path() == '/dashboard-overall'){
-                this.dashboardService.dashboardLeftmenu = 'overall';
-            }else if(this.location.path() == '/dashboard-risk-appetite'){
-                this.dashboardService.dashboardLeftmenu = 'risk-appetite';
-            }else if(this.location.path() == '/dashboard-rcsa'){
-                this.dashboardService.dashboardLeftmenu = 'rcsa';
-            }else if(this.location.path() == '/dashboard-kri'){
-                this.dashboardService.dashboardLeftmenu = 'kri';
-            }else if(this.location.path() == '/dashboard-incident'){
-                this.dashboardService.dashboardLeftmenu = 'incident';
+            if (this.location.path() != '') {
+                if (this.location.path() == '/dashboard-overall') {
+                    this.dashboardService.dashboardLeftmenu = 'overall';
+                } else if (this.location.path() == '/dashboard-risk-appetite') {
+                    this.dashboardService.dashboardLeftmenu = 'risk-appetite';
+                } else if (this.location.path() == '/dashboard-rcsa') {
+                    this.dashboardService.dashboardLeftmenu = 'rcsa';
+                } else if (this.location.path() == '/dashboard-kri') {
+                    this.dashboardService.dashboardLeftmenu = 'kri';
+                } else if (this.location.path() == '/dashboard-incident') {
+                    this.dashboardService.dashboardLeftmenu = 'incident';
+                }
             }
-            }
-          });
-  }
-
-
+        });
+    }
 
     checkYear(yearValue: any) {
-        console.log('yearValue: ', yearValue);
+        // console.log('yearValue: ', yearValue);
         this.yearData = yearValue
         this.yearFilter = yearValue
         this.dashboardService.getYearData(this.yearData);
@@ -126,14 +112,15 @@ export class DashboardComponent implements OnInit {
             this.quartersList = [1, 2, 3, 4];
         }
         this.dashboardService.getQuarterData(this.quarterFilter);
-        console.log('this.quarterFilter: ', this.quarterFilter);
-        if(this.dashboardService.dashboardLeftmenu == "overall"){
+        // console.log('this.quarterFilter: ', this.quarterFilter);
+        if (this.dashboardService.dashboardLeftmenu == "overall") {
             this.allMethod()
         }
         this.checkMonth(this.quarterFilter);
     }
+
     checkMonth(quarterValue: number) {
-        console.log('this.yearFilter: '+this.yearFilter)
+        // console.log('this.yearFilter: ' + this.yearFilter)
         if (quarterValue == 1) {
             this.startDate = new Date(this.yearFilter, 0, 1);
             this.endDate = new Date(this.yearFilter, 2, 31);
@@ -151,44 +138,36 @@ export class DashboardComponent implements OnInit {
             this.endDate = new Date(this.yearFilter, 11, 31);
         }
     }
+
     checkQuarter(quarterValue: any) {
         this.quarterFilter = quarterValue
         this.dashboardService.getQuarterData(quarterValue);
         this.checkMonth(quarterValue);
     }
 
-    openMenu(data: any, type:any)
-    {
-        // this.dashboardService.gotMasterIndicator.unsubscribe();
-        // this.dashboardService.gotMaster.unsubscribe();
-        // this.dashboardService.gotRAMaster.unsubscribe();
-        // this.dashboardService.gotincidentDashboardMaster.unsubscribe();
-        // this.dashboardService.gotYearQuater.unsubscribe();
-        // this.dashboardService.gotOverallDashboardMaster.unsubscribe();
-        // this.yearFilter = Number(this.year);
-        // this.checkYear(this.year);
-        if(type == 'same'){
+    openMenu(data: any, type: any) {
+        if (type == 'same') {
             localStorage.setItem("selectQ", this.quarterFilter);
             localStorage.setItem("selectY", this.yearFilter);
-        }else{
+        } else {
             localStorage.removeItem("selectQ");
             localStorage.removeItem("selectY");
         }
         this.dashboardService.dashboardLeftmenu = data;
-        if(data == 'overall'){
+        if (data == 'overall') {
             this.router.navigate(['dashboard-overall']);
-        }else if(data == 'risk-appetite'){
+        } else if (data == 'risk-appetite') {
             this.router.navigate(['dashboard-risk-appetite']);
-        }else if(data == 'rcsa'){
+        } else if (data == 'rcsa') {
             this.router.navigate(['dashboard-rcsa']);
-        }else if(data == 'kri'){
+        } else if (data == 'kri') {
             this.router.navigate(['dashboard-kri']);
-        }else if(data == 'incident'){
+        } else if (data == 'incident') {
             this.router.navigate(['dashboard-incident']);
         }
     }
 
-    allMethod(){
+    allMethod() {
         this.dashboardService.getOverallDashbardData(this.yearFilter)
     }
 
@@ -200,6 +179,7 @@ export class DashboardComponent implements OnInit {
             return false;
         }
     }
+
     getType(data: any) {
         return this.dashboardService.dashboardLeftmenu == data
     }
@@ -229,11 +209,7 @@ export class DashboardComponent implements OnInit {
             default:
                 break;
         }
-
-
         this.yearFilter = Number(this.year);
-
         this.checkYear(this.yearFilter);
     }
-
 }

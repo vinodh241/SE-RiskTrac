@@ -8,7 +8,7 @@ import { UtilsService } from 'src/app/services/utils/utils.service';
 import { KriService } from 'src/app/services/kri/kri.service';
 import { Router } from '@angular/router';
 import { FileUploader } from 'ng2-file-upload';
-import { ValidExtension } from '../incident-list/incident/file-upload/evidence-files/evidence-file.component';
+import { ValidExtension } from 'src/app/core-shared/file-upload/evidence-files/evidence-file.component';
 import { DashboardService } from 'src/app/services/dashboard/dashboard.service';
 export interface KriScoring {
     ThresholdValue: number;
@@ -590,7 +590,7 @@ export class KriScoringComponent implements OnInit {
                 dbt += 1
             }
         }
-        if (data = null || dbt <= 0) {
+        if (data == null || dbt <= 0) {
             bol = true
         } else {
             bol = false

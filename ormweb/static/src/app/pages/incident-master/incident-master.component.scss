@@ -175,3 +175,15 @@ mat-form-field{
     justify-content: center;
     align-items: center;
 }
+
+// Criticality info icon styling
+.info-icon {
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+    margin-left: 4px;
+    color: #1976d2;
+    cursor: help;
+    vertical-align: middle;
+}
+

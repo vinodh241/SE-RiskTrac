@@ -7,6 +7,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { MasterResidualRiskRatingComponent } from './master-residual-risk-rating.component';
+import { CoresharedModule } from 'src/app/core-shared/coreshared.module';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { MasterResidualRiskRatingComponent } from './master-residual-risk-rating
     MatModule,
     MatGridListModule,
     FlexLayoutModule,
-    ColorPickerModule
+    ColorPickerModule,
+    CoresharedModule
   ],
   exports:[MasterResidualRiskRatingComponent]
 })

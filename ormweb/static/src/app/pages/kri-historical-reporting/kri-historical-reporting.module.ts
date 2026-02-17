@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { KriHistoricalReportingRoutingModule } from './kri-historical-reporting-routing.module';
 import { KriHistoricalReportingComponent } from './kri-historical-reporting.component';
 import { MatModule } from 'src/app/modules/mat/mat.module';
+import { CoresharedModule } from 'src/app/core-shared/coreshared.module';
 
 
 @NgModule({
@@ -13,7 +14,8 @@ import { MatModule } from 'src/app/modules/mat/mat.module';
   imports: [
     CommonModule,
     MatModule,
-    KriHistoricalReportingRoutingModule
+    KriHistoricalReportingRoutingModule,
+    CoresharedModule
   ]
 })
 export class KriHistoricalReportingModule { }

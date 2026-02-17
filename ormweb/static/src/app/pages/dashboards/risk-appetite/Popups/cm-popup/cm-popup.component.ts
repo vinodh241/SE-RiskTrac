@@ -27,7 +27,7 @@ export class CmPopupComponent implements OnInit {
     this.dataSource = this.parent.id;
     this.popUpName = this.parent.RATitle
     this.popupdata = this.parent.title;
-    console.log('this.parent.data: ',this.parent.title)
+    // console.log('this.parent.data: ',this.parent.title)
     
   }
   

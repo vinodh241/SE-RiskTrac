@@ -13,10 +13,10 @@
         </button>
 
 
-        <!-- <button mat-button (click)="riskRegister()" [ngClass]="{'active': activePage === 'risk-register','disabled-header': !headerFlag}">
+        <button mat-button (click)="riskRegister()" [ngClass]="{'active': activePage === 'risk-register','disabled-header': !headerFlag}">
             <mat-icon> <img src="assets/icons/risk-register.svg" height="100%" width="100%"></mat-icon>
             <span class="button-text">Risk Register</span>
-        </button> -->
+        </button>
 
 
         <button mat-button [matMenuTriggerFor]="menuInherentRisk" [ngClass]="{'active': isActiveForRcsa(),'disabled-header': !headerFlag}">
@@ -38,6 +38,10 @@
                 <mat-icon> <img src="assets/rcsa/nav-rcsa-manageControlEnvironment.svg" width="100%"> </mat-icon>
                 <span>Manage Control Environment</span>
             </button>
+            <button mat-menu-item (click)="controlLibrary()" *ngIf="isFunctionalAdmin || isStandardUser || isPowerUser">
+                <mat-icon><img src="assets/rcsa/icon-cl.svg" width="100%"></mat-icon>
+                <span>Control Library</span>
+            </button>
             <button mat-menu-item (click)="manageResidualRisk()"*ngIf="isFunctionalAdmin">
                 <mat-icon><img src="assets/rcsa/nav-rcsa-manageResidualRisk.svg" width="100%"></mat-icon>
                 <span>Manage Residual Risk</span>
@@ -54,6 +58,10 @@
                 <mat-icon><img src="assets/rcsa/nav-rcsa-selfAssessments.svg" width="100%"></mat-icon>
                 <span>Self Assessments</span>
             </button>
+            <!-- <button mat-menu-item (click)="controlLibrary()" *ngIf="isFunctionalAdmin || isStandardUser || isPowerUser">
+                <mat-icon><img src="assets/rcsa/icon-cl.svg" width="100%"></mat-icon>
+                <span>Control Library</span>
+            </button> -->
         </mat-menu>
         <button mat-button [matMenuTriggerFor]="menuIncidents" [ngClass]="{'active': isActiveForIncident(),'disabled-header': !headerFlag}"><mat-icon>
                 <img src="assets/icons/nav-icon-incident.svg" height="100%" width="100%"></mat-icon> <span
@@ -90,7 +98,7 @@
                 <mat-icon><img src="assets/icons/nav-icon-kri-management.svg" width="100%"></mat-icon>
                 <span>KRI Measurement</span>
             </button>
-            <button mat-menu-item (click)="kriHistorical()" *ngIf="!isRiskManagementUnit">
+            <button mat-menu-item (click)="kriHistorical()">
                 <mat-icon><img src="assets/icons/icon-clock.svg" width="100%"></mat-icon>
                 <span>Historical Measurement</span>
             </button>

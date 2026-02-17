@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { IncidentService } from 'src/app/services/incident/incident.service';
 import { MatDialog } from '@angular/material/dialog';
-import { EvidenceFileComponent } from './evidence-files/evidence-file.component';
+import { EvidenceFileComponent } from 'src/app/core-shared/file-upload/evidence-files/evidence-file.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { UtilsService } from 'src/app/services/utils/utils.service';
 

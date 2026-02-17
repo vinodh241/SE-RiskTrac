@@ -19,7 +19,7 @@ import { environment } from 'src/environments/environment';
 })
 export class MasterResidualRiskRatingComponent implements OnInit {
   color: string = 'primary';
-  displayedResidualRiskColumns: string[] = ['Index', 'Risk', 'ColourName',  'IsActive']; //'Action',
+  displayedResidualRiskColumns: string[] = ['Index', 'Risk', 'ColourName',  'IsActive']; // 'Action',
   addResidualRiskdg: boolean = false;
   ResidualRiskForm = new FormGroup({
     txtratename: new FormControl('', [Validators.required, Validators.minLength(2)]),
@@ -297,8 +297,8 @@ export class MasterResidualRiskRatingComponent implements OnInit {
           this.saveResidualRiskerror = res.error.errorMessage;
         event.source.checked = !event.source.checked;
       }
-      error:
-      console.log("err::", "error");
+      error: (err: any) =>
+      console.log("err::", err);
     });
     console.log(obj);
   }
@@ -326,8 +326,8 @@ export class MasterResidualRiskRatingComponent implements OnInit {
           else
             this.saveResidualRiskerror = res.error.errorMessage;
         }
-        error:
-        console.log("err::", "error");
+        error: (err: any) =>
+        console.log("err::", err);
       });
     }
     else {
@@ -351,8 +351,8 @@ export class MasterResidualRiskRatingComponent implements OnInit {
           else
             this.saveResidualRiskerror = res.error.errorMessage;
         }
-        error:
-        console.log("err::", "error");
+        error: (err: any) =>
+        console.log("err::", err);
       });
     }
 
@@ -679,8 +679,8 @@ export class MasterResidualRiskRatingComponent implements OnInit {
           this.saveOverallRiskRatingerror = res.error.errorMessage;
         event.source.checked = !event.source.checked;
       }
-      error:
-      console.log("err::", "error");
+      error: (err: any) =>
+      console.log("err::", err);
     });
     console.log(obj);
   }
@@ -708,8 +708,8 @@ export class MasterResidualRiskRatingComponent implements OnInit {
           else
             this.saveOverallRiskRatingerror = res.error.errorMessage;
         }
-        error:
-        console.log("err::", "error");
+        error: (err: any) =>
+        console.log("err::", err);
       });
     }
     else {
@@ -733,8 +733,8 @@ export class MasterResidualRiskRatingComponent implements OnInit {
           else
             this.saveOverallRiskRatingerror = res.error.errorMessage;
         }
-        error:
-        console.log("err::", "error");
+        error: (err: any) =>
+        console.log("err::", err);
       });
     }
 

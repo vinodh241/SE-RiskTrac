@@ -80,7 +80,7 @@
 .expansion-length-title {
     width: 10%;
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
     align-items: center;
 }
 .title-label {
@@ -161,3 +161,4 @@ hr.line {
     align-items: center;
     margin-left: 1vh !important;
 }
+

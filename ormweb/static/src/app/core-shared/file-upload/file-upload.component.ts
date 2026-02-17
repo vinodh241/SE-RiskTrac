@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { EvidenceFileComponent } from './evidence-files/evidence-file.component';
 import { MatTableDataSource } from '@angular/material/table';
@@ -7,6 +7,7 @@ import { KriService } from 'src/app/services/kri/kri.service';
 import { RiskAssessmentService } from 'src/app/services/risk-assessment/risk-assessment.service';
 import { UtilsService } from 'src/app/services/utils/utils.service';
 import { saveAs } from 'file-saver';
+import { Subscription, interval } from 'rxjs';
 
 // export const ValidExtension = ["pdf", "xls", "xlsx"];
 
@@ -23,18 +24,20 @@ export interface Evidence {
     styleUrls: ['./file-upload.component.scss']
 })
 
-export class FileUploadComponent implements OnInit {
+export class FileUploadComponent implements OnInit, OnDestroy {
     @Input() recid: number = -1;
     @Input() disabled: boolean = true;
     @Output() filesdataOP: EventEmitter<any> = new EventEmitter();
     @Output() isFileUploadChanged: EventEmitter<boolean> = new EventEmitter();
     @Input() inputData: any;
-    displayedColumns: String[] = ['Index', 'UploadFile'];
+    displayedColumns: String[] = ['Index', 'UploadFile', 'Remark'];
     recEvidences: MatTableDataSource<Evidence> = new MatTableDataSource();
     @Input() evdname: string = "";
     @Input() showFileIcon: boolean = false;
     // @Input() filesdata: Evidence[] = [];
-
+    
+    private refreshSubscription?: Subscription;
+    private lastEvidenceCount: number = 0;
 
     constructor(
         public incidentservice: IncidentService,
@@ -47,10 +50,80 @@ export class FileUploadComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.recEvidences = new MatTableDataSource(this.inputData.evidences)
-        // console.log("🚀 ~ file: file-upload.component.ts:51 ~ FileUploadComponent ~ ngOnInit ~ this.inputData.evidences:", this.inputData.evidences)
-        // console.log("🚀 ~ file: file-upload.component.ts:51 ~ FileUploadComponent ~ ngOnInit ~ this.recEvidences:", this.recEvidences)
-        this.displayedColumns.push("AddIcon")
+        this.loadEvidences();
+        
+        // Ensure Remark column is included if not already present
+        if (!this.displayedColumns.includes('Remark')) {
+            this.displayedColumns.push('Remark');
+        }
+        if (!this.displayedColumns.includes('AddIcon')) {
+            this.displayedColumns.push("AddIcon");
+        }
+        
+        // Set up polling to refresh evidence data for Incident/RCA when inputData is not provided
+        if (!this.inputData && (this.evdname === 'Incident' || this.evdname === 'RCA')) {
+            this.lastEvidenceCount = this.recEvidences.data.length;
+            this.refreshSubscription = interval(1000).subscribe(() => {
+                this.checkAndRefreshEvidences();
+            });
+        }
+    }
+    
+    ngOnDestroy(): void {
+        if (this.refreshSubscription) {
+            this.refreshSubscription.unsubscribe();
+        }
+    }
+    
+    private loadEvidences(): void {
+        let evidences: Evidence[] = [];
+        
+        // If inputData is provided and has evidences, use it
+        if (this.inputData && this.inputData.evidences) {
+            evidences = this.inputData.evidences;
+        } 
+        // Otherwise, check evdname and use service properties
+        else if (this.evdname === 'Incident' && this.incidentservice.incEvidences) {
+            evidences = this.mapServiceEvidenceToComponent(this.incidentservice.incEvidences.data || []);
+        } 
+        else if (this.evdname === 'RCA' && this.incidentservice.rcaEvidences) {
+            evidences = this.mapServiceEvidenceToComponent(this.incidentservice.rcaEvidences.data || []);
+        }
+        
+        this.recEvidences = new MatTableDataSource(evidences);
+    }
+    
+    private checkAndRefreshEvidences(): void {
+        if (!this.inputData) {
+            let currentCount = 0;
+            let newEvidences: Evidence[] = [];
+            
+            if (this.evdname === 'Incident' && this.incidentservice.incEvidences) {
+                newEvidences = this.mapServiceEvidenceToComponent(this.incidentservice.incEvidences.data || []);
+                currentCount = newEvidences.length;
+            } else if (this.evdname === 'RCA' && this.incidentservice.rcaEvidences) {
+                newEvidences = this.mapServiceEvidenceToComponent(this.incidentservice.rcaEvidences.data || []);
+                currentCount = newEvidences.length;
+            }
+            
+            // If count changed, refresh the data
+            if (currentCount !== this.lastEvidenceCount) {
+                this.recEvidences = new MatTableDataSource(newEvidences);
+                this.lastEvidenceCount = currentCount;
+            }
+        }
+    }
+
+    /**
+     * Maps service Evidence type (with OriginalFileName) to component Evidence type (with FileName)
+     */
+    private mapServiceEvidenceToComponent(serviceEvidences: any[]): Evidence[] {
+        return serviceEvidences.map((ev: any) => ({
+            EvidenceID: ev.EvidenceID,
+            FileName: ev.OriginalFileName || ev.FileName || '',
+            Remark: ev.Remark || '',
+            CreatedDate: ev.CreatedDate || ''
+        }));
     }
 
     uploadEvidence(event: any) {
@@ -67,14 +140,13 @@ export class FileUploadComponent implements OnInit {
             }
         });
         dialogRef.afterClosed().subscribe(result => {
-            this.recEvidences = new MatTableDataSource(this.recEvidences.data);
-            this.isFileUploadChanged.emit(true);
-            this.filesdataOP.emit({ 'Evidences': this.recEvidences.data, 'inputData': this.inputData })
-            // if(result){
-            //     this.recEvidences = new MatTableDataSource(this.recEvidences.data);
-            //     this.isFileUploadChanged.emit(true);
-            //     this.filesdataOP.emit({ 'Evidences': this.recEvidences.data, 'inputData': this.inputData })
-            // }
+            // Wait a bit for async upload to complete, then refresh
+            setTimeout(() => {
+                this.loadEvidences();
+                this.lastEvidenceCount = this.recEvidences.data.length;
+                this.isFileUploadChanged.emit(true);
+                this.filesdataOP.emit({ 'Evidences': this.recEvidences.data, 'inputData': this.inputData });
+            }, 500);
         })
     }
 

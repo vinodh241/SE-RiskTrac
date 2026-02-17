@@ -7,7 +7,7 @@ import { RiskAssessmentService } from 'src/app/services/risk-assessment/risk-ass
 import { UtilsService } from 'src/app/services/utils/utils.service';
 import { CommentsComponent } from '../comments/comments.component';
 import { FileUploader } from 'ng2-file-upload';
-import { ValidExtension } from '../../incident-list/incident/file-upload/evidence-files/evidence-file.component';
+import { ValidExtension } from 'src/app/core-shared/file-upload/evidence-files/evidence-file.component';
 
 @Component({
     selector: 'app-risk-unit-maker',
@@ -259,8 +259,8 @@ export class RiskUnitMakerComponent implements OnInit {
                         else
                             this.popupInfo("Error", res.error.errorMessage, false, null);
                     }
-                    error:
-                    console.log("err::", "error");
+                    error: (err: any) =>
+                    console.log("err::", err);
                 });
             } else
                 this.popupInfo("Information", "Data was not changed", false, null);
@@ -314,8 +314,8 @@ export class RiskUnitMakerComponent implements OnInit {
                     else
                         this.popupInfo("Error", res.error.errorMessage, false, null);
                 }
-                error:
-                console.log("err::", "error");
+                error: (err: any) =>
+                console.log("err::", err);
             });
         }
         else {

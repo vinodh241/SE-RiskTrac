@@ -6,6 +6,7 @@ import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable';
 import { UtilsService } from 'src/app/services/utils/utils.service';
 import { utils } from 'xlsx';
+import { IncidentService } from 'src/app/services/incident/incident.service';
 
 @Component({
   selector: 'app-report-incident',
@@ -45,6 +46,7 @@ export class ReportIncidentComponent implements OnInit {
     private service: ReportsService,
     public kriService: KriService,
     public utilsService: UtilsService,
+    public incidentService: IncidentService
 
   ) {
     service.gotIncidents.subscribe(value => {
@@ -60,6 +62,11 @@ export class ReportIncidentComponent implements OnInit {
 
 
         this.getTableData();
+
+        // Load criticality master data for tooltips (DB-driven descriptions)
+        // Called after getIncidentMaster completes to avoid concurrent API calls
+        // which can cause session timeout due to token race condition
+        this.incidentService.getIncidentInfo();
 
       }
     })
@@ -195,5 +202,11 @@ export class ReportIncidentComponent implements OnInit {
     this.utilsService.generatePdf('incidentTable', excludedColumns, 'IncidentReport');
   }
 
-
+  /**
+   * Get the description for a criticality level by name (DB-driven)
+   * Used to display info tooltips in the reports table
+   */
+  getCriticalityDescription(criticalityName: string): string {
+    return this.incidentService.getCriticalityDescription(criticalityName);
+  }
 }

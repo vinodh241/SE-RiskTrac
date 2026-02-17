@@ -10,8 +10,41 @@
         <!-- <form [formGroup]="actionForm"> -->
         <mat-form-field appearance="standard">
             <mat-label>Year</mat-label>
-            <mat-select [(ngModel)]="selectedYear" (selectionChange)="yearChange()">
+            <mat-select matSelectSearch placeholder="Search year..." [multiple]="true"
+                [(ngModel)]="selectedYears" (selectionChange)="yearChange()">
                 <mat-option *ngFor="let row of assessmentYear" [value]="row.ScheduledYear">{{row.ScheduledYear}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="standard" class="list-filter-field">
+            <mat-label>Quarter</mat-label>
+            <mat-select matSelectSearch placeholder="Search quarter..." [multiple]="true"
+                [(ngModel)]="selectedQuarters" (selectionChange)="quarterChange()">
+                <mat-option *ngFor="let q of quarterOptions" [value]="q.value">{{q.label}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <!-- Department & Unit Filters - Multi-select with search -->
+        <mat-form-field appearance="standard" class="list-filter-field">
+            <mat-label>Department</mat-label>
+            <mat-select matSelectSearch placeholder="Search department..." [multiple]="true"
+                [(ngModel)]="listFilterDepartmentIds"
+                (selectionChange)="onListDepartmentChange()">
+                <mat-option *ngFor="let dept of listDepartments" [value]="dept.GroupID">
+                    {{ dept.Name }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="standard" class="list-filter-field">
+            <mat-label>Unit</mat-label>
+            <mat-select matSelectSearch placeholder="Search unit..." [multiple]="true"
+                [(ngModel)]="listFilterUnitIds"
+                [disabled]="listFilterDepartmentIds.length === 0"
+                (selectionChange)="onListUnitChange()">
+                <mat-option *ngFor="let unit of listFilteredUnits" [value]="unit.UnitID">
+                    {{ unit.Name }}
                 </mat-option>
             </mat-select>
         </mat-form-field>
@@ -28,11 +61,10 @@
                 <mat-icon>add</mat-icon>
             </button> -->
             <div class="applyFilter addDesktop position-relative text-start me-4" *ngIf="canCreateEditAccess()">
-                <button type="button" class="btn btn-dark btnGradient ad" [style.display]="iSCreateScheduleAssementEnabled === 1 ? ''  : 'none'" data-bs-toggle="modal" aria-label="New Schedule Assessment" (click)="initiateAdd()" matTooltip="Schedule New RCSA"><span
-                    class="font-weight-bold"></span>Schedule New RCSA</button>
-                <span class="position-absolute vmiddleLeft text-white iconPositionLeft"><img src="./assets/images/icon-add-desktop.svg" style="    width: 2vh;
-                    margin-top: 1vh;
-                    margin-left: -7.2vh;"></span>
+                <button type="button" class="btn btn-dark btnGradient ad position-relative" [style.display]="iSCreateScheduleAssementEnabled === 1 ? ''  : 'none'" data-bs-toggle="modal" aria-label="New Schedule Assessment" (click)="initiateAdd()" matTooltip="Schedule New RCSA" style="position: relative;">
+                    <span class="font-weight-bold"></span> 
+                    <span class="position-absolute vmiddleLeft text-white leftPlusIcon"><img src="./assets/images/icon-add-desktop.svg" style="width: 2vh;"></span> Schedule New RCSA</button>
+                
             </div>
             <span *ngIf="showexportData && canDownloadsearchAccess()" (click)="exportAsXLSX()" class="mat-button-wrapper"><img
                     src="assets/icon-excel.svg" style="opacity: 1;" matTooltip="Export to Excel"></span>

@@ -13,16 +13,16 @@
     <mat-action-row style="padding-bottom: 0px; padding-right: 24px; padding-top: 20px; display: flex;    padding-left: 9px; justify-content: space-between;">
         <div style="display: flex; align-items: center;">
             <mat-form-field appearance="fill" class="filter-field" >
-                <mat-label>Group</mat-label>
-                <mat-select (selectionChange)="groupFilter($event.value)">
-                    <mat-option [value]="''">All Groups</mat-option>
+                <mat-label>Department</mat-label>
+                <mat-select matSelectSearch placeholder="Search department..." (selectionChange)="groupFilter($event.value)">
+                    <mat-option [value]="''">All Departments</mat-option>
                     <mat-option *ngFor="let group of groupsData" [value]="group.GroupID">{{ group.GroupName }}</mat-option>
                 </mat-select>
             </mat-form-field>
     
             <mat-form-field appearance="fill" class="filter-field" style="margin-left: 2vh;">
                 <mat-label>Unit</mat-label>
-                <mat-select (selectionChange)="unitFilter($event.value)">
+                <mat-select matSelectSearch placeholder="Search unit..." (selectionChange)="unitFilter($event.value)">
                     <mat-option [value]="''">All Units</mat-option>
                     <mat-option *ngFor="let unit of filteredUnitData" [value]="unit.UnitID">{{ unit.UnitName }}</mat-option>
                 </mat-select>
@@ -30,7 +30,7 @@
 
             <mat-form-field appearance="fill" class="filter-field" style="margin-left: 2vh;">
                 <mat-label>Action Plan Status</mat-label>
-                <mat-select [value]="statusFilterValue" (selectionChange)="statusFilter($event.value)">
+                <mat-select matSelectSearch placeholder="Search status..." [value]="statusFilterValue" (selectionChange)="statusFilter($event.value)">
                     <mat-option [value]="''">All Action Plan Status</mat-option>
                     <mat-option *ngFor="let s of actionPlanStatusData" [value]="s.ActionPlanStatusID">{{ s.ActionPlanStatus }}</mat-option>
                 </mat-select>
@@ -92,7 +92,7 @@
                         </ng-container>
 
                         <ng-container matColumnDef="Group">
-                            <th mat-header-cell *matHeaderCellDef  style = "width: 4vw;"> Group </th>
+                            <th mat-header-cell *matHeaderCellDef  style = "width: 4vw;"> Department </th>
                             <td mat-cell *matCellDef="let element" > {{ element.GroupName }} </td>
                         </ng-container>
 

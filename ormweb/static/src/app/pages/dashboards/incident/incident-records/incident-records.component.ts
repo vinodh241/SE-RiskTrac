@@ -36,7 +36,7 @@ export class IncidentRecordsComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        console.log("id",this.parent.id)
+        // console.log("id",this.parent.id)
         this.tableData = this.parent.id
         this.criticalWiseData = this.parent.criticalData
         this.criticalId = this.parent.popup
@@ -44,14 +44,14 @@ export class IncidentRecordsComponent implements OnInit {
             (ele:any) =>
                 ele.selected
         )
-        console.log("this.tableData",this.tableData[0])
+        // console.log("this.tableData",this.tableData[0])
 
         if(this.parent.popup == "criticaldata"){
             this.cwGraphFlag = true
         }
-        console.log("cwGraphFlag",this.cwGraphFlag)
+        // console.log("cwGraphFlag",this.cwGraphFlag)
         this.dataSource = this.tableData[0].countdata;
-        console.log('this.unitWiseData', this.dataSource);
+        // console.log('this.unitWiseData', this.dataSource);
     }
 
     cancel() {

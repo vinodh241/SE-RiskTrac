@@ -30,4 +30,9 @@ export class InherentRiskService extends RestService {
     return this.upload("/rcsa/schedule/add-bulk-inherent-risk", data)
   }
 
+  /** Fetch departments (groups) and units for filter dropdowns */
+  getDepartmentsAndUnitsForSchedule() {
+    return this.post("/rcsa/schedule/get-departments-and-units-for-schedule", {});
+  }
+
 }

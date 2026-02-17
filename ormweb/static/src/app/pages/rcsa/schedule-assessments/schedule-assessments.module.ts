@@ -11,7 +11,9 @@ import { NewScheduleAssessmentsComponent } from './new-schedule-assessments/new-
 import { InprogressScheduleAssessmentsComponent } from './inprogress-schedule-assessments/inprogress-schedule-assessments.component';
 import { CompletedScheduleAssessmentsComponent } from './completed-schedule-assessments/completed-schedule-assessments.component';
 import { ScheduleAssessmentsDetailsComponent } from './schedule-assessments-details/schedule-assessments-details.component';
+import { ExistingCyclesDialogComponent } from './existing-cycles-dialog/existing-cycles-dialog.component';
 import { MatPaginator } from '@angular/material/paginator';
+import { CoresharedModule } from 'src/app/core-shared/coreshared.module';
 
 
 @NgModule({
@@ -20,7 +22,8 @@ import { MatPaginator } from '@angular/material/paginator';
     NewScheduleAssessmentsComponent,
     InprogressScheduleAssessmentsComponent,
     CompletedScheduleAssessmentsComponent,
-    ScheduleAssessmentsDetailsComponent    
+    ScheduleAssessmentsDetailsComponent,
+    ExistingCyclesDialogComponent
   ],
   imports: [
     CommonModule,
@@ -29,6 +32,7 @@ import { MatPaginator } from '@angular/material/paginator';
     MatGridListModule,
     FlexLayoutModule,
     ColorPickerModule,
+    CoresharedModule
     
   ],
   exports:[

@@ -544,8 +544,8 @@ export class RiskMetricsComponent implements OnInit {
                 else
                 this.saveerror = res.error.errorMessage;
             }
-            error:
-            console.log("err::", "error");
+            error: (err: any) =>
+            console.log("err::", err);
             })
         }
         })

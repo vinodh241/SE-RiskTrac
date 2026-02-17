@@ -8,7 +8,7 @@
             <mat-card class="paddingZero"
                 style="background: #E3E3E3 url(./assets/rcsa/rd-left-img.png) no-repeat center bottom; height: 100%;">
                 <div>
-                    <div class="topDate" >
+                    <!-- <div class="topDate" >
                         <span>Data Shown: </span>
                         <span *ngIf="selectedModule=='Incidents'">
                             {{startDate | date: 'dd MMM yyyy'}} - {{endDate | date: 'dd MMM yyyy'}}
@@ -19,13 +19,13 @@
                         <span *ngIf="selectedModule!='Incidents' && selectedModule!='Risk Appetite'">
                             {{minStartDate | date: 'dd MMM yyyy'}} - {{maxEndDate | date: 'dd MMM yyyy'}}
                         </span>
-                    </div>
+                    </div> -->
                     <div class="dashFilter">
                         <mat-card-content class="side-card-content">
                             <div class="w50 padd1vhRight">
                                 <h4 class="header-style">Year</h4>
                                 <mat-form-field appearance="fill">
-                                    <mat-select (selectionChange)="checkYear($event.value)" [(ngModel)]="yearFilter">
+                                    <mat-select matSelectSearch placeholder="Search year..." (selectionChange)="checkYear($event.value)" [(ngModel)]="yearFilter">
                                         <mat-option *ngFor="let year of yearsList" [value]="year">
                                             {{year}}
                                         </mat-option>
@@ -35,7 +35,7 @@
                             <div class="w50 padd1vhLeft" style="margin-right: 0px;">
                                 <h4 class="header-style">Quarter</h4>
                                 <mat-form-field appearance="fill">
-                                    <mat-select [(ngModel)]="quarterFilter"
+                                    <mat-select matSelectSearch placeholder="Search quarter..." [(ngModel)]="quarterFilter"
                                         (selectionChange)="checkMonth($event.value)">
                                         <mat-option *ngFor="let quarter of quartersList" [value]="quarter">
                                             {{quarter}}
@@ -71,7 +71,7 @@
                                 </mat-form-field>
                                 <h5>Criticality</h5>
                                 <mat-form-field appearance="fill">
-                                    <mat-select [(ngModel)]="selectedCriticality">
+                                    <mat-select matSelectSearch placeholder="Search criticality..." [(ngModel)]="selectedCriticality">
                                         <mat-option [value]="'All'">All</mat-option>
                                         <mat-option *ngFor="let item of incidentValues?.criticality" [value]="item">
                                             {{item}}
@@ -80,7 +80,7 @@
                                 </mat-form-field>
                                 <h5>Incident Status</h5>
                                 <mat-form-field appearance="fill">
-                                    <mat-select [(ngModel)]="selectedIncidentStatus">
+                                    <mat-select matSelectSearch placeholder="Search status..." [(ngModel)]="selectedIncidentStatus">
                                         <mat-option [value]="'All'">All</mat-option>
                                         <mat-option *ngFor="let item of incidentValues?.incidentStatus" [value]="item">
                                             {{item}}
@@ -89,7 +89,7 @@
                                 </mat-form-field>
                                 <h5>Incident Unit</h5>
                                 <mat-form-field appearance="fill">
-                                    <mat-select [(ngModel)]="selectedUnit">
+                                    <mat-select matSelectSearch placeholder="Search unit..." [(ngModel)]="selectedUnit">
                                         <mat-option [value]="'All'">All</mat-option>
                                         <mat-option *ngFor="let item of incidentUnitData" [value]="item">
                                             {{item}}
@@ -99,7 +99,7 @@
                             </div>
                             <!-- KRI LEFT SIDE  -->
                             <div *ngIf="selectedModule=='KRI'">
-                                <h5>Measurement Frequency</h5>
+                                <!-- <h5>Measurement Frequency</h5>
                                 <mat-form-field appearance="fill">
                                     <mat-select [(ngModel)]="selectedMeasureFreq">
                                         <mat-option [value]="'All'">All</mat-option>
@@ -107,10 +107,19 @@
                                             {{item}}
                                         </mat-option>
                                     </mat-select>
+                                </mat-form-field> -->                                
+                                <h5>Month</h5>
+                                <mat-form-field appearance="fill">
+                                <mat-select matSelectSearch placeholder="Search month..." [(ngModel)]="selectedMonth" (selectionChange)="onMonthChange($event.value)">
+                                    <mat-option *ngFor="let m of monthsList" [value]="m.period">
+                                    {{ m.name }}   <!-- only month name shown -->
+                                    </mat-option>
+                                </mat-select>
                                 </mat-form-field>
+                                                            
                                 <h5>KRI Type</h5>
                                 <mat-form-field appearance="fill">
-                                    <mat-select [(ngModel)]="selectedKriType">
+                                    <mat-select matSelectSearch placeholder="Search KRI type..." [(ngModel)]="selectedKriType">
                                         <mat-option [value]="'All'">All</mat-option>
                                         <mat-option *ngFor="let item of KRIValues?.KriType" [value]="item">
                                             {{item}}
@@ -120,7 +129,7 @@
 
                                 <h5>KRI Value</h5>
                                 <mat-form-field appearance="fill">
-                                    <mat-select [(ngModel)]="selectedKriValue">
+                                    <mat-select matSelectSearch placeholder="Search KRI value..." [(ngModel)]="selectedKriValue">
                                         <mat-option [value]="'All'">All</mat-option>
                                         <mat-option [value]="'1'">1</mat-option>
                                         <mat-option [value]="'2'">2</mat-option>
@@ -135,7 +144,7 @@
 
                                 <h5>Status</h5>
                                 <mat-form-field appearance="fill">
-                                    <mat-select [(ngModel)]="selectedKriStatus">
+                                    <mat-select matSelectSearch placeholder="Search status..." [(ngModel)]="selectedKriStatus">
                                         <mat-option [value]="'All'">All</mat-option>
                                         <mat-option *ngFor="let item of KRIValues?.KriStatus" [value]="item">
                                             {{item}}
@@ -163,7 +172,7 @@
                                 </mat-form-field>
                                 <h5>Units</h5>
                                 <mat-form-field appearance="fill">
-                                    <mat-select [(ngModel)]="selectedAssesmentUnits">
+                                    <mat-select matSelectSearch placeholder="Search units..." [(ngModel)]="selectedAssesmentUnits">
                                         <mat-option [value]="'All'">All</mat-option>
                                         <mat-option *ngFor="let item of raUnitData" [value]="item">
                                             {{item}}
@@ -172,7 +181,7 @@
                                 </mat-form-field>
                                 <h5>Status</h5>
                                 <mat-form-field appearance="fill">
-                                    <mat-select [(ngModel)]="selectedStatus">
+                                    <mat-select matSelectSearch placeholder="Search status..." [(ngModel)]="selectedStatus">
                                         <mat-option [value]="'All'">All</mat-option>
                                         <mat-option *ngFor="let item of assessmentStatus" [value]="item">
                                             {{item}}
@@ -184,7 +193,7 @@
                             <div *ngIf="selectedModule=='RCSA'">
                                 <h5>Unit</h5>
                                 <mat-form-field appearance="fill">
-                                    <mat-select [(ngModel)]="selectedRCSUnit">
+                                    <mat-select matSelectSearch placeholder="Search unit..." [(ngModel)]="selectedRCSUnit">
                                         <mat-option [value]="'All'">All</mat-option>
                                         <mat-option *ngFor="let item of rcsaUnitData" [value]="item">
                                             {{item}}
@@ -193,7 +202,7 @@
                                 </mat-form-field>
                                 <h5>Status</h5>
                                 <mat-form-field appearance="fill">
-                                    <mat-select [(ngModel)]="selectedRCSStatus">
+                                    <mat-select matSelectSearch placeholder="Search status..." [(ngModel)]="selectedRCSStatus">
                                         <mat-option [value]="'All'">All</mat-option>
                                         <mat-option *ngFor="let item of RCSValues?.status" [value]="item">
                                             {{item}}
@@ -202,7 +211,7 @@
                                 </mat-form-field>
                                 <h5>Inherent Risk Rating</h5>
                                 <mat-form-field appearance="fill">
-                                    <mat-select [(ngModel)]="selectedInherentRating">
+                                    <mat-select matSelectSearch placeholder="Search inherent rating..." [(ngModel)]="selectedInherentRating">
                                         <mat-option [value]="'All'">All</mat-option>
                                         <mat-option *ngFor="let item of RCSValues?.inherentRating" [value]="item">
                                             {{item}}
@@ -211,7 +220,7 @@
                                 </mat-form-field>
                                 <h5>Residual Risk Rating</h5>
                                 <mat-form-field appearance="fill">
-                                    <mat-select [(ngModel)]="selectedResidualRating">
+                                    <mat-select matSelectSearch placeholder="Search residual rating..." [(ngModel)]="selectedResidualRating">
                                         <mat-option [value]="'All'">All</mat-option>
                                         <mat-option *ngFor="let item of RCSValues?.residualRating" [value]="item">
                                             {{item}}
@@ -236,7 +245,8 @@
             <app-report-kri *ngIf="selectedModule=='KRI'" [selectedMeasureFreq]="selectedMeasureFreq"
                 [presentQuarter]="quarter" [selectedKriType]="selectedKriType" [selectedKriValue]="selectedKriValue"
                 [selectedKriStatus]="selectedKriStatus" [yearValue]="yearFilter" [quarterValue]="quarterFilter"
-                [quarterNumber]="presentQuater" [qStartDate]="minStartDate" [qEndDate]="maxEndDate"></app-report-kri>
+                [quarterNumber]="presentQuater" [qStartDate]="minStartDate" [qEndDate]="maxEndDate"
+                [selectedMonth]="selectedMonth"></app-report-kri>
             <app-report-rcsa *ngIf="selectedModule=='RCSA'" [selectedRCSUnit]="selectedRCSUnit"
                 [selectedRCSStatus]="selectedRCSStatus" [selectedInherentRating]="selectedInherentRating"
                 [selectedResidualRating]="selectedResidualRating" [yearValue]="yearFilter"

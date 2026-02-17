@@ -77,9 +77,9 @@ export class RiskappetiteOverallComponent implements OnInit {
                     // console.log('radata', this.RAData);
                     const colorData = this.dashboardservice.dashboardRAColor;
                     // console.log('colorData', colorData);
-                    this.lowcolor = colorData[0].ColorCode;
-                    this.modcolor = colorData[1].ColorCode;
-                    this.criticColor = colorData[2].ColorCode;
+                    this.lowcolor = colorData?.[0]?.ColorCode || '#808080';
+                    this.modcolor = colorData?.[1]?.ColorCode || '#FFA500';
+                    this.criticColor = colorData?.[2]?.ColorCode || '#FF0000';
                     this.raGraphData = [];
                     this.countMetricGroups(this.viewall);
                     // this.setChart();

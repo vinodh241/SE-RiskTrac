@@ -177,8 +177,8 @@ export class ReportSettingComponent implements OnInit {
                     this.utils.relogin(this.document);
                 //this.saveerror = res.error.errorMessage;
             }
-            error:
-            console.log("err::", "error");
+            error: (err: any) =>
+            console.log("err::", err);
         });
     }
 

@@ -59,12 +59,12 @@ export class IncidentOflGraphComponent implements OnInit {
         this.dashboardservice.gotincidentDashboardMaster.subscribe((value) => {
             if (value == true) {
                 this.RawData = this.dashboardservice.dashboardIncMaster;
-                // this.currency = (this.RawData.length > 0) ? this.RawData[0].Currency : '';
+                this.currency = (Array.isArray(this.RawData) && this.RawData.length > 0) ? this.RawData[0].Currency : '';
                 this.dashboardservice.gotYearQuater.subscribe((value) => {
                     this.yearData = this.dashboardservice.yearValue
                     this.quaterData = this.dashboardservice.quaterValue
-                    console.log("this.yearData",this.yearData)
-                    console.log("this.quaterData",this.quaterData)
+                    // console.log("this.yearData",this.yearData)
+                    // console.log("this.quaterData",this.quaterData)
 
                 let currentDate = new Date(); // Get the current date
                 let currMath = (Math.ceil((currentDate.getMonth() + 1) / 3))
@@ -83,9 +83,9 @@ export class IncidentOflGraphComponent implements OnInit {
                 this.quarterFilter = 'Q' + ((this.quaterData !== undefined && this.quaterData > 0) ? this.quaterData : currQuarter) + '-' + this.yearData.toString().substr(2, 2);
                 // console.log("currQuarter",currQuarter)
                 // let quarterFilter = 'Q' + ((this.quaterData !== undefined && this.quaterData > 0) ? this.quaterData : currQuarter) + '-' + this.yearData.toString().substr(2, 2);
-                console.log("🚀 ~ file: incident-ofl-graph.component.ts:68 ~ IncidentOflGraphComponent ~ this.dashboardservice.gotYearQuater.subscribe ~ quarterFilter:", this.quarterFilter)
+                // console.log("🚀 ~ file: incident-ofl-graph.component.ts:68 ~ IncidentOflGraphComponent ~ this.dashboardservice.gotYearQuater.subscribe ~ quarterFilter:", this.quarterFilter)
 
-                this.listdata = this.RawData.filter(
+                this.listdata = (Array.isArray(this.RawData) ? this.RawData : []).filter(
                     (data: any) =>   (data.StatusID != 1 && data.StatusID != 11 && data.StatusID != 12 && data.StatusID != 17 && data.StatusID != 18 && data.StatusID != 13 &&
                          data.StatusID != 14 && data.StatusID != 15 &&
                          data.StatusID != 16)
@@ -319,12 +319,12 @@ export class IncidentOflGraphComponent implements OnInit {
     }
 
     showPopup(barID: string) {
-          console.log("barid",barID)
-          console.log("this.metricGroupData1",this.metricGroupData1)
+        //   console.log("barid",barID)
+        //   console.log("this.metricGroupData1",this.metricGroupData1)
         this.metricdata = this.metricGroupData1.filter(
             (obj: any) => obj.name == barID
         );
-        console.log("metricdata",this.metricdata)
+        // console.log("metricdata",this.metricdata)
         //   let popupElement = document.getElementById('data');
         // console.log('metricdata', this.metricdata);
     }
@@ -422,7 +422,7 @@ export class IncidentOflGraphComponent implements OnInit {
             previousQuarters.push(quarterKey);
             previousQuartersLossAmount[quarterKey] = {};
         }
-        console.log("previousQuarters",previousQuarters)
+        // console.log("previousQuarters",previousQuarters)
 
         let dataArr: any = [];
 
@@ -445,10 +445,10 @@ export class IncidentOflGraphComponent implements OnInit {
                 }
             }
         }
-       console.log("previousQuartersLossAmount",previousQuartersLossAmount)
+    //    console.log("previousQuartersLossAmount",previousQuartersLossAmount)
         for (let key in previousQuartersLossAmount) {
             // console.log("i",key)
-            console.log("previousQuartersLossAmount[i]",previousQuartersLossAmount[key])
+            // console.log("previousQuartersLossAmount[i]",previousQuartersLossAmount[key])
             if (previousQuartersLossAmount[key] != {}) {
                 this.metricGroupData1.push({
                     name: key,
@@ -495,7 +495,7 @@ export class IncidentOflGraphComponent implements OnInit {
         this.selectedValue = this.metricGroupData1.filter(
             (ele: any) => ele.name == this.quarterFilter
         );
-        console.log("this.selectedValue",this.selectedValue)
+        // console.log("this.selectedValue",this.selectedValue)
 
         //         console.log('transformedData', transformedData);
         // console.log("records", this.records)
@@ -513,11 +513,11 @@ export class IncidentOflGraphComponent implements OnInit {
         let obj: any = {};
         let d = new Date().getFullYear().toString();
         d = d.substring(d.length - 1);
-        console.log(d.substring(d.length - 1));
+        // console.log(d.substring(d.length - 1));
         for (let i = 1; i >= 4; i++) {
             obj[`Q${i}-${d}`] = `Q${i}-${d}`;
         }
-        console.log(obj);
+        // console.log(obj);
         return obj;
     }
 
@@ -563,7 +563,7 @@ export class IncidentOflGraphComponent implements OnInit {
             }
             // this.quarter = this.selectedValue[0].name || this.metricdata[0].name
         }else if(id == 5){
-            console.log("")
+            // console.log("")
             this.unitId =  "Legal"
             if(!this.onclick){
                 this.quarter = this.selectedValue[0].name

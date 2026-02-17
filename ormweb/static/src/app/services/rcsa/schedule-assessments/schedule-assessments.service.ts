@@ -27,7 +27,7 @@ export class ScheduleAssessmentsService extends RestService {
   }
 
   getSchedulePeriod() {
-    return this.post("/rcsa/schedule/get-schedule-period-data", {},false);
+    return this.post("/rcsa/schedule/get-schedule-period-data", {}, false);
   }
 
   getActiveReviewer() {
@@ -55,7 +55,7 @@ export class ScheduleAssessmentsService extends RestService {
 
   getAssessmentCard(data: any) {
     return this.post("/rcsa/scheduleassessment/get-all-schedule-assessment-cards-data", data, false);
-  }  
+  }
 
   getSnapInprogressDetails(data: any) {
     return this.post("/rcsa/schedule/get-snapshot-for-inprogress-schedule-assessment-details-data", data, false);
@@ -69,4 +69,20 @@ export class ScheduleAssessmentsService extends RestService {
     return this.post("/rcsa/schedule/get-reminder-email-data", data);
   }
 
+  // --- New endpoints for Schedule RCSA - ALL vs Individual mode enhancement ---
+
+  /** Fetch departments (groups) and units for Individual mode dropdown */
+  getDepartmentsAndUnitsForSchedule() {
+    return this.post("/rcsa/schedule/get-departments-and-units-for-schedule", {});
+  }
+
+  /** Fetch existing scheduled cycles for a given period */
+  getExistingScheduledCycles(data: any) {
+    return this.post("/rcsa/schedule/get-existing-scheduled-cycles", data);
+  }
+
+  /** Fetch unit mappings for an existing assessment (for edit pre-selection) */
+  getScheduleAssessmentUnits(data: any) {
+    return this.post("/rcsa/schedule/get-schedule-assessment-units", data);
+  }
 }

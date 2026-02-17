@@ -7,6 +7,7 @@ import { KriService } from 'src/app/services/kri/kri.service';
 import { ReportsService } from 'src/app/services/reports/reports.service';
 import { DatePipe } from '@angular/common';
 import { FormControl } from '@angular/forms';
+
 export const MY_FORMATS = {
     parse: {
         dateInput: 'LL',
@@ -18,6 +19,7 @@ export const MY_FORMATS = {
         monthYearA11yLabel: 'MMM YYYY',
     },
 };
+
 @Component({
     selector: 'app-reports',
     templateUrl: './reports.component.html',
@@ -85,8 +87,20 @@ export class ReportsComponent implements OnInit {
     selectedYear: any;
     selectedQuarter: any;
     incidentUnit: any = [];
-    raUnit: any= [];
-    rcsaUnit: any= [];
+    raUnit: any = [];
+    rcsaUnit: any = [];
+
+    // monthsList now contains objects { name: string, period: string }
+    monthsList: Array<{ name: string; period: string }> = [];
+    selectedMonth: string | null = null; // will hold period like "Oct 2025"
+
+    // short & full month helpers
+    private monthShortNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    private monthFullNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
 
     constructor(private service: ReportsService, public kriService: KriService, private datePipe: DatePipe
     ) {
@@ -107,7 +121,6 @@ export class ReportsComponent implements OnInit {
         })
     }
 
-
     ngOnInit(): void {
         this.getQuarter(new Date());
         this.getModules();
@@ -126,10 +139,10 @@ export class ReportsComponent implements OnInit {
 
     }
 
-    getIncidentUnit() {       
+    getIncidentUnit() {
         this.service.gotIncidents.subscribe((res: any) => {
             next:
-            if(res == true) {
+            if (res == true) {
                 this.incidentUnit = this.service.incidents.IncidentData;
             }
         })
@@ -139,7 +152,7 @@ export class ReportsComponent implements OnInit {
         console.log("inside ra");
         this.service.gotRA.subscribe((res: any) => {
             next:
-            if(res == true) {
+            if (res == true) {
                 this.raUnit = this.service.RAResults;
             }
         })
@@ -148,12 +161,11 @@ export class ReportsComponent implements OnInit {
     getRcsaUnit() {
         this.service.gotRCSA.subscribe((res: any) => {
             next:
-            if(res == true) {
+            if (res == true) {
                 this.rcsaUnit = this.service.RCSAResults;
             }
         })
     }
-
 
     getRAUnits() {
         this.assessmentUnits = [
@@ -195,24 +207,23 @@ export class ReportsComponent implements OnInit {
         ]
     }
 
-    getFiltered():any{
-        let Qutr = 'Q'+this.selectedQuarter+'-'+this.selectedYear.toString().substr(2, 2); 
-        let period = 'Quarter '+this.selectedQuarter+ ", " +this.selectedYear.toString(); 
-        if(this.incidentUnit.length) {
-            let filteredINC = this.incidentUnit.filter((itr:any)=>itr.Quarter == Qutr);
-            this.incidentUnitData = [...new Set(filteredINC.map((itr:any) => itr.IncidentUnitName))];    
-        }          
-        if(this.raUnit.length) {
-            let filteredRA = this.raUnit.filter((itr:any)=>itr.Quater == Qutr);
-            this.raUnitData  = [...new Set(filteredRA.map((itr:any) => itr.UnitName))];
+    getFiltered(): any {
+        let Qutr = 'Q' + this.selectedQuarter + '-' + this.selectedYear.toString().substr(2, 2);
+        let period = 'Quarter ' + this.selectedQuarter + ", " + this.selectedYear.toString();
+        if (this.incidentUnit.length) {
+            let filteredINC = this.incidentUnit.filter((itr: any) => itr.Quarter == Qutr);
+            this.incidentUnitData = [...new Set(filteredINC.map((itr: any) => itr.IncidentUnitName))];
         }
-        if(this.rcsaUnit.length) {
-            let filteredRA = this.rcsaUnit.filter((itr:any)=>itr.SchedulePeriod == period);
-            this.rcsaUnitData  = [...new Set(filteredRA.map((itr:any) => itr.Unit))];
+        if (this.raUnit.length) {
+            let filteredRA = this.raUnit.filter((itr: any) => itr.Quater == Qutr);
+            this.raUnitData = [...new Set(filteredRA.map((itr: any) => itr.UnitName))];
+        }
+        if (this.rcsaUnit.length) {
+            let filteredRA = this.rcsaUnit.filter((itr: any) => itr.SchedulePeriod == period);
+            this.rcsaUnitData = [...new Set(filteredRA.map((itr: any) => itr.Unit))];
         }
 
-    }  
-
+    }
 
     upDateFilters() {
         this.selectedCriticality = 'All';
@@ -223,7 +234,7 @@ export class ReportsComponent implements OnInit {
         this.selectedEndDate = null;
         this.selectedStatus = 'All';
         this.selectedUnits = 'All';
-        this.selectedMeasureFreq = 'All';
+        this.selectedMeasureFreq = this.KRIValues?.measurementFreq[0] ?? "Monthly";
         this.selectedKriType = 'All';
         this.selectedKriValue = 'All';
         this.selectedKriStatus = 'All';
@@ -235,9 +246,11 @@ export class ReportsComponent implements OnInit {
         this.yearFilter = new Date().getFullYear();
         this.checkYear(this.yearFilter);
     }
+
     getModules() {
         this.modules = ['Incidents', 'KRI', 'Risk Appetite', 'RCSA'];
     }
+
     getStatusCounts() {
         this.claimClosedCount = 0;
         this.closedCount = 0;
@@ -250,13 +263,16 @@ export class ReportsComponent implements OnInit {
             })
         })
     }
+
     generateExcel() {
         this.kriService.exportAsExcelFile(this.dataSource.data, 'reportFIle');
     }
+
     clearDates() {
         this.startDate = null;
         this.endDate = null;
     }
+
     getQuarter(date: Date) {
         date = date || new Date();
         var month = Math.floor(date.getMonth() / 3) + 1;
@@ -294,6 +310,7 @@ export class ReportsComponent implements OnInit {
         this.checkYear(this.yearFilter);
         this.selectedStartDate = this.minStartDate;
     }
+
     checkYear(yearValue: any) {
         this.selectedYear = yearValue;
         if (this.year == yearValue) {
@@ -314,6 +331,7 @@ export class ReportsComponent implements OnInit {
             this.quartersList = [1, 2, 3, 4];
         }
         this.checkMonth(this.quarterFilter);
+        this.updateMonthsList();
         this.getFiltered();
     }
 
@@ -338,6 +356,7 @@ export class ReportsComponent implements OnInit {
         this.minStartDate = this.selectedStartDate = this.startDate;
         this.maxEndDate = this.selectedEndDate = this.endDate;
         this.getFiltered();
+        this.updateMonthsList();
     }
 
     getIncidentUnitNew() {
@@ -364,5 +383,55 @@ export class ReportsComponent implements OnInit {
     }
     updateSelecedendDate(event: any) {
         this.selectedEndDate = new Date(event.value._d)
+    }
+
+    updateMonthsList() {
+        const year = Number(this.yearFilter);
+        const quarter = Number(this.quarterFilter);
+
+        if (!year || !quarter) {
+            this.monthsList = [];
+            this.selectedMonth = null;
+            return;
+        }
+
+        // map quarter to 0-based month indices
+        const quarterMap: { [q: number]: number[] } = {
+            1: [0, 1, 2],
+            2: [3, 4, 5],
+            3: [6, 7, 8],
+            4: [9, 10, 11]
+        };
+
+        const monthsIdx = quarterMap[quarter] || [];
+
+        // Build monthsList: name (display only) and period (value: short format "Oct 2025")
+        this.monthsList = monthsIdx.map(mi => {
+            return {
+                // change here if you prefer shortened display like "Oct" or full like "October"
+                name: this.monthFullNames[mi],            // display: "October"
+                period: `${this.monthShortNames[mi]} ${year}` // value: "Oct 2025"
+            };
+        });
+
+        // Default: choose current month in quarter (if same year) otherwise first month of quarter
+        const now = new Date();
+        const nowYear = now.getFullYear();
+        const nowMonthIdx = now.getMonth();
+
+        const isCurrentMonthInQuarter = (nowYear === year) && monthsIdx.includes(nowMonthIdx);
+        if (isCurrentMonthInQuarter) {
+            this.selectedMonth = `${this.monthShortNames[nowMonthIdx]} ${year}`; // "Oct 2025"
+        } else {
+            this.selectedMonth = this.monthsList.length ? this.monthsList[0].period : null;
+        }
+    }
+
+    // call when user explicitly changes month (optional extra handling)
+    onMonthChange(val: string) {
+        // val will be a string like "October 2025"
+        this.selectedMonth = val;
+        // if you need to update date ranges based on selectedMonth, do here:
+        // e.g. parse to a Date range, or set qStartDate/qEndDate if required.
     }
 }

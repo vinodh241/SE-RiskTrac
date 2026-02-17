@@ -202,8 +202,8 @@ export class RiskUnitReviewerComponent implements OnInit{
                     else
                         this.popupInfo("Error", res.error.errorMessage, false, null);
                 }
-                error:
-                console.log("err::", "error");
+                error: (err: any) =>
+                console.log("err::", err);
             });
         } else {
             this.popupInfo("Information", "Data was not changed", false, null);
@@ -241,8 +241,8 @@ export class RiskUnitReviewerComponent implements OnInit{
                         this._utils.relogin(this._document);
                     this.popupInfo("Error", res.error.errorMessage, false, null);
                 }
-                error:
-                console.log("err::", "error");
+                error: (err: any) =>
+                console.log("err::", err);
             });
         }
     }

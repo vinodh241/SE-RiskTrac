@@ -100,8 +100,8 @@ export class RiskApptiteDashboardComponent implements OnInit {
         this.dashboardservice.gotRAMaster.subscribe((value) => {
             if (value == true) {   
                 //to get the details of the current quater         
-                this.formattedData  = this.dashboardservice.RAMaster.Formatted_DATA;
-                console.log('this.formattedData: '+ JSON.stringify(this.formattedData)) 
+                this.formattedData  = this.dashboardservice.RAMaster.Formatted_DATA || [];
+                // console.log('this.formattedData: '+ JSON.stringify(this.formattedData)) 
                                
                 this.RawData        = this.formattedData.filter((item:any) => item.CollectionStatusName !== "Not Started" && item.StatusID !== null && item.StatusID !== 1 && item.StatusID !== 2 );
                 this.dashboardservice.gotYearQuater.subscribe((value) => {
@@ -115,7 +115,7 @@ export class RiskApptiteDashboardComponent implements OnInit {
                     this.quarterFilter = 'Q' + ((this.quaterData !== undefined && this.quaterData > 0) ? this.quaterData : currQuarter) + '-' + this.yearData.toString().substr(2, 2);                
                     // this.quarterFilter  = "Q" + Math.ceil((currentDate.getMonth() + 1) / 3) + "-" + currentDate.getFullYear().toString().substr(2,2); // Get the current quarter
                     this.RiskData       = this.RawData.filter((data:any) => data.Quater == this.quarterFilter);                                                
-                    console.log('this.RiskData : ',this.RiskData )
+                    // console.log('this.RiskData : ',this.RiskData )
                     this.notStarted     = this.formattedData.filter((item:any) =>  item.Quater == this.quarterFilter && item.CollectionStatusName == "Not Started" && item.StatusID == null).length;                 
                     this.inProgress     = this.formattedData.filter((item:any) =>  item.Quater == this.quarterFilter && item.StatusID == 2).length;
                     this.submitted      = this.formattedData.filter((item:any) =>  item.Quater == this.quarterFilter && item.StatusID == 3).length;
@@ -130,9 +130,9 @@ export class RiskApptiteDashboardComponent implements OnInit {
                     this.countMetricGroups();
                     this.countRiskLevel();
                     const colorData     = this.dashboardservice.RAMaster.RISK_COLOR_DATA;                         
-                    this.lowcolor       =  colorData[0].ColorCode;
-                    this.modcolor       =  colorData[1].ColorCode;
-                    this.criticColor    =  colorData[2].ColorCode; 
+                    this.lowcolor       =  colorData?.[0]?.ColorCode || '#808080';
+                    this.modcolor       =  colorData?.[1]?.ColorCode || '#FFA500';
+                    this.criticColor    =  colorData?.[2]?.ColorCode || '#FF0000';
 
                     this.status = this.RiskData.filter((obj: any) => obj.StatusID === 1 );
                     this.statusCount    = this.status.length;
@@ -351,7 +351,7 @@ export class RiskApptiteDashboardComponent implements OnInit {
             // if(this.viewAlldata.length){
             // this.orgDataViewAll = Array.from(this.orgViewData);
             
-            console.log('Array.from(this.orgViewData) ',Array.from(this.orgViewData))
+            // console.log('Array.from(this.orgViewData) ',Array.from(this.orgViewData))
             const dialog = this.dialog.open(ViewAllComponent, {
                 disableClose: true,         
                 panelClass: 'full-screen-modal',
@@ -425,7 +425,7 @@ export class RiskApptiteDashboardComponent implements OnInit {
 
 
     openOrgPopup(status: string, element: any) :void{ 
-        console.log('element: ',element);
+        // console.log('element: ',element);
         let RATitle = 'Organizational RA';
         let statusMetric :any;
         let OrgData:any;
@@ -442,7 +442,7 @@ export class RiskApptiteDashboardComponent implements OnInit {
             statusMetric = 'Critical Risk Level'
             OrgData = this.RiskData.filter((obj: any) => obj.CaptionData == element.name && obj.RiskMetricLevel == 3)
         }
-        console.log('statusMetric: ',statusMetric)
+        // console.log('statusMetric: ',statusMetric)
         if(OrgData?.length > 0){ 
             const dialog = this.dialog.open(RaPopupComponent, {
                 disableClose: true,         

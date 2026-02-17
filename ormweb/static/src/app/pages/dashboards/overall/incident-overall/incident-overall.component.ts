@@ -5,6 +5,7 @@ import { DashboardService } from 'src/app/services/dashboard/dashboard.service';
 import { CwPopupComponent } from '../../incident/incident-popups/cw-popup/cw-popup.component';
 import { DashboardComponent } from '../../dashboard.component';
 import { environment } from 'src/environments/environment';
+import { IncidentService } from 'src/app/services/incident/incident.service';
 
 @Component({
     selector: 'app-incident-overall',
@@ -29,16 +30,20 @@ export class IncidentOverallComponent implements OnInit {
     high: any;
     medium: any;
     low: any;
-    currency: any = environment.currency;
-    constructor(public dashboardservice: DashboardService,public dialog: MatDialog, public DashboardComponent: DashboardComponent) {}
+    currency: any;
+    constructor(public dashboardservice: DashboardService, public dialog: MatDialog, public DashboardComponent: DashboardComponent, public incidentService: IncidentService) {}
 
     ngOnInit(): void {
+        // Silently load criticality data for tooltips (won't cause session issues)
+        this.incidentService.loadCriticalityDataSilent();
+        
         this.dashboardservice.getYearQuarterData();
         // this.dashboardservice.getOverallDashbardData();
         this.dashboardservice.gotOverallDashboardMaster.subscribe((value) => {
             if (value == true) {
                 this.INCData = this.dashboardservice.dashboardINCMaster;
-                console.log('INCdata', this.INCData);
+                this.currency = this.dashboardservice?.CurrencyType.length > 0 ? this.dashboardservice?.CurrencyType[0].Currency : ''
+                // console.log('INCdata', this.INCData);
                 this.dashboardservice.gotYearQuater.subscribe((value) => {
                     this.yearData = this.dashboardservice.yearValue;
                     this.quaterData = this.dashboardservice.quaterValue;
@@ -62,9 +67,9 @@ export class IncidentOverallComponent implements OnInit {
                     this.listdata = this.INCData.filter(
                         (data: any) => data.StatusID != 1
                     );
-                    console.log('this.quarterFilter', this.quarterFilter);
+                    // console.log('this.quarterFilter', this.quarterFilter);
                     this.allData = this.INCData.filter((data: any) =>  data.Quater === this.quarterFilter && (data.StatusID != 1 && data.StatusID != 11 && data.StatusID != 12 && data.StatusID != 17 && data.StatusID != 18 && data.StatusID != 13 && data.StatusID != 14 && data.StatusID != 15 && data.StatusID != 16)); // Filter the object based on the current quarter
-                    console.log(' this.allData', this.allData);
+                    // console.log(' this.allData', this.allData);
                     this.incidentAllData = this.allData.length;
                     setTimeout(() => {
                         this.values = this.allData;
@@ -92,7 +97,7 @@ export class IncidentOverallComponent implements OnInit {
         });
     }
     incidentGraphData() {
-        console.log('123');
+        // console.log('123');
         this.options = {
             chart: {
                 type: 'column',
@@ -155,7 +160,20 @@ export class IncidentOverallComponent implements OnInit {
             },
 
             tooltip: {
-                enabled: false,
+                enabled: true,
+                useHTML: true,
+                outside: true,
+                formatter: ((service: IncidentService) => function(this: any) {
+                    const name = this.point.name.replace(/<[^>]*>/g, '').trim();
+                    // Get description from DB via service (no hardcoding)
+                    const desc = service.getCriticalityDescription(name) || '';
+                    const formattedDesc = desc.replace(/\. /g, '.<br/>');
+                    return '<div style="background:#fff;border:1px solid #ccc;border-radius:6px;padding:10px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-family:Arial,sans-serif;">' +
+                        '<div style="font-weight:600;font-size:13px;color:#333;margin-bottom:6px;">' + name + ': ' + this.point.y + ' incident(s)</div>' +
+                        '<div style="font-size:11px;color:#666;line-height:1.4;">' + formattedDesc + '</div>' +
+                        '<div style="font-size:10px;color:#999;font-style:italic;margin-top:6px;">Click to view details</div>' +
+                    '</div>';
+                })(this.incidentService)
             },
 
             series: [
@@ -242,14 +260,14 @@ export class IncidentOverallComponent implements OnInit {
                 this.totalLossAmount += item.LossAmount;
             }
         });
-        console.log('Total Loss Amount:', this.totalLossAmount);
+        // console.log('Total Loss Amount:', this.totalLossAmount);
     }
 
     getIndex(dt: any) {
         let index = 1;
         let list = [];
         for (let i of dt) {
-            i.sno = index;
+            i['sno'] = index;
             list.push(i);
             index++;
         }

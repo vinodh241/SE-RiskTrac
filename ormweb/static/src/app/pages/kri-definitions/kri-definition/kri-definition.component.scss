@@ -41,6 +41,53 @@
   display: flex;
 }
 
+/* Threshold Type: horizontal toggle/slider (Number left, Percentage right) */
+.threshold-type-toggle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+
+  .toggle-label {
+    font-size: 0.9rem;
+    color: #737373;
+    cursor: pointer;
+    user-select: none;
+
+    &.active {
+      color: #000;
+      font-weight: 500;
+    }
+  }
+
+  .toggle-track {
+    position: relative;
+    width: 56px;
+    height: 28px;
+    background: #c3c3c3;
+    border-radius: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    .toggle-handle {
+      position: absolute;
+      top: 50%;
+      left: 4px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #0B65A0;
+      transform: translateY(-50%);
+      transition: left 0.2s ease;
+
+      &.percentage {
+        left: calc(100% - 26px);
+      }
+    }
+  }
+}
+
 .frequency {
     width: 50%;
     border: solid 1px black;
@@ -210,3 +257,35 @@
     overflow: hidden !important;
   }
 
+
+  .topNewSectionFiled {
+    display: flex;
+    flex-direction: row;
+    margin-top: 1vh;
+  }
+
+.topFirstField {
+  margin-right: 2vw;
+  width: 25%;
+}
+
+.topFirstField:last-child {
+  width: calc(50% - 4vw);
+  margin-right: 0;
+}
+
+.w49{
+  width: calc(55% - 2vw);
+}
+
+.w100 {
+  width: 100%;
+}
+
+.wMax100 {
+  max-width: 100%;
+}
+
+.w50plus {
+  width: calc(50% + 2vw);
+}
