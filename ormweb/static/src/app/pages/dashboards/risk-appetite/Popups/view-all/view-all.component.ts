@@ -34,7 +34,7 @@ export class ViewAllComponent implements OnInit {
 
     this.data=[]
     this.data= this.parent.id;
-    // console.log('this.parent.id: ',this.data)
+    console.log('this.parent.id: ',this.data)
     this.dataSource =this.data;
     
    
@@ -70,7 +70,7 @@ export class ViewAllComponent implements OnInit {
     
   }
   openOrgPopup(status: string, element: any) :void{ 
-    // console.log('element: ',element);
+    console.log('element: ',element);
     let RATitle = 'Organizational RA';
     let statusMetric :any;
     let OrgData:any;
@@ -87,7 +87,7 @@ export class ViewAllComponent implements OnInit {
         statusMetric = 'Critical Risk Level'
         OrgData = this.RiskData.filter((obj: any) => obj.CaptionData == element.name && obj.RiskMetricLevel == 3)
     }
-    // console.log('statusMetric: ',statusMetric)
+    console.log('statusMetric: ',statusMetric)
     if(OrgData?.length > 0){ 
         const dialog = this.dialog.open(RaPopupComponent, {
             disableClose: true,         

@@ -197,9 +197,7 @@ export class KriReviewComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        // console.log("Entered in KRI Review Page");
-        
-        // console.log('headers', this.displayedColumns);
+        console.log('headers', this.displayedColumns);
         // let listGroup: any[] = []
         // listGroup.push({
         //     groupID : "all",
@@ -333,17 +331,17 @@ export class KriReviewComponent implements OnInit {
     }
 
     filterGroups(data: any): any {
-        // console.log('data in if', data.value);
+        console.log('data in if', data.value);
         if (data.value == 'all') {
             this.dataSource.data = this.kriService?.kriMeasurments;
             this.completedata = this.kriService?.kriMeasurments;
             setTimeout(() => (this.dataSource.paginator = this.paginator));
         } else {
-            // console.log('inside else part');
+            console.log('inside else part');
             let list: any = [];
             let service = this.kriService?.kriMeasurments;
             this.groupID = data.value;
-            // console.log('groupId in groups', this.groupID);
+            console.log('groupId in groups', this.groupID);
             for (let i of this.kriService?.kriMeasurments) {
                 if (i.GroupID == data.value) {
                     list.push(i);
@@ -479,68 +477,24 @@ export class KriReviewComponent implements OnInit {
         }
     }
 
-   isLastMonth(): boolean {
-        const now = new Date();
-        const bufferRaw = this.kriService?.BufferDays;
-        const gracePeriodDays = Number.isFinite(bufferRaw) ? Number(bufferRaw) : 0;
-        const freq = (this.kriService?.kriMeasurmentsReportingFrequncy || "").trim();
-        // console.log('isLastMonth-freq::', freq);
-        // console.log('isLastMonth-gracePeriodDays::', gracePeriodDays);
-        let periodStart: Date | null = null;
-        let periodEnd: Date | null = null;
-        switch (freq) {
-            case "Monthly": {
-                // Last completed month: start = first day of previous month, end = last day of previous month
-                const prevMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-                periodStart = new Date(prevMonthDate.getFullYear(), prevMonthDate.getMonth(), 1);
-                periodEnd = new Date(prevMonthDate.getFullYear(), prevMonthDate.getMonth() + 1, 0); // last day prev month
+    isLastMonth(): boolean {
+        let date = new Date();
+        let isLast = false;
+        switch (this.kriService.kriMeasurmentsReportingFrequncy) {
+            case 'Monthly':
+                isLast = true;
                 break;
-            }
-            case "Quarterly": {
-                // Determine which quarter the previous completed month belonged to
-                // Find current month index (0-11). We want previous quarter (the quarter that ended before the current month).
-                // Compute previous-month date, then quarter containing that month.
-                const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-                const monthIdx = prevMonth.getMonth();
-                const quarter = Math.floor(monthIdx / 3); // 0..3
-                const quarterStartMonth = quarter * 3;
-                periodStart = new Date(prevMonth.getFullYear(), quarterStartMonth, 1);
-                periodEnd = new Date(prevMonth.getFullYear(), quarterStartMonth + 3, 0); // last day of quarter
+            case 'Quarterly':
+                isLast = [2, 5, 8, 11].includes(date.getMonth());
                 break;
-            }
-            case "Semi Annual": {
-                // Two halves: Jan-Jun, Jul-Dec. Use the half that contains previous month.
-                const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-                const m = prevMonth.getMonth();
-                const halfStartMonth = m < 6 ? 0 : 6; // 0 or 6
-                periodStart = new Date(prevMonth.getFullYear(), halfStartMonth, 1);
-                periodEnd = new Date(prevMonth.getFullYear(), halfStartMonth + 6, 0); // last day of half
+            case 'Semi Annual':
+                isLast = [5, 11].includes(date.getMonth());
                 break;
-            }
-            case "Annually": {
-                // Previous calendar year
-                const prevYear = now.getFullYear() - 1;
-                periodStart = new Date(prevYear, 0, 1); // Jan 1 last year
-                periodEnd = new Date(prevYear, 12, 0);   // Dec 31 last year
+            case 'Annually':
+                isLast = [11].includes(date.getMonth());
                 break;
-            }
-            default:
-                return false;
         }
-        if (!periodStart || !periodEnd) return false;
-        // Compute grace end: periodEnd + gracePeriodDays, but set to end-of-day
-        const graceEnd = new Date(periodEnd);
-        graceEnd.setDate(graceEnd.getDate() + gracePeriodDays);
-        graceEnd.setHours(23, 59, 59, 999); // inclusive through the end of that day
-        // Normalize now to current timestamp (no change, but explicit)
-        const nowTs = now.getTime();
-        // Return true only if now is within [periodStart (00:00:00.000), graceEnd (23:59:59.999)]
-        const startOfPeriod = new Date(periodStart);
-        startOfPeriod.setHours(0, 0, 0, 0);
-        // console.log("nowTs (Local):", new Date(nowTs).toLocaleString());
-        // console.log("startOfPeriod (Local):", new Date(startOfPeriod).toLocaleString());
-        // console.log("graceEnd (Local):", new Date(graceEnd).toLocaleString());
-        return nowTs >= startOfPeriod.getTime() && nowTs <= graceEnd.getTime();
+        return isLast;
     }
 
     getQuarter() {
@@ -824,7 +778,7 @@ export class KriReviewComponent implements OnInit {
         let listData: any = [];
         let service = this.completedata;
         for (let i in service) {
-            // console.log(service[i]);
+            console.log(service[i]);
             if (
                 service[i].KRI_Status === data &&
                 service[i].MeasurementFrequency === frequency
@@ -840,7 +794,7 @@ export class KriReviewComponent implements OnInit {
     }
 
     measurementFrequencyData(data: any) {
-        // console.log(data);
+        console.log(data);
         this.model = '';
         this.dataSource.filter = ' ';
         if (this.dataSource.paginator) this.dataSource.paginator.firstPage();
@@ -1194,8 +1148,6 @@ export class KriReviewComponent implements OnInit {
             '🚀 ~ file: kri-review.component.ts:992 ~ KriReviewComponent ~ openDialog ~ this.commentData:',
             this.commentData
         );
-        console.log("Data Source data: ", this.dataSource.data);
-        
         if (this.checkedData == false) {
             this.allData = this.dataSource.data.filter(
                 (ele: any) => ele.isChecked == false
@@ -1214,36 +1166,17 @@ export class KriReviewComponent implements OnInit {
                 }
             );
 
-            console.log('Dialog is Opened:  ' + JSON.stringify(dialog));
+            console.log('dialog:  ' + JSON.stringify(dialog));
             dialog.afterClosed().subscribe((result) => {});
-        } 
-        
-        else if (this.checkedData == true) {
-            this.allData = this.dataSource.data.filter(
-                (ele: any) => ele.isChecked == true
-            );
-        console.log('🚀 ~ all approvedData', this.allData);
-
-        const dialog = this.dialog.open(
-            KriSendEmailReminderDialogComponent,
-            {
-                disableClose: true,
-                maxWidth: '50vw',
-                panelClass: 'full-screen-modal',
-                data: {
-                allData: this.allData,
-                    id: this.checkedData, // mark it approved mode
-                },
-            }
-    );
-    dialog.afterClosed().subscribe((result) => {});
-    } 
-        else {
+        } else {
             const metricIds: string = this.kriService.kriMeasurments
                 .filter((ele: any) => ele.IsSaved == true)
                 .map((metric: any) => metric.MetricID)
                 .join(',');
-     
+            console.log(
+                '🚀 ~ file: kri-review.component.ts:1026 ~ KriReviewComponent ~ openDialog ~ metricIds:',
+                metricIds
+            );
             this.kriService
                 .submitReviewerDetails({ metricIDs: metricIds })
                 .subscribe(
@@ -1347,7 +1280,7 @@ export class KriReviewComponent implements OnInit {
                 (ele: any) => ele.IsSaved == true
             ).length > 0;
         console.log('insdie save details', this.KRIReviewData);
-        this.isReviewedStatus = true;
+        this.isReviewedStatus = false;
     }
 
     countReportStatus(measurementFrequency: string, status: any): number {
@@ -1464,14 +1397,13 @@ export class KriReviewComponent implements OnInit {
                 }
             }
         });
-        
+        console.log('this.dataSource.data11', this.dataSource.data);
 
         //   this.dataSource.data = this.kriService.kriMeasurments;
     }
 
     setApproveAll(data: any, value: boolean) {
-        this.checkedData = value;
-        this.kriService.kriMeasurments.forEach((x: any) => {
+        this.checkedData = value;this.kriService.kriMeasurments.forEach((x: any) => {
             if (x.ReportStatusID != 2 && x.ReportStatusID != 3 && x.KRI_Status != 'Measured' && x.KRI_Status != 'Not Measured' &&  x.KRI_Status != null) {
                 console.log('approve------all')
                 if (data == null || data != value) {

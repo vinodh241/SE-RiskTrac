@@ -34,18 +34,11 @@ mat-card{
     fill: #ffffff
 }
 
-.w-100 {
-    width: 100%;
-}
-
 .d-flexSec{
     display: flex;
-    padding-block: 10px;
-    padding-inline: .5vw;
-    // padding: 10px;
+    padding: 10px;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
 }
 
 .d-flexSec p {
@@ -57,22 +50,13 @@ mat-card{
     justify-content: space-between;
     align-items: center; 
 }
-.d-flexSecF.width100{
-    width: 100%;
-    flex-wrap: wrap;
-}
 .d-flexSecS{
     display: flex;
     position: relative;
     justify-content: center;
     align-items: center;
-    width: calc((100% / 3) - 1vw);
-    // width: 26.33%; 
-    margin-left: 0.5vw;
-    // margin-left: 2%;
-}
-.d-flexSecS.ml0SecF{ 
-    margin-left: 0;
+    width: 26.33%; 
+    margin-left: 2%;
 }
 .d-flexSecS p{
     width: 100%;   
@@ -96,8 +80,7 @@ mat-card{
 .mainSectionForORCSAInner{
     overflow: auto;
     height: calc(100% - 70px);
-    // padding: 0px 10px 10px;
-    width: 100%;
+    padding: 0px 10px 10px;
 }
 .maincard {
     display: flex;
@@ -106,7 +89,6 @@ mat-card{
     
 }
 .maincard .chartcard{
-    width: 100%;
     width: 100%;
     height: 100px;
     margin: auto;
@@ -126,15 +108,13 @@ mat-card{
 .maincard .chartcard .mainButton{
     position: relative;
     height: 100%;
-    width: 2.2em;
-    // width: 35px;
+    width: 35px;
     display: flex;
     align-items: center;
     left: -5px;
 }
 .maincard .chartcard .mainButton .btnBg {
-    width: 2.2em;
-    // width: 100%;
+    width: 100%;
     height: 100%;
 }
 /* .maincard .chartcard .mainButton::before{
@@ -156,36 +136,31 @@ mat-card{
 }
 .maincard .chartcard .carts{
     padding: 16px 4px 4px 0px;
-    width: calc(100% - 35px);
-    // width: 100%;
+    width: 100%;
     position: relative;
     z-index: 1;
 }
 .maincard .chartcard .carts .candals{
     display: flex;
-    align-items: flex-end;
+    align-items: end;
     justify-content: space-between;
     border-bottom: 1px solid #0000009a;
-    padding: 0;
-    // padding: 0px 5px;
+    padding: 0px 5px;
 }
 .maincard .chartcard .carts .candals{
     height: 60px;
 }
 .maincard .chartcard .carts .candals .candal{
     display: flex;
-    align-items: flex-end;
+    align-items: end;
     height: 100%;
-    width: calc(100% / 5);
-    padding-inline: 1px;
 }
 .maincard .chartcard .carts .candals .candal span{
     cursor: pointer;
 }
 .maincard .chartcard .carts .candals .candal span{
     display: flex;
-    width: 100%;
-    // width: 25px;
+    width: 25px;
     height: 0%;
     transition: all 0.2s ease-in-out;
     border-radius: 4px 4px 0px 0px;
@@ -202,27 +177,14 @@ mat-card{
     border: 1px solid #0B9A45;
     background-color: #0B9A45;
 }
-.maincard .chartcard .carts .candals .candal.candal4 span{
-    // height: 20px;
-    border: 1px solid #6928d1;
-    background-color: #6928d1;
-}
-.maincard .chartcard .carts .candals .candal.candal5 span{
-    // height: 20px;
-    border: 1px solid #ff0d0d;;
-    background-color: #ff0d0d;;
-}
 .maincard .chartcard .carts .candalContent{
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    padding: 0;
-    // padding: 0px 5px;
-    width: 100%;
+    padding: 0px 5px;
 }
 .maincard .chartcard .carts .candalContent .content{
-    width: 100%;
-    // min-width: 25px;
+    min-width: 25px;
     text-align: center;
     font-size: 14px;
     font-weight: 600;

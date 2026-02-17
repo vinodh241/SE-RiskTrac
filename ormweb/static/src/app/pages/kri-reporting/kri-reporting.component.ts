@@ -20,9 +20,7 @@ export class KriReportingComponent implements OnInit {
     this.kriService.getKriReport();
   }
 
-  ngOnInit(): void { 
-    
-  }
+  ngOnInit(): void { }
 
   onGroupChange() {
     this.kriService.kriReportedSelectedUnit = '';

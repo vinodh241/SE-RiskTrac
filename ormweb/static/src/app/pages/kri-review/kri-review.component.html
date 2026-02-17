@@ -104,8 +104,8 @@
                                             <div class="w-100 toptbl pb-2 c-menu__item">
                                                 <table class="w-100">
                                                     <tbody>
-                                                        <tr (click)="measured('Measured')" [ngClass]="{'selected-row': selectedRow === 'Measured'}">
-                                                          <td style="margin: 0; padding: 0;">Measureds</td>
+                                                        <tr (click)="measured('Measured')" [ngClass]="{'selected-row': selectedRow=== 'Measured'}">
+                                                          <td style="margin: 0; padding: 0;">Measured</td>
                                                           <td class="text-right" style="margin: 0; padding: 0;">{{ this.measuredData('Measured') }}</td>
                                                         </tr>
                                                         <tr (click)="measured('Not Measured')" [ngClass]="{'selected-row': selectedRow=== 'Not Measured'}">

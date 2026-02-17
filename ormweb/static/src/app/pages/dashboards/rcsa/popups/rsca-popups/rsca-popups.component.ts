@@ -17,7 +17,7 @@ export class RscaPopupComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {    
-    // console.log(this.data.data)
+    console.log(this.data.data)
     this.listdata = this.data.data;
   }
 

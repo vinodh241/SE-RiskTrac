@@ -49,7 +49,7 @@ export class RiskAppetiteGraphComponent implements OnInit {
     this.dashboardservice.gotRAMaster.subscribe((value) => {
       if (value == true) 
       {            
-          this.formattedData = this.dashboardservice.RAMaster.Formatted_DATA || [];
+          this.formattedData = this.dashboardservice.RAMaster.Formatted_DATA; 
           this.RawData = this.formattedData.filter((item:any) => item.CollectionStatusName !== "Not Started" && item.StatusID !== null && item.StatusID !== 1 && item.StatusID !== 2 ); 
           const colorData        = this.dashboardservice.RAMaster.RISK_COLOR_DATA;     
           this.exportedData      = colorData;         

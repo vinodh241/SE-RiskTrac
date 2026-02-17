@@ -590,7 +590,7 @@ export class KriScoringComponent implements OnInit {
                 dbt += 1
             }
         }
-        if (data == null || dbt <= 0) {
+        if (data = null || dbt <= 0) {
             bol = true
         } else {
             bol = false

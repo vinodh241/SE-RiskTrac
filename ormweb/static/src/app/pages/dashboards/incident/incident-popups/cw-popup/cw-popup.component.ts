@@ -40,8 +40,8 @@ export class CwPopupComponent implements OnInit {
 
   ngOnInit(): void {
     this.dataSet = this.parent.data
-    // console.log("🚀 ~ CwPopupComponent ~ ngOnInit ~ this.dataSet:", this.dataSet)
-    this.currency = this.dataSet[0]?.Currency;
+    console.log("🚀 ~ CwPopupComponent ~ ngOnInit ~ this.dataSet:", this.dataSet)
+    // this.currency = this.dataSet[0]?.Currency;
     this.title = this.parent.title
   }
   openIncident(id: number): void {

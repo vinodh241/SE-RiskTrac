@@ -19,7 +19,7 @@ import { environment } from 'src/environments/environment';
 })
 export class MasterResidualRiskRatingComponent implements OnInit {
   color: string = 'primary';
-  displayedResidualRiskColumns: string[] = ['Index', 'Risk', 'ColourName',  'IsActive']; // 'Action',
+  displayedResidualRiskColumns: string[] = ['Index', 'Risk', 'ColourName',  'IsActive']; //'Action',
   addResidualRiskdg: boolean = false;
   ResidualRiskForm = new FormGroup({
     txtratename: new FormControl('', [Validators.required, Validators.minLength(2)]),

@@ -58,6 +58,16 @@
                     </mat-card-header>
                 </mat-card>
             </div>
+            <!-- <div class="col-1" style="cursor:pointer; padding-left: 30px;" matTooltip="Export to PDF">
+                <mat-card class="icon-excel" (click)="generatePdf()">
+                    <img class="excel-img" src="assets/icon-pdf.svg" />
+                </mat-card>
+            </div> -->
+            <!-- <div class="col-1" style="cursor:pointer;" matTooltip="Export to Excel">
+                <mat-card class="icon-excel" (click)="generateExcel()">
+                    <img class="excel-img" src="assets/icon-excel.svg" />
+                </mat-card>
+            </div> -->
             <div class="col-1" style="cursor:pointer;margin-left: 1vh;" matTooltip="Export to Excel">
                 <mat-card class="icon-excel" (click)="generateExcel()">
                     <img class="excel-img" src="assets/icon-excel.svg" alt="Excel Icon" style="height: 4vh;
@@ -89,7 +99,8 @@
                         <td mat-cell *matCellDef="let element"
                         [style.background]="item.includes('KRI_Value')? element['ColorCode']:'#FFFFFF'">
                             <span
-                                [ngClass]="{'threshold-value': item.includes('KRI_Value'), 'measurement-value': i == 2}">                                 
+                                [ngClass]="{'threshold-value': item.includes('KRI_Value'), 'measurement-value': i == 2}">
+                                <!-- [ngStyle]="{'background-color': item.includes('KRI_Value')? element['ColorCode']: ''}"> -->
                                 {{(i == 1)? (element[item] | date :'dd MMM yyyy'): element[item]}}
                                 {{(i == 2) && !([undefined, null, ''].includes(element[item]))? '%': ''}}
                             </span>
@@ -135,11 +146,7 @@
                     <span>
                         <tr mat-header-row *matHeaderRowDef="displayedHeaders; sticky: true"></tr>
                         <tr mat-header-row *matHeaderRowDef="periodColumns.concat(thresholdColumns);"></tr>
-                        <tr *matNoDataRow>
-                            <td [attr.colspan]="displayedColumns.concat(periodColumns, thresholdColumns).length">
-                                <span style="font-size: large;margin-left: 33vw;">No data found.</span>
-                            </td>
-                        </tr>
+                        <tr *matNoDataRow><td [attr.colspan]="displayedColumns.concat(periodColumns, thresholdColumns).length"><span style="font-size: large;margin-left: 33vw;">No data found.</span></td></tr>
                     </span>
                     <tr mat-row *matRowDef="let row; columns: displayedColumns.concat(periodColumns, thresholdColumns)">
                     </tr>

@@ -42,7 +42,7 @@ export class OflGrphPopupComponent implements OnInit {
         this.dashboardservice.gotincidentDashboardMaster.subscribe((value) => {
             if (value == true) {
                 this.RawData = this.dashboardservice.dashboardIncMaster;
-                this.currency = this.RawData[0]?.Currency;
+                // this.currency = this.RawData[0]?.Currency;
                 let currentDate = new Date(); // Get the current date
 
                 let currentQuarter =
@@ -69,7 +69,7 @@ export class OflGrphPopupComponent implements OnInit {
                     });
                 });
 
-                // console.log(this.duplicatedJson);
+                console.log(this.duplicatedJson);
                 // this.countIncidentTypes(this.listdata)
             }
         });

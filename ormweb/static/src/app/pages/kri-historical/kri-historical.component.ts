@@ -8,7 +8,7 @@ import { KriService } from 'src/app/services/kri/kri.service';
   styleUrls: ['./kri-historical.component.scss']
 })
 export class KriHistoricalComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['Index', 'GroupName', 'UnitName','KriCode','KeyRiskIndicator', 'MeasurementFrequencyName'];
+  displayedColumns: string[] = ['Index', 'GroupName', 'UnitName', 'KeyRiskIndicator', 'MeasurementFrequencyName'];
   monthsColumns: string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   isMeasuredValueView: boolean = false;
 
@@ -22,7 +22,7 @@ export class KriHistoricalComponent implements OnInit, AfterViewInit {
 
   public ngOnInit() {
     this.kriService.gotHistoricalMeasurements.subscribe((value: boolean) => {
-      // console.log(value)
+      console.log(value)
       if (value ==true)
       setTimeout(() => this.kriService.kriHistoricalDataSource.paginator = this.paginator);
     })

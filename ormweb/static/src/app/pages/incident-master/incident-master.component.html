@@ -7,6 +7,10 @@
         <div class="table-header">
             <span> <b> Incident Type </b> </span>
             <span class="spacer"></span>
+            <!-- <mat-form-field appearance="standard">
+                    <mat-label>Search</mat-label>
+                    <input matInput (keyup)="applyFilter($event, 'incidentTable')" placeholder="" #input>
+                </mat-form-field> -->
         </div>
         <div class="mat-elevation-z8 border-radius">
             <mat-table [dataSource]="service.masterIT" class="border-radius-top">
@@ -86,13 +90,18 @@
                         <mat-icon class="add-icon" aria-hidden="false" aria-label="Add" fontIcon="add"></mat-icon>
                     </button>
                 </div>
-            </div>             
+            </div>
+            <!-- <mat-paginator #paginatorIT [pageSizeOptions]="[10, 25, 100]"></mat-paginator> -->
         </div>
     </div>
     <div class="incident-table">
         <div class="table-header">
             <span><b>Source of Identification</b></span>
             <span class="spacer"></span>
+            <!--<mat-form-field appearance="standard">
+                    <mat-label>Search</mat-label>
+                    <input matInput (keyup)="applyFilter($event, 'SourceOfIdentification')" placeholder="" #input>
+                </mat-form-field> -->
         </div>
         <div class="mat-elevation-z8 border-radius">
             <mat-table [dataSource]="service.masterSI" class="border-radius-top">
@@ -173,13 +182,18 @@
                         <mat-icon class="add-icon" aria-hidden="false" aria-label="Add" fontIcon="add"></mat-icon>
                     </button>
                 </div>
-            </div>             
+            </div>
+            <!-- <mat-paginator #paginatorSI [pageSizeOptions]="[10, 25, 100]"></mat-paginator> -->
         </div>
     </div>
     <div class="incident-table">
         <div class="table-header">
             <span> <b>Criticality</b> </span>
             <span class="spacer"></span>
+            <!-- <mat-form-field appearance="standard">
+                    <mat-label>Search</mat-label>
+                    <input matInput (keyup)="applyFilter($event, 'Criticality')" placeholder="" #input>
+                </mat-form-field> -->
         </div>
         <div class="mat-elevation-z8 border-radius">
             <mat-table [dataSource]="service.masterCriticality" class="border-radius-top">
@@ -201,7 +215,7 @@
                         </div>
                     </mat-cell>
                 </ng-container>
-                <!-- <ng-container matColumnDef="Action">
+                <ng-container matColumnDef="Action">
                     <mat-header-cell *matHeaderCellDef>Action</mat-header-cell>
                     <mat-cell *matCellDef="let row">
                         <button *ngIf="!row.EditMode" mat-icon-button (click)="edit(row, 'Criticality')">
@@ -219,7 +233,7 @@
                             </button>
                         </mat-action-row>
                     </mat-cell>
-                </ng-container> -->
+                </ng-container>
                 <ng-container matColumnDef="IsActive">
                     <mat-header-cell *matHeaderCellDef> Status Enabled / <br>Disabled</mat-header-cell>
                     <mat-cell *matCellDef="let row">
@@ -254,18 +268,23 @@
                         </button>
                     </mat-action-row>
                 </div>
-                <!-- <div *ngIf="!newEditCri" class="add-button border-radius-bottom">
+                <div *ngIf="!newEditCri" class="add-button border-radius-bottom">
                     <button mat-icon-button (click)="addRow('Criticality')">
                         <mat-icon class="add-icon" aria-hidden="false" aria-label="Add" fontIcon="add"></mat-icon>
                     </button>
-                </div> -->
-            </div>           
+                </div>
+            </div>
+            <!-- <mat-paginator #paginatorCrit [pageSizeOptions]="[10, 25, 100]"></mat-paginator> -->
         </div>
     </div>
     <div class="incident-table">
         <div class="table-header">
             <span> <b>Operational Risk Loss Event Category</b> </span>
             <span class="spacer"></span>
+            <!-- <mat-form-field appearance="standard">
+                    <mat-label>Search</mat-label>
+                    <input matInput (keyup)="applyFilter($event, 'OperationalRiskLoss')" placeholder="" #input>
+                </mat-form-field> -->
         </div>
         <div class="mat-elevation-z8 border-radius">
             <mat-table [dataSource]="service.masterORLEC" class="border-radius-top">
@@ -348,12 +367,17 @@
                     </button>
                 </div>
             </div>
-         </div>
+            <!-- <mat-paginator #paginatorOR [pageSizeOptions]="[10, 25, 100]"></mat-paginator> -->
+        </div>
     </div>
     <div class="incident-table">
         <div class="table-header">
             <span> <b>Incident Reviewers</b> </span>
             <span class="spacer"></span>
+            <!-- <mat-form-field appearance="standard">
+                    <mat-label>Search</mat-label>
+                    <input matInput (keyup)="applyFilter($event, 'IncidentReviewers')" placeholder="" #input>
+                </mat-form-field> -->
         </div>
         <div class="mat-elevation-z8 border-radius" matTooltipPosition="above"
             [matTooltip]="(service.isMasterReviwersActive && service.isMasterReviwerAssigned)? 'No Active Reviewer Users' : ''" >
@@ -418,12 +442,17 @@
                     </button>
                 </div>
             </div>
-         </div>
+            <!-- <mat-paginator #paginatorIR [pageSizeOptions]="[10, 25, 100]"></mat-paginator> -->
+        </div>
     </div>
     <div class="incident-table">
         <div class="table-header">
             <span> <b>Incident Approval Users</b> </span>
             <span class="spacer"></span>
+            <!-- <mat-form-field appearance="standard">
+                    <mat-label>Search</mat-label>
+                    <input matInput (keyup)="applyFilter($event, 'IncidentApprovalUsers')" placeholder="" #input>
+                </mat-form-field> -->
         </div>
         <div class="mat-elevation-z8 border-radius" matTooltipPosition="above"
             [matTooltip]="(service.isMasterApproversActive && service.isMasterApproverAssigned)? 'No Active Approval Users' : ''">
@@ -491,10 +520,9 @@
                     </button>
                 </div>
             </div>
+            <!-- <mat-paginator #paginatorIA [pageSizeOptions]="[10, 25, 100]"></mat-paginator> -->
         </div>
     </div>
-
-    <!-- Incident Checkers start -->
     <div class="incident-table1">
         <div class="table-header">
             <span> <b>Incident Checkers</b> </span>
@@ -548,11 +576,13 @@
                 <mat-row *matRowDef="let row; columns: displayedColumns2; let i = index"
                     [ngClass]="(i%2 == 0)? 'odd-row-bg':''"></mat-row>
             </mat-table>
+            <!-- <div  *ngIf="!(service.isMasterCheckerActive)"> -->
             <div style="background-color: white;"   *ngIf="!(service.isMasterCheckerAssigned)">
                 <div class="no-data">
                     <span>No Checker user added yet</span>
                 </div>
             </div>
+        <!-- </div> -->
             <div class="border-radius-bottom" style=" background-color: white; padding-top: 4vh;">
                 <div *ngIf="newEditCA" class="form-style border-radius-bottom">
                     <label for="Checkers" style="margin-top: 1.5vh;">Select Group:</label>
@@ -574,6 +604,7 @@
                     </mat-form-field>
                     <div class="error" *ngIf="!selectedGroup" style="color: red;margin-left: 8vh;">Please Select the Group</div>
                 </div>
+                    <!-- <mat-error  *ngIf="!selectedGroup"></mat-error> -->
                     <div>
                     <label for="Checkers" style="margin-top: 1.5vh;">Select Checker:</label>
                     <mat-form-field style="margin: -2vh 0.5vw;">
@@ -602,7 +633,12 @@
                     </button>
                 </div>
             </div>
+            <!-- <mat-paginator #paginatorIA [pageSizeOptions]="[10, 25, 100]"></mat-paginator> -->
         </div>
     </div>
-     <!-- Incident Checkers END -->
 </div>
+<!-- <mat-dialog-actions>
+    <span class="spacer"></span>
+    <button mat-button mat-raised-button (click)="service.save()" color="primary">Save</button>
+    <button mat-button mat-dialog-close>Cancel</button>
+</mat-dialog-actions> -->

@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 
 import { KriMasterRoutingModule } from './kri-master-routing.module';
 import { KriMasterComponent } from './kri-master.component';
@@ -14,7 +13,6 @@ import { ColorPickerModule } from 'ngx-color-picker';
   ],
   imports: [
     CommonModule,
-    FormsModule,
     KriMasterRoutingModule,
     MatModule,
     ColorPickerModule

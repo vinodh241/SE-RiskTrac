@@ -1,6 +1,5 @@
 .container{
     background: #e3e3e3;
-    overflow: hidden;
 }
 
 .sidebar-container {
@@ -173,8 +172,7 @@
 
 .right-container {
     width: 100%;
-    margin: 0px 0.8vw;
-    // margin: 0px 15px
+    margin: 0px 15px
 }
 
 mat-sidenav[style] {
@@ -194,9 +192,7 @@ mat-sidenav[style] {
 
 .mat-drawer-container {
     background-color: none !important;
-    // margin-left: 20px !important
-    margin-left: 0.8vw;
-    // min-width: 14.3vw;
+    margin-left: 20px !important
 }
 
 .mat-drawer-content {
@@ -595,34 +591,3 @@ border-radius: 5px; background: linear-gradient(90deg, #FF7474 32.86%, #FFD0AD 1
     align-items: center;
     margin-left: 1vh;
 }
-
-.reportingAlign {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    width: -webkit-fill-available;
-    padding-inline: 0.5vw;
-}
-
-.reportItems {
-    width: calc(40% - 0.5vw);
-    /* padding-top: 14px; */
-    position: relative;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-}
-.reportItems:last-child {
-    width: calc(20% - 0.5vw);
-}
-
-@media only screen and (width < 1400px) {
-    .right-container {
-    width: calc(100% - 16.5vw);
-    margin: 0px 0.8vw;
-}
-    .mat-drawer-container {
-    min-width: 14.3vw;
-}
-}
-

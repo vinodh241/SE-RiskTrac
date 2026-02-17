@@ -333,7 +333,7 @@
                             </div>
                         </div>
                         <div class="dropdown-div-class">
-                            <div class="ui-g-3" for="unit" style="margin-top: 15px;font-weight: bold; margin-left: 0.5vw;">Unit</div>
+                            <div class="ui-g-3" for="unit" style="margin-top: 15px;font-weight: bold;">Unit</div>
                             <div class="ui-g-9" style="margin-left: 10px" >
                                 <mat-form-field class="dropdown-class dropdown-mat-field">
                                     <mat-select
@@ -347,25 +347,13 @@
                                 </mat-form-field>
                             </div>
                         </div>
-                        <div class="reportingAlign">
-                            <div class="reportItems">
-                                <!-- <div class="reporting-frequency-class"> -->
-                                    <span style="font-weight: bold;"> Reporting Frequency:&nbsp;<span
-                                        class="reporting-frequency-font">{{kriService.kriMeasurmentsReportingFrequncy}}</span></span>
-                                <!-- </div> -->
-                            </div>
-                            <div class="reportItems">
-                                <!-- <div class="reporting-frequency-class"> -->
-                                    <span style="font-weight: bold;"> Frequency End Date:&nbsp;<span
-                                            class="reporting-frequency-font">{{ utils.formatDate(kriService.kriMeasurmentsReportingEndDate)}} </span></span>
-                                <!-- </div>  -->
-                            </div>
-                                             
-                            <div class=" me-4 cursor-pointer" class="reportItems" id="resetFilter">
-                                <i class="fa fa-refresh" aria-hidden="true"  ></i><span style="font-weight: bold;cursor: pointer;color: blue;" (click)="resetFilter()" matTooltip="Reset Filter">Reset</span>
-                                <mat-icon style="cursor: pointer;font-size: 18px;color: blue; line-height: 1.2;" ><span (click)="resetFilter()" matTooltip="Reset Filter">refresh</span> </mat-icon>
-                            </div>
-                                
+                        <div class="reporting-frequency-class">
+                            <span style="font-weight: bold;    padding-top: 16px;"> Reporting Frequency:&nbsp;<span
+                                    class="reporting-frequency-font">{{kriService.kriMeasurmentsReportingFrequncy}}</span></span>
+                        </div>
+                        <div class=" me-4 cursor-pointer" style="width: 20vh;top: 3.5vh;position: absolute;left: 103vh;"  id="resetFilter">
+                            <i class="fa fa-refresh" aria-hidden="true"  ></i><span style="font-weight: bold;cursor: pointer;color: blue;" (click)="resetFilter()" matTooltip="Reset Filter">Reset</span>
+                            <mat-icon style="position: absolute;cursor: pointer;font-size: 18px;color: blue;margin-top: 0.4vh;" ><span (click)="resetFilter()" matTooltip="Reset Filter">refresh</span> </mat-icon>
                         </div>
                         <div class="searchfilter" style="width: 25%;">
                             <div class="srhposition" style="display: flex;">
@@ -391,12 +379,12 @@
                                     <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2"   [matTooltip]="(groupSelected === 'all'|| unitSelected == '' || unitSelected == 'all') ? 'Select group and Unit first to start Bulk Reviewing' : ''" >
 
                                         <div class="round checkred" style="margin-top: 15px;" [matTooltip]="getBulkRejectTooltipMessage()" >
-                                            <input type="checkbox"  id="checkred"  [checked]="checkedAll == false" [value]="checkedAll" [disabled]="isRejectedValid" (change)="setRejectAll(checkedAll,false)" />
+                                            <input type="checkbox"  id="checkred"  [checked]="checkedAll == false" [value]="checkedAll" [disabled]="this.isReadOnly || groupSelected === 'all' || allApprovedRejected || rejectedMetrics || unitSelected == '' || unitSelected == 'all'" (change)="setRejectAll(checkedAll,false)" />
                                             <label for="checkred"></label>
                                         </div>
 
                                         <div class="round checkgreen"  [matTooltip]="getBulkApproveTooltipMessage()">
-                                            <input type="checkbox"  id="checkgreen" [checked]="checkedAll == true" [value]="checkedAll" [disabled]="isApprovedValid" (change)="setApproveAll(checkedAll,true)"/>
+                                            <input type="checkbox"  id="checkgreen" [checked]="checkedAll == true" [value]="checkedAll" [disabled]="this.isReadOnly || groupSelected === 'all' || allApprovedRejected || rejectedMetrics || unitSelected == '' || unitSelected == 'all'" (change)="setApproveAll(checkedAll,true)"/>
                                             <label for="checkgreen"></label>
                                         </div>
                                     </th>
@@ -454,38 +442,38 @@
                             </ng-container>
 
                             <ng-container matColumnDef="tvalue-1">
-                            <th mat-header-cell *matHeaderCellDef style="text-align: center;" [ngStyle]="{ 'background-color': kriService.kriThresholds?.[0]?.ColorCode || 'transparent' }">
+                            <th mat-header-cell *matHeaderCellDef style="text-align: center;" [ngStyle]="{'background-color': this.kriService.kriThresholds[0].ColorCode}">
                                 <span style="position: relative; top: 10px;">1</span>
                             </th>
-                            <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color': kriService.kriThresholds?.[0]?.ColorCode, 'text-align': 'center'}">
+                            <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color': this.kriService.kriThresholds[0].ColorCode, 'text-align': 'center'}">
                                 {{element.ThresholdValue1 <= element.ThresholdValue2 ? '>=' : '<=' }}  {{element.ThresholdValue1}}%</td>
                             </ng-container>
 
                             <ng-container matColumnDef="tvalue-2">
-                            <th mat-header-cell *matHeaderCellDef style="text-align: center;"  [ngStyle]="{ 'background-color': kriService.kriThresholds?.[1]?.ColorCode || 'transparent' }">
+                            <th mat-header-cell *matHeaderCellDef style="text-align: center;"  [ngStyle]="{'background-color': this.kriService.kriThresholds[1].ColorCode}">
                                 <span style="position: relative; top: 10px;">2</span></th>
-                            <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color': kriService.kriThresholds?.[1]?.ColorCode || 'transparent', 'text-align': 'center'}">
+                            <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color': this.kriService.kriThresholds[1].ColorCode, 'text-align': 'center'}">
                                 {{element.ThresholdValue2 <= element.ThresholdValue3 ? '>=' : '<=' }}{{element.ThresholdValue2}}%</td>
                             </ng-container>
 
                             <ng-container matColumnDef="tvalue-3">
-                            <th mat-header-cell *matHeaderCellDef style="text-align: center;"  [ngStyle]="{ 'background-color': kriService.kriThresholds?.[2]?.ColorCode || 'transparent' }">
+                            <th mat-header-cell *matHeaderCellDef style="text-align: center;"  [ngStyle]="{'background-color': this.kriService.kriThresholds[2].ColorCode}">
                                 <span style="position: relative; top: 10px;">3</span></th>
-                            <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color': kriService.kriThresholds?.[2]?.ColorCode || 'transparent', 'text-align': 'center'}">
+                            <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color': this.kriService.kriThresholds[2].ColorCode, 'text-align': 'center'}">
                                 {{element.ThresholdValue3 <= element.ThresholdValue4 ? '>=' : '<=' }}{{element.ThresholdValue3}}%</td>
                             </ng-container>
 
                             <ng-container matColumnDef="tvalue-4">
-                            <th mat-header-cell *matHeaderCellDef style="text-align: center;"  [ngStyle]="{ 'background-color': kriService.kriThresholds?.[3]?.ColorCode || 'transparent' }">
+                            <th mat-header-cell *matHeaderCellDef style="text-align: center;"  [ngStyle]="{'background-color': this.kriService.kriThresholds[3].ColorCode}">
                                 <span style="position: relative; top: 10px;">4</span></th>
-                            <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color': kriService.kriThresholds?.[3]?.ColorCode || 'transparent', 'text-align': 'center'}">
+                            <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color': this.kriService.kriThresholds[3].ColorCode, 'text-align': 'center'}">
                                 {{element.ThresholdValue4 <= element.ThresholdValue5 ? '>=' : '<=' }}{{element.ThresholdValue4}}%</td>
                             </ng-container>
 
                             <ng-container matColumnDef="tvalue-5">
-                                <th mat-header-cell *matHeaderCellDef style="text-align: center;"  [ngStyle]="{ 'background-color': kriService.kriThresholds?.[4]?.ColorCode || 'transparent' }">
+                                <th mat-header-cell *matHeaderCellDef style="text-align: center;"  [ngStyle]="{'background-color': this.kriService.kriThresholds[4].ColorCode}">
                                     <span style="position: relative; top: 10px;">5</span></th>
-                                <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color': kriService.kriThresholds?.[4]?.ColorCode || 'transparent', 'text-align': 'center'}">
+                                <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color': this.kriService.kriThresholds[4].ColorCode, 'text-align': 'center'}">
                                     ={{element.ThresholdValue5}}%</td>
                             </ng-container>
 
@@ -575,16 +563,15 @@
                                                 <col span="2">
                                             </colgroup>
                                             <tr class="tooltip-table">
-                                                <!-- <th class="tooltip-table"></th> -->
+                                                <th class="tooltip-table"></th>
                                                 <th class="tooltip-table">Period</th>
                                                 <th class="tooltip-table">Date</th>
                                                 <th class="tooltip-table">Measurement</th>
                                                 <th class="tooltip-table">KRI Value</th>
-                                                <th class="tooltip-table">KRI Status</th>
                                             </tr>
                                             <tr class="tooltip-table" *ngFor="let data of getPreviousScoring(element)">
-                                                <!-- <td class="tooltip-table">
-                                                    T-{{getPreviousScoring(element).indexOf(data)+1}}</td> --> 
+                                                <td class="tooltip-table">
+                                                    T-{{getPreviousScoring(element).indexOf(data)+1}}</td>
                                                 <td class="tooltip-table">{{data.Period}}</td>
                                                 <td class="tooltip-table">{{utils.formatDate(data.Date)}}</td>
                                                 <td class="tooltip-table">{{data.Measurement}}%</td>
@@ -596,7 +583,6 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                                 <td class="tooltip-table">{{data.KRI_Status}}</td>
                                             </tr>
                                         </table>
                                     </span>
@@ -667,9 +653,9 @@
                             </button>
 
                             <button type="button" class="btn btnsubmit" *ngIf="!this.isReadOnly"
-                            [matTooltip]="dataRejectedSubmit() ? toolTipButton : ''"
-                            [ngClass]="{'disabled-btn': dataRejectedSubmit()}"
-                            [disabled]="dataRejectedSubmit() " style="margin-left: 10px;"
+                            matTooltip = "{{toolTipButton}}"
+                            [ngClass]="{'disabled-btn': isSubmit || dataRejectedSubmit()}"
+                            [disabled]="isSubmit || dataRejectedSubmit() " style="margin-left: 10px;"
                              (click)="openDialog()">
                                 <span style="left: -52%;"><img src="assets/icons/icon-submit-btn.svg" style="width: 100%;" class="d-inline-block align-middle cursor-pointer" alt=""></span>Submit
                             </button>

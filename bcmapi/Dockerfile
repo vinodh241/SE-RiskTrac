@@ -22,11 +22,11 @@ RUN addgroup -g 1001 -S nodejs && \
 USER nodejs
 
 # Expose port
-EXPOSE 46004
+EXPOSE 6004
 
 # Health check (check if process is running)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:46004', (r) => {process.exit(r.statusCode ? 0 : 1)})" || exit 1
+  CMD node -e "require('http').get('http://localhost:6004', (r) => {process.exit(r.statusCode ? 0 : 1)})" || exit 1
 
 # Start application
 CMD ["node", "app-server.js"]

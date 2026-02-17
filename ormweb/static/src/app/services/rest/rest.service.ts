@@ -32,27 +32,12 @@ export abstract class RestService {
             }));
     }
 
-    private pathHasSetSegment(path: string | null | undefined, caseInsensitive = false): boolean {
-        if (!path)
-            return false;
-        const p = path.split(/[?#]/)[0];
-        const flags = caseInsensitive ? 'i' : '';
-        const re = new RegExp(String.raw`(?:^|/)(?:set|add|update)-[^/]+(?:$|/)`, flags);
-        return re.test(p);
-    }
-
     protected post(path: string, data: any, wait: boolean = true): Observable<any> {
         if (wait) {
-            if (path.includes('download')) {
+            if (path.includes('download'))
                 this.openWait("Downloading...")
-            }
-            else {
-                if (this.pathHasSetSegment(path)) {
-                    this.openWait("Saving Data ...")
-                } else {
-                    this.openWait("Fetching Data ...")
-                }
-            }
+            else
+                this.openWait("Fetching Data ...")
         }
         data['token'] = localStorage.getItem('token');
         this.getHTTPHeaders();
@@ -61,6 +46,7 @@ export abstract class RestService {
             .pipe(map((result: any) => {
                 if (wait)
                     this.closeWait()
+                //this.messageService.sendMessage(path, result['success'], result['token'], result['error'].errorMessage, result['message'])
                 localStorage.setItem('token', result['token']);
                 if (result instanceof Array) {
                     return result.pop();
@@ -155,14 +141,14 @@ export abstract class RestService {
         // this.getHTTPHeaders();
         let httpHeaders = this.getHTTPHeaders();
         return this.http.post(base + path, data, {
-            headers: httpHeaders,
-            responseType: 'blob' as 'json',
-            observe: 'response'
+          headers: httpHeaders,
+          responseType: 'blob' as 'json',
+          observe: 'response'
         }).pipe(map((result: any) => {
-            localStorage.setItem('token', result.headers.get('token'));
-            return result;
+           localStorage.setItem('token', result.headers.get('token'));
+          return result;
         }))
-    }
+      }
 
 
 

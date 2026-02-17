@@ -44,7 +44,7 @@ export class KriUnitComponent implements OnInit {
     }
     let n=1
     for (let i of list){
-      i['sno']=n
+      i.sno=n
       n++
       list1.push(i)
     }
@@ -53,13 +53,13 @@ export class KriUnitComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // console.log(this.data)
+    console.log(this.data)
     this.oldfulldata = this.data.data
     // this.source = this.getAllFourData(this.data.dat)
     this.source = this.data.dat    
     this.source.sort((a:any, b:any) =>  b.Count - a.Count);
     for(let i = 0; i<this.source?.length; i++){ 
-      this.source[i]['sno'] = i+1
+      this.source[i].sno = i+1
     } 
     // console.log(this.source)
     setTimeout(() => {
@@ -74,11 +74,11 @@ export class KriUnitComponent implements OnInit {
     let index=1
     let list =[]
     for (let i of dt){
-      i['sno']=index
+      i.sno=index
       list.push(i)
       index++
     }
-    // console.log(list)
+    console.log(list)
     return list
   }
   getName(ad:any){
@@ -95,7 +95,7 @@ export class KriUnitComponent implements OnInit {
 
   openPopUp(id:any): void {
     let filterDate
-    // console.log(id)
+    console.log(id)
     if(id==1){
       filterDate=this.oldfulldata.filter((dt:any)=>dt.KRI_Value===4 || dt.KRI_Value===5
       )

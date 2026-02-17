@@ -45,7 +45,7 @@ export class GenerateEmailComponent implements OnInit {
       data.push({ key: key, value: this.emailTemplate[key] })
     });
 
-    // console.log(data);
+    console.log(data);
     this.service.triggerEmail(this.userguid, data);
   }
 

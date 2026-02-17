@@ -14,6 +14,7 @@ import { ControlNatureScoreService } from 'src/app/services/rcsa/master/control-
 import { ControlTotalScoreService } from 'src/app/services/rcsa/master/control-environment/control-total-score.service';
 import { OverallControlEnvironmentRatingService } from 'src/app/services/rcsa/master/control-environment/overall-control-environment-rating.service';
 import { UtilsService } from 'src/app/services/utils/utils.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-master-control-environment',
@@ -23,19 +24,7 @@ import { UtilsService } from 'src/app/services/utils/utils.service';
 export class MasterControlEnvironmentComponent implements OnInit {
   exceedCharLenErr: any;
   type: any;
-  duplicate: any;
-  displayedControlTypeColumns = ['Index', 'ControlType', 'Action', 'Status'];
-  controlTypeForm = this.fb.group({
-    ControlTypeID: [null],
-    ControlType: ['', Validators.required]
-  });
-  GridFormsControlType = this.fb.group({
-    GridRows: this.fb.array<FormGroup>([])
-  });
-  dataSourceControlType = new MatTableDataSource<FormGroup>();
-  addControlTypeDialog = false;
-  saveControlTypeError = '';
-  @ViewChild('ctSort', { read: MatSort }) ctSort!: MatSort;
+  duplicate:any;
 
   constructor(private controlInPaceService: ControlInPaceService,
     private configScoreRatingService: ConfigScoreRatingService,
@@ -59,9 +48,11 @@ export class MasterControlEnvironmentComponent implements OnInit {
     this.GridFormsControlNatureScore = this._formBuilder.group({
       GridRows: this._formBuilder.array([])
     });
+
     this.GridFormsControlAutomationScore = this._formBuilder.group({
       GridRows: this._formBuilder.array([])
     });
+
     this.GridFormsControlFrequencyScore = this._formBuilder.group({
       GridRows: this._formBuilder.array([])
     });
@@ -69,26 +60,288 @@ export class MasterControlEnvironmentComponent implements OnInit {
   }
 
   getPageLoadData(): void {
-    this.configScoreRatingService.getMasterControlEnvironmentScreen().subscribe(data => {
-      next: {
-        if (data.success == 1) {
-          this.processControlInPlace(data);
-          this.processControlNatureScore(data);
-          this.processControlAutomationScore(data);
-          this.processControlFrequencyScore(data);
-          this.processControlTotalScoreMasterData(data);
-          this.processControlTotalScore(data);
-          this.processMasterOverallControlEnvironmentRatingData(data);
-          this.processOverallControlEnvironmentRating(data);
-          this.processControlType(data);
-        } else {
-          if (data.error.errorCode == "TOKEN_EXPIRED")
-            this.utils.relogin(this._document);
-        }
-      }
-    });
-  }
+    if (environment.dummyData) {
+      let data = {
+        "success": 1,
+        "message": "Data fetch from DB successful.",
+        "result": {
+          "recordset": {
+            "ControlInPace": [
+              {
+                "Name": "NA (Not Available)",
+                "IsActive": true,
+                "ControlInPaceID": 1
+              },
+              {
+                "Name": "No",
+                "IsActive": false,
+                "ControlInPaceID": 2
+              },
+              {
+                "Name": "Yes",
+                "IsActive": true,
+                "ControlInPaceID": 3
+              }
 
+            ],
+            "ControlNatureScore": [
+              {
+                "NatureofControl": "NA(Not Available)",
+                "IsActive": true,
+                "Score": 1,
+                "ControlNatureID": 1
+              },
+              {
+                "NatureofControl": "Corrective",
+                "IsActive": false,
+                "Score": 5,
+                "ControlNatureID": 2
+              },
+              {
+                "NatureofControl": "Detective",
+                "IsActive": true,
+                "Score": 3,
+                "ControlNatureID": 3
+              },
+              {
+                "NatureofControl": "Preventive",
+                "IsActive": true,
+                "Score": 4,
+                "ControlNatureID": 4
+              }
+            ],
+            "ControlAutomationScore": [
+              {
+                "LevelofControl": "NA(Not Available)",
+                "IsActive": true,
+                "Score": 1,
+                "ControlAutomationID": 1
+              },
+              {
+                "LevelofControl": "Corrective",
+                "IsActive": false,
+                "Score": 5,
+                "ControlAutomationID": 2
+              },
+              {
+                "LevelOfControl": "Detective",
+                "IsActive": true,
+                "Score": 3,
+                "ControlAutomationID": 3
+              },
+              {
+                "LevelOfControl": "Preventive",
+                "IsActive": true,
+                "Score": 4,
+                "ControlAutomationID": 4
+              }
+            ],
+            "ControlFrequencyScore": [
+              {
+                "Frequency": "NA(Not Available)",
+                "IsActive": true,
+                "Score": 1,
+                "ControlFrequencyID": 1
+              },
+              {
+                "Frequency": "Corrective",
+                "IsActive": false,
+                "Score": 5,
+                "ControlFrequencyID": 2
+              },
+              {
+                "Frequency": "Detective",
+                "IsActive": true,
+                "Score": 3,
+                "ControlFrequencyID": 3
+              },
+              {
+                "Frequency": "Preventive",
+                "IsActive": true,
+                "Score": 4,
+                "ControlFrequencyID": 4
+              }
+            ],
+            "ControlTotalScore": [
+              {
+                "OverallInherentRiskScoreID": 1,
+                "Computation": "InherentImpactRatingID + (InherentLikelihoodRatingID)",
+                "ComputationCode": "1",
+                "IsActive": true,
+                "IsDeleted": false,
+                "CreatedDate": "2022-11-26T22:08:26.090Z",
+                "CreatedBy": "vamshi",
+                "LastUpdatedDate": "2022-11-26T22:08:26.090Z",
+                "LastUpdatedBy": null
+              }
+            ],
+            "ControlTotalScoreConfig": [
+              {
+                "ConfigScoreAndRatingID": 1,
+                "ConfigField": "+",
+                "ConfigDisplay": "+",
+                "IsOperator": true,
+                "ConfigScoreAndRatingScreenMappingID": 1,
+                "ConfigScreen": "ControlTotalScore"
+              },
+              {
+                "ConfigScoreAndRatingID": 2,
+                "ConfigField": "-",
+                "ConfigDisplay": "-",
+                "IsOperator": true,
+                "ConfigScoreAndRatingScreenMappingID": 2,
+                "ConfigScreen": "ControlTotalScore"
+              },
+              {
+                "ConfigScoreAndRatingID": 3,
+                "ConfigField": "*",
+                "ConfigDisplay": "*",
+                "IsOperator": true,
+                "ConfigScoreAndRatingScreenMappingID": 3,
+                "ConfigScreen": "ControlTotalScore"
+              },
+              {
+                "ConfigScoreAndRatingID": 4,
+                "ConfigField": "/",
+                "ConfigDisplay": "/",
+                "IsOperator": true,
+                "ConfigScoreAndRatingScreenMappingID": 4,
+                "ConfigScreen": "ControlTotalScore"
+              },
+              {
+                "ConfigScoreAndRatingID": 5,
+                "ConfigField": "(",
+                "ConfigDisplay": "(",
+                "IsOperator": true,
+                "ConfigScoreAndRatingScreenMappingID": 5,
+                "ConfigScreen": "ControlTotalScore"
+              },
+              {
+                "ConfigScoreAndRatingID": 6,
+                "ConfigField": ")",
+                "ConfigDisplay": ")",
+                "IsOperator": true,
+                "ConfigScoreAndRatingScreenMappingID": 6,
+                "ConfigScreen": "ControlTotalScore"
+              }
+            ],
+            "OverallControlEnvironmentRating": [
+              {
+                "OverallControlEnvironmentRatingID": 2,
+                "RiskRating": "Part. Effective",
+                "Computation": "4<Control Total Score>7",
+                "ComputationCode": null,
+                "ColourName": null,
+                "ColourCode": "Yellow",
+                "IsActive": true,
+                "IsDeleted": false,
+                "CreatedDate": "2022-11-29T23:27:28.147Z",
+                "CreatedBy": "Sangee",
+                "LastUpdatedDate": "2022-11-29T23:31:00.703Z",
+                "LastUpdatedBy": "Sngee"
+              },
+              {
+                "OverallControlEnvironmentRatingID": 3,
+                "RiskRating": "Partially Effective",
+                "Computation": "4<Control Total Score = 7",
+                "ComputationCode": null,
+                "ColourName": null,
+                "ColourCode": "Amber",
+                "IsActive": true,
+                "IsDeleted": false,
+                "CreatedDate": "2022-12-07T18:16:13.023Z",
+                "CreatedBy": "Sangee",
+                "LastUpdatedDate": "2022-12-07T18:16:13.023Z",
+                "LastUpdatedBy": null
+              }
+            ],
+            "ControlEnvironmentRatingConfig": [
+              {
+                "ConfigScoreAndRatingID": 1,
+                "ConfigField": "+",
+                "ConfigDisplay": "+",
+                "IsOperator": true,
+                "ConfigScoreAndRatingScreenMappingID": 1,
+                "ConfigScreen": "ControlTotalScore"
+              },
+              {
+                "ConfigScoreAndRatingID": 2,
+                "ConfigField": "-",
+                "ConfigDisplay": "-",
+                "IsOperator": true,
+                "ConfigScoreAndRatingScreenMappingID": 2,
+                "ConfigScreen": "ControlTotalScore"
+              },
+              {
+                "ConfigScoreAndRatingID": 3,
+                "ConfigField": "*",
+                "ConfigDisplay": "*",
+                "IsOperator": true,
+                "ConfigScoreAndRatingScreenMappingID": 3,
+                "ConfigScreen": "ControlTotalScore"
+              },
+              {
+                "ConfigScoreAndRatingID": 4,
+                "ConfigField": "/",
+                "ConfigDisplay": "/",
+                "IsOperator": true,
+                "ConfigScoreAndRatingScreenMappingID": 4,
+                "ConfigScreen": "ControlTotalScore"
+              },
+              {
+                "ConfigScoreAndRatingID": 5,
+                "ConfigField": "(",
+                "ConfigDisplay": "(",
+                "IsOperator": true,
+                "ConfigScoreAndRatingScreenMappingID": 5,
+                "ConfigScreen": "ControlTotalScore"
+              },
+              {
+                "ConfigScoreAndRatingID": 6,
+                "ConfigField": ")",
+                "ConfigDisplay": ")",
+                "IsOperator": true,
+                "ConfigScoreAndRatingScreenMappingID": 6,
+                "ConfigScreen": "ControlTotalScore"
+              }
+            ]
+          }
+        },
+        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1",
+        "error": {
+          "errorCode": null,
+          "errorMessage": null
+        }
+      };
+      this.processControlInPlace(data);
+      this.processControlNatureScore(data);
+      this.processControlAutomationScore(data);
+      this.processControlFrequencyScore(data);
+      this.processControlTotalScoreMasterData(data);
+      this.processControlTotalScore(data);
+      this.processMasterOverallControlEnvironmentRatingData(data);
+      this.processOverallControlEnvironmentRating(data);
+    } else {
+      this.configScoreRatingService.getMasterControlEnvironmentScreen().subscribe(data => {
+        next: {
+          if (data.success == 1) {
+            this.processControlInPlace(data);
+            this.processControlNatureScore(data);
+            this.processControlAutomationScore(data);
+            this.processControlFrequencyScore(data);
+            this.processControlTotalScoreMasterData(data);
+            this.processControlTotalScore(data);
+            this.processMasterOverallControlEnvironmentRatingData(data);
+            this.processOverallControlEnvironmentRating(data);
+          } else {
+            if (data.error.errorCode == "TOKEN_EXPIRED")
+              this.utils.relogin(this._document);
+          }
+        }
+        //this.processRiskCategory(res);
+      });
+    }
+  }
   //#region ControlInPlace
   displayedControlInPlaceColumns: string[] = ['Index', 'RatingName', 'Action', 'Status'];
   dataSourceControlInPlace = new MatTableDataSource<any>();
@@ -98,12 +351,13 @@ export class MasterControlEnvironmentComponent implements OnInit {
     txtRateName: new FormControl('', [Validators.required, Validators.minLength(2)]),
     txtRateId: new FormControl(0)
   });
+
   GridFormsControlInPlace!: FormGroup;
+
   saveControlInPlaceError: String = "";
+
   // @ts-ignore
   @ViewChild(MatSort) sortControlInPlace: MatSort;
-
-
 
   processControlInPlace(data: any): void {
     if (data.success == 1) {
@@ -144,21 +398,23 @@ export class MasterControlEnvironmentComponent implements OnInit {
 
   // On click of correct button in table (after click on edit) this method will call
   saveEditControlInPlaceData(GridFormElement: any, i: any) {
+
     const rowvalue = (GridFormElement.get('GridRows').at(i).get('Name')?.value)?.trim();
-    let filteredRecords = this.gridDataSourceControlInPlace.filter((ob: any, inx: any) => inx != i);
-    this.checkCharLengthDuplicate(rowvalue, 'Name', filteredRecords).then((allowToSave) => {
+    let filteredRecords = this.gridDataSourceControlInPlace.filter((ob:any, inx:any) => inx != i);
+    this.checkCharLengthDuplicate(rowvalue, 'Name',filteredRecords).then((allowToSave) => {
       if (allowToSave) {
-        return;
+          return;
       }
       GridFormElement.get('GridRows').at(i).get('isEditable').patchValue(true);
       let data = {
-        "name": rowvalue,
-        "createdBy": "palani",
-        "id": GridFormElement.get('GridRows').at(i).get('ControlInPaceID')?.value
+        "name"      : rowvalue,
+        "createdBy" : "palani",
+        "id"        : GridFormElement.get('GridRows').at(i).get('ControlInPaceID')?.value
       }
       this.controlInPaceService.updateData(data).subscribe(res => {
         next:
         if (res.success == 1) {
+
           this.cancelControlInPace();
           this.addControlInPlaceDialog = false;
           this.saveSuccess(res.message);
@@ -174,6 +430,8 @@ export class MasterControlEnvironmentComponent implements OnInit {
         console.log("err::", "error");
       });
     });
+
+    
   }
 
   // On click of cancel button in the table (after click on edit) this method will call and reset the previous data
@@ -198,9 +456,10 @@ export class MasterControlEnvironmentComponent implements OnInit {
   saveControlInPlaceData(): void {
     if (this.masterControlInPlaceForm.get('txtRateId')?.value == 0 || this.masterControlInPlaceForm.get('txtRateId')?.value == null) {
       const rowvalue = (this.masterControlInPlaceForm.get('txtRateName')?.value)?.trim();
-      this.checkCharLengthDuplicate(rowvalue, 'Name', this.gridDataSourceControlInPlace).then((allowToSave) => {
+      // this.checkCharLength(rowvalue, 'ControlInPlace')
+      this.checkCharLengthDuplicate(rowvalue, 'Name',this.gridDataSourceControlInPlace).then((allowToSave) => {
         if (allowToSave) {
-          return;
+            return;
         }
         let data = {
           "name": rowvalue
@@ -208,6 +467,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
         this.controlInPaceService.addNew(data).subscribe(res => {
           next:
           if (res.success == 1) {
+  
             this.cancelControlInPace();
             this.addControlInPlaceDialog = false;
             this.saveSuccess(res.message);
@@ -221,14 +481,14 @@ export class MasterControlEnvironmentComponent implements OnInit {
           error:
           console.log("err::", "error");
         });
-      })
+      })      
     }
     else {
       const rowvalue = (this.masterControlInPlaceForm.get('txtRateName')?.value)?.trim();
-      this.checkCharLengthDuplicate(rowvalue, 'Name', this.gridDataSourceControlInPlace).then((allowToSave) => {
+      this.checkCharLengthDuplicate(rowvalue, 'Name',this.gridDataSourceControlInPlace).then((allowToSave) => {
         if (allowToSave) {
-          return;
-        }
+            return;
+        } 
         let data = {
           "name": (this.masterControlInPlaceForm.get('txtRateName')?.value)?.trim(),
           "id": this.masterControlInPlaceForm.get('txtRateId')?.value
@@ -236,6 +496,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
         this.controlInPaceService.updateData(data).subscribe(res => {
           next:
           if (res.success == 1) {
+  
             this.cancelControlInPace();
             this.addControlInPlaceDialog = false;
             this.saveSuccess(res.message);
@@ -249,7 +510,9 @@ export class MasterControlEnvironmentComponent implements OnInit {
           error:
           console.log("err::", "error");
         });
+
       })
+      
     }
   }
 
@@ -264,6 +527,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
         content: content
       }
     });
+
     confirm.afterOpened().subscribe(result => {
       setTimeout(() => {
         confirm.close();
@@ -282,7 +546,6 @@ export class MasterControlEnvironmentComponent implements OnInit {
   resetForm(): void {
     this.masterControlInPlaceForm.reset();
   }
-
   setValue(data: any): void {
     this.masterControlInPlaceForm.patchValue({ txtRateName: data.Name, txtRateId: data.ControlInPaceID });
   }
@@ -310,6 +573,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
   }
 
   //#endregion
+
   //#region Control Nature Score
   displayedControlNatureScoreColumns: string[] = ['Index', 'RatingName', 'RatingScore', 'Action', 'Status'];
   dataSourceControlNatureScore = new MatTableDataSource<any>();
@@ -322,14 +586,56 @@ export class MasterControlEnvironmentComponent implements OnInit {
   });
   GridFormsControlNatureScore!: FormGroup;
   saveControlNatureScoreerror: String = "";
+
   // @ts-ignore
   @ViewChild(MatSort) sortControlNatureScore: MatSort;
 
   getControlNatureScore(): void {
-    this.controlNatureScoreService.getAll().subscribe(res => {
-      next:
-      this.processControlNatureScore(res);
-    });
+    if (environment.dummyData) {
+      let data = {
+        "success": 1,
+        "message": "Data fetch from DB successful.",
+        "result": {
+          "recordset": [
+            {
+              "NatureofControl": "NA(Not Available)",
+              "IsActive": true,
+              "Score": 1,
+              "ControlNatureID": 1
+            },
+            {
+              "NatureofControl": "Corrective",
+              "IsActive": false,
+              "Score": 5,
+              "ControlNatureID": 2
+            },
+            {
+              "NatureofControl": "Detective",
+              "IsActive": true,
+              "Score": 3,
+              "ControlNatureID": 3
+            },
+            {
+              "NatureofControl": "Preventive",
+              "IsActive": true,
+              "Score": 4,
+              "ControlNatureID": 4
+            }
+          ]
+        },
+        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1",
+        "error": {
+          "errorCode": null,
+          "errorMessage": null
+        }
+      };
+      this.processControlNatureScore(data);
+    } else {
+      this.controlNatureScoreService.getAll().subscribe(res => {
+        next:
+        this.processControlNatureScore(res);
+      });
+    }
   }
 
   processControlNatureScore(data: any): void {
@@ -338,6 +644,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
         let docs: any = this.gridDataSourceControlNatureScore = data.result.recordset.ControlNatureScore;
         if (docs) {
           let id = 0;
+
           docs.forEach((doc: any) => {
             id++;
             doc.RowNumber = id;
@@ -357,6 +664,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
           }); // end of form group cretation
           this.dataSourceControlNatureScore = new MatTableDataSource((
             this.GridFormsControlNatureScore.get('GridRows') as FormArray).controls);
+
           this.dataSourceControlNatureScore.sort = this.sortControlNatureScore
         }
       }
@@ -375,14 +683,14 @@ export class MasterControlEnvironmentComponent implements OnInit {
     const rowValue = (GridFormElement.get('GridRows').at(i).get('NatureofControl')?.value)?.trim();
     this.checkCharLength(rowValue, 'ControlNatureScore').then((allowToSave) => {
       if (allowToSave) {
-        return;
+          return;
       }
       GridFormElement.get('GridRows').at(i).get('isEditable').patchValue(true);
       let data = {
-        "natureOfControl": rowValue,
-        "score": GridFormElement.get('GridRows').at(i).get('Score')?.value,
-        "id": GridFormElement.get('GridRows').at(i).get('ControlNatureID')?.value,
-        "createdBy": "palani"
+        "natureOfControl" : rowValue,
+        "score"           : GridFormElement.get('GridRows').at(i).get('Score')?.value,
+        "id"              : GridFormElement.get('GridRows').at(i).get('ControlNatureID')?.value,
+        "createdBy"       : "palani"
       }
       this.controlNatureScoreService.updateData(data).subscribe(res => {
         next:
@@ -401,7 +709,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
         error:
         console.log("err::", "error");
       });
-    });
+    });    
   }
 
   // On click of cancel button in the table (after click on edit) this method will call and reset the previous data
@@ -432,6 +740,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
     this.resetControlNatureScore();
     this.setControlNatureScoreValue(row);
     this.addControlNatureScoredg = true;
+    console.log("row", row);
   }
 
   setControlNatureScoreValue(data: any): void {
@@ -440,6 +749,8 @@ export class MasterControlEnvironmentComponent implements OnInit {
 
   changedControlNatureScore(data: any, event: any): void {
     let obj = {
+      // "id": data.ControlNatureID,
+      // "isActive": !data.IsActive
       "id": data.get('ControlNatureID')?.value,
       "isActive": !data.get('IsActive')?.value
     }
@@ -465,16 +776,17 @@ export class MasterControlEnvironmentComponent implements OnInit {
       const rowValue = (this.controlNatureScoreForm.get('txtRateName')?.value)?.trim();
       this.checkCharLength(rowValue, 'ControlNatureScore').then((allowToSave) => {
         if (allowToSave) {
-          return;
+            return;
         }
         let data = {
-          "natureOfControl": rowValue,
-          "score": this.controlNatureScoreForm.get('txtratescore')?.value,
-          "createdBy": "palani"
+          "natureOfControl" : rowValue,
+          "score"           : this.controlNatureScoreForm.get('txtratescore')?.value,
+          "createdBy"       : "palani"
         }
         this.controlNatureScoreService.addNew(data).subscribe(res => {
           next:
           if (res.success == 1) {
+  
             this.cancelControlNatureScore();
             this.addControlNatureScoredg = false;
             this.saveSuccess(res.message);
@@ -488,7 +800,11 @@ export class MasterControlEnvironmentComponent implements OnInit {
           error:
           console.log("err::", "error");
         });
+
+
       })
+      
+      
     }
     else {
       let data = {
@@ -500,6 +816,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
       this.controlNatureScoreService.updateData(data).subscribe(res => {
         next:
         if (res.success == 1) {
+
           this.cancelControlNatureScore();
           this.addControlNatureScoredg = false;
           this.saveSuccess(res.message);
@@ -514,10 +831,12 @@ export class MasterControlEnvironmentComponent implements OnInit {
         console.log("err::", "error");
       });
     }
-  }
 
+  }
   //#endregion
+
   //#region control automation
+
   displayedControlAutomationScoreColumns: string[] = ['Index', 'RatingName', 'RatingScore', 'Action', 'Status'];
   dataSourceControlAutomationScore = new MatTableDataSource<any>();
   gridDataSourceControlAutomationScore: any;
@@ -529,14 +848,56 @@ export class MasterControlEnvironmentComponent implements OnInit {
   });
   GridFormsControlAutomationScore!: FormGroup;
   saveControlAutomationScoreerror: String = "";
+
   // @ts-ignore
   @ViewChild(MatSort) sortAutomation: MatSort;
 
   getControlAutomationScore(): void {
-    this.controlAutomationScoreService.getAll().subscribe(res => {
-      next:
-      this.processControlAutomationScore(res);
-    });
+    if (environment.dummyData) {
+      let data = {
+        "success": 1,
+        "message": "Data fetch from DB successful.",
+        "result": {
+          "recordset": [
+            {
+              "LevelofControl": "NA(Not Available)",
+              "IsActive": true,
+              "Score": 1,
+              "ControlAutomationID": 1
+            },
+            {
+              "LevelofControl": "Corrective",
+              "IsActive": false,
+              "Score": 5,
+              "ControlAutomationID": 2
+            },
+            {
+              "LevelOfControl": "Detective",
+              "IsActive": true,
+              "Score": 3,
+              "ControlAutomationID": 3
+            },
+            {
+              "LevelOfControl": "Preventive",
+              "IsActive": true,
+              "Score": 4,
+              "ControlAutomationID": 4
+            }
+          ]
+        },
+        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1",
+        "error": {
+          "errorCode": null,
+          "errorMessage": null
+        }
+      };
+      this.processControlAutomationScore(data);
+    } else {
+      this.controlAutomationScoreService.getAll().subscribe(res => {
+        next:
+        this.processControlAutomationScore(res);
+      });
+    }
   }
 
   processControlAutomationScore(data: any): void {
@@ -545,6 +906,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
         let docs: any = this.gridDataSourceControlAutomationScore = data.result.recordset.ControlAutomationScore;
         if (docs) {
           let id = 0;
+
           docs.forEach((doc: any) => {
             id++;
             doc.RowNumber = id;
@@ -572,7 +934,6 @@ export class MasterControlEnvironmentComponent implements OnInit {
         this.utils.relogin(this._document);
     }
   }
-
   editControlAutomationScoreData(GridFormElement: any, i: number) {
     GridFormElement.get('GridRows').at(i).get('isEditable').patchValue(false);
   }
@@ -582,7 +943,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
     const rowValue = (GridFormElement.get('GridRows').at(i).get('LevelOfControl')?.value)?.trim()
     this.checkCharLength(rowValue, 'ControlAutomationScore').then((allowToSave) => {
       if (allowToSave) {
-        return;
+          return;
       }
       GridFormElement.get('GridRows').at(i).get('isEditable').patchValue(true);
       let data = {
@@ -594,6 +955,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
       this.controlAutomationScoreService.updateData(data).subscribe(res => {
         next:
         if (res.success == 1) {
+
           this.cancelControlAutomationScore();
           this.addControlAutomationScoredg = false;
           this.saveSuccess(res.message);
@@ -608,7 +970,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
         error:
         console.log("err::", "error");
       });
-    })
+    })    
   }
 
   // On click of cancel button in the table (after click on edit) this method will call and reset the previous data
@@ -639,6 +1001,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
     this.resetControlAutomationScore();
     this.setControlAutomationScoreValue(row);
     this.addControlAutomationScoredg = true;
+    console.log("row", row);
   }
 
   setControlAutomationScoreValue(data: any): void {
@@ -647,8 +1010,10 @@ export class MasterControlEnvironmentComponent implements OnInit {
 
   changedControlAutomationScore(data: any, event: any): void {
     let obj = {
-      "id": data.get('ControlAutomationID')?.value,
-      "isActive": !data.get('IsActive')?.value
+      // "id": data.ControlAutomationID,
+      // "isActive": !data.IsActive
+      "id"        : data.get('ControlAutomationID')?.value,
+      "isActive"  : !data.get('IsActive')?.value
     }
     this.controlAutomationScoreService.updateStatus(obj).subscribe(res => {
       next:
@@ -665,53 +1030,56 @@ export class MasterControlEnvironmentComponent implements OnInit {
       error:
       console.log("err::", "error");
     });
+    console.log(obj);
   }
 
   saveControlAutomationScore(): void {
     if (this.controlAutomationScoreForm.get('txtControlAutomationScoreID')?.value == 0 || this.controlAutomationScoreForm.get('txtControlAutomationScoreID')?.value == null) {
       const rowValue = (this.controlAutomationScoreForm.get('txtRateName')?.value)?.trim();
       this.checkCharLength(rowValue, 'ControlAutomationScore').then((allowToSave) => {
-        if (allowToSave) {
-          return;
-        }
-        let data = {
-          "levelOfControl": rowValue,
-          "score": this.controlAutomationScoreForm.get('txtratescore')?.value,
-          "createdBy": "palani"
-        }
-        this.controlAutomationScoreService.addNew(data).subscribe(res => {
-          next:
-          if (res.success == 1) {
-            this.cancelControlAutomationScore();
-            this.addControlAutomationScoredg = false;
-            this.saveSuccess(res.message);
-            this.saveControlAutomationScoreerror = "";
-          } else {
-            if (res.error.errorCode == "TOKEN_EXPIRED")
-              this.utils.relogin(this._document);
-            else
-              this.saveControlAutomationScoreerror = res.error.errorMessage;
+          if (allowToSave) {
+              return;
           }
-          error:
-          console.log("err::", "error");
-        });
-      });
+          let data = {
+            "levelOfControl"  : rowValue,
+            "score"           : this.controlAutomationScoreForm.get('txtratescore')?.value,
+            "createdBy"       : "palani"
+          }
+          this.controlAutomationScoreService.addNew(data).subscribe(res => {
+            next:
+            if (res.success == 1) {
+    
+              this.cancelControlAutomationScore();
+              this.addControlAutomationScoredg = false;
+              this.saveSuccess(res.message);
+              this.saveControlAutomationScoreerror = "";
+            } else {
+              if (res.error.errorCode == "TOKEN_EXPIRED")
+                this.utils.relogin(this._document);
+              else
+                this.saveControlAutomationScoreerror = res.error.errorMessage;
+            }
+            error:
+            console.log("err::", "error");
+          });
+      }); 
     }
     else {
       const rowValue = (this.controlAutomationScoreForm.get('txtRateName')?.value)?.trim();
       this.checkCharLength(rowValue, 'ControlAutomationScore').then((allowToSave) => {
         if (allowToSave) {
-          return;
+            return;
         }
         let data = {
-          "LevelOfControl": rowValue,
-          "score": this.controlAutomationScoreForm.get('txtratescore')?.value,
-          "id": this.controlAutomationScoreForm.get('txtRateId')?.value,
-          "createdBy": "palani"
+          "LevelOfControl"  : rowValue,
+          "score"           : this.controlAutomationScoreForm.get('txtratescore')?.value,
+          "id"              : this.controlAutomationScoreForm.get('txtRateId')?.value,
+          "createdBy"       : "palani"
         }
         this.controlAutomationScoreService.updateData(data).subscribe(res => {
           next:
           if (res.success == 1) {
+  
             this.cancelControlAutomationScore();
             this.addControlAutomationScoredg = false;
             this.saveSuccess(res.message);
@@ -725,11 +1093,14 @@ export class MasterControlEnvironmentComponent implements OnInit {
           error:
           console.log("err::", "error");
         });
-      })
+      })     
     }
   }
+
   //#endregion control automation
+
   //#region Frequency
+
   displayedControlFrequencyScoreColumns: string[] = ['Index', 'RatingName', 'RatingScore', 'Action', 'Status'];
   dataSourceControlFrequencyScore = new MatTableDataSource<any>();
   gridDataSourceControlFrequencyScore: any;
@@ -741,14 +1112,56 @@ export class MasterControlEnvironmentComponent implements OnInit {
   });
   GridFormsControlFrequencyScore!: FormGroup;
   saveControlFrequencyScoreerror: String = "";
+
   // @ts-ignore
   @ViewChild(MatSort) sortFrequency: MatSort;
 
   getControlFrequencyScore(): void {
-    this.controlFrequencyScoreService.getAll().subscribe(res => {
-      next:
-      this.processControlFrequencyScore(res);
-    });
+    if (environment.dummyData) {
+      let data = {
+        "success": 1,
+        "message": "Data fetch from DB successful.",
+        "result": {
+          "recordset": [
+            {
+              "Frequency": "NA(Not Available)",
+              "IsActive": true,
+              "Score": 1,
+              "ControlFrequencyID": 1
+            },
+            {
+              "Frequency": "Corrective",
+              "IsActive": false,
+              "Score": 5,
+              "ControlFrequencyID": 2
+            },
+            {
+              "Frequency": "Detective",
+              "IsActive": true,
+              "Score": 3,
+              "ControlFrequencyID": 3
+            },
+            {
+              "Frequency": "Preventive",
+              "IsActive": true,
+              "Score": 4,
+              "ControlFrequencyID": 4
+            }
+          ]
+        },
+        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1",
+        "error": {
+          "errorCode": null,
+          "errorMessage": null
+        }
+      };
+      this.processControlFrequencyScore(data);
+    } else {
+      this.controlFrequencyScoreService.getAll().subscribe(res => {
+        next:
+        this.processControlFrequencyScore(res);
+      });
+    }
   }
 
   processControlFrequencyScore(data: any): void {
@@ -757,6 +1170,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
         let docs: any = this.gridDataSourceControlFrequencyScore = data.result.recordset.ControlFrequencyScore;
         if (docs) {
           let id = 0;
+
           docs.forEach((doc: any) => {
             id++;
             doc.RowNumber = id;
@@ -794,18 +1208,19 @@ export class MasterControlEnvironmentComponent implements OnInit {
     const rowValue = (GridFormElement.get('GridRows').at(i).get('Frequency')?.value)?.trim();
     this.checkCharLength(rowValue, 'ControlFrequencyScore').then((allowToSave) => {
       if (allowToSave) {
-        return;
+          return;
       }
       GridFormElement.get('GridRows').at(i).get('isEditable').patchValue(true);
       let data = {
-        "frequency": rowValue,
-        "score": GridFormElement.get('GridRows').at(i).get('Score')?.value,
-        "id": GridFormElement.get('GridRows').at(i).get('ControlFrequencyID')?.value,
-        "createdBy": "palani"
+        "frequency" : rowValue,
+        "score"     : GridFormElement.get('GridRows').at(i).get('Score')?.value,
+        "id"        : GridFormElement.get('GridRows').at(i).get('ControlFrequencyID')?.value,
+        "createdBy" : "palani"
       }
       this.controlFrequencyScoreService.updateData(data).subscribe(res => {
         next:
         if (res.success == 1) {
+
           this.cancelControlFrequencyScore();
           this.addControlFrequencyScoredg = false;
           this.saveSuccess(res.message);
@@ -820,7 +1235,12 @@ export class MasterControlEnvironmentComponent implements OnInit {
         error:
         console.log("err::", "error");
       });
+
+
     })
+
+
+    
   }
 
   // On click of cancel button in the table (after click on edit) this method will call and reset the previous data
@@ -851,6 +1271,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
     this.resetControlFrequencyScore();
     this.setControlFrequencyScoreValue(row);
     this.addControlFrequencyScoredg = true;
+    console.log("row", row);
   }
 
   setControlFrequencyScoreValue(data: any): void {
@@ -859,6 +1280,8 @@ export class MasterControlEnvironmentComponent implements OnInit {
 
   changedControlFrequencyScore(data: any, event: any): void {
     let obj = {
+      // "id": data.ControlFrequencyID,
+      // "isActive": !data.IsActive
       "id": data.get('ControlFrequencyID')?.value,
       "isActive": !data.get('IsActive')?.value
     }
@@ -883,16 +1306,17 @@ export class MasterControlEnvironmentComponent implements OnInit {
       const rowValue = (this.controlFrequencyScoreForm.get('txtRateName')?.value)?.trim();
       this.checkCharLength(rowValue, 'ControlFrequencyScore').then((allowToSave) => {
         if (allowToSave) {
-          return;
+            return;
         }
         let data = {
-          "frequency": rowValue,
-          "score": this.controlFrequencyScoreForm.get('txtratescore')?.value,
-          "createdBy": "palani"
+          "frequency" : rowValue,
+          "score"     : this.controlFrequencyScoreForm.get('txtratescore')?.value,
+          "createdBy" : "palani"
         }
         this.controlFrequencyScoreService.addNew(data).subscribe(res => {
           next:
           if (res.success == 1) {
+  
             this.cancelControlFrequencyScore();
             this.addControlFrequencyScoredg = false;
             this.saveSuccess(res.message);
@@ -905,23 +1329,23 @@ export class MasterControlEnvironmentComponent implements OnInit {
           error:
           console.log("err::", "error");
         });
-      })
+      }) 
     }
     else {
       const rowValue = (this.controlFrequencyScoreForm.get('txtRateName')?.value)?.trim();
       this.checkCharLength(rowValue, 'ControlFrequencyScore').then((allowToSave) => {
         if (allowToSave) {
-          return;
+            return;
         }
         let data = {
-          "Frequency": rowValue,
-          "score": this.controlFrequencyScoreForm.get('txtratescore')?.value,
-          "id": this.controlFrequencyScoreForm.get('txtRateId')?.value,
-          "createdBy": "palani"
+          "Frequency" : rowValue,
+          "score"     : this.controlFrequencyScoreForm.get('txtratescore')?.value,
+          "id"        : this.controlFrequencyScoreForm.get('txtRateId')?.value,
+          "createdBy" : "palani"
         }
         this.controlFrequencyScoreService.updateData(data).subscribe(res => {
           next:
-          if (res.success == 1) {
+          if (res.success == 1) {  
             this.cancelControlFrequencyScore();
             this.addControlFrequencyScoredg = false;
             this.saveSuccess(res.message);
@@ -934,13 +1358,16 @@ export class MasterControlEnvironmentComponent implements OnInit {
           error:
           console.log("err::", "error");
         });
-      })
+      })      
     }
   }
 
+
   //#endregion
+
   //#region Control total
   iseditControlTotalScoredg: boolean = false;
+  //txttag = new FormControl('');
   controlTotalScoreTags: any;
   beforeControlTotalScoreTags: any;
   controlTotalScoresourcedata: any;
@@ -949,10 +1376,83 @@ export class MasterControlEnvironmentComponent implements OnInit {
   saveControlTotalScoreerror: string = "";
 
   getMasterData() {
+    //configService]
+    if (environment.dummyData) {
+      let data = {
+        "success": true,
+        "message": "Config Score And Rating fetched successfully",
+        "result": {
+          "status": 1,
+          "recordset": [
+            {
+              "ConfigScoreAndRatingID": 1,
+              "ConfigField": "+",
+              "ConfigDisplay": "+",
+              "IsOperator": true,
+              "ConfigScoreAndRatingScreenMappingID": 1,
+              "ConfigScreen": "ControlTotalScore"
+            },
+            {
+              "ConfigScoreAndRatingID": 2,
+              "ConfigField": "-",
+              "ConfigDisplay": "-",
+              "IsOperator": true,
+              "ConfigScoreAndRatingScreenMappingID": 2,
+              "ConfigScreen": "ControlTotalScore"
+            },
+            {
+              "ConfigScoreAndRatingID": 3,
+              "ConfigField": "*",
+              "ConfigDisplay": "*",
+              "IsOperator": true,
+              "ConfigScoreAndRatingScreenMappingID": 3,
+              "ConfigScreen": "ControlTotalScore"
+            },
+            {
+              "ConfigScoreAndRatingID": 4,
+              "ConfigField": "/",
+              "ConfigDisplay": "/",
+              "IsOperator": true,
+              "ConfigScoreAndRatingScreenMappingID": 4,
+              "ConfigScreen": "ControlTotalScore"
+            },
+            {
+              "ConfigScoreAndRatingID": 5,
+              "ConfigField": "(",
+              "ConfigDisplay": "(",
+              "IsOperator": true,
+              "ConfigScoreAndRatingScreenMappingID": 5,
+              "ConfigScreen": "ControlTotalScore"
+            },
+            {
+              "ConfigScoreAndRatingID": 6,
+              "ConfigField": ")",
+              "ConfigDisplay": ")",
+              "IsOperator": true,
+              "ConfigScoreAndRatingScreenMappingID": 6,
+              "ConfigScreen": "ControlTotalScore"
+            }
+          ],
+          "errorMsg": null,
+          "procedureSuccess": true,
+          "procedureMessage": "Config Score And Rating fetched successfully"
+        },
+        "error": {
+          "errorCode": null,
+          "errorMessage": null
+        }
+      };
+      this.processControlTotalScoreMasterData(data);
+    } else {
+      // this.configService.getControlTotalScoreScreen().subscribe(res => {
+      //   next:
+      //   this.processMasterData(res);
+      // });
+    }
   }
-
   processControlTotalScoreMasterData(data: any): void {
     if (data.success == 1) {
+
       let id = 0;
       if (data.result.recordset.ControlTotalScoreConfig.length > 0) {
         let docs: Array<any> = data.result.recordset.ControlTotalScoreConfig
@@ -981,6 +1481,45 @@ export class MasterControlEnvironmentComponent implements OnInit {
     }
   }
 
+  // getgriddata(): void {
+  //   if (environment.dummyData) {
+  //     let data = {
+  //       "success": true,
+  //       "message": "Overall Inherent Risk Score fetched successfully",
+  //       "result": {
+  //         "status": 1,
+  //         "recordset": [
+  //           {
+  //             "OverallInherentRiskScoreID": 1,
+  //             "Computation": "InherentImpactRatingID + (InherentLikelihoodRatingID)",
+  //             "ComputationCode": "1",
+  //             "IsActive": true,
+  //             "IsDeleted": false,
+  //             "CreatedDate": "2022-11-26T22:08:26.090Z",
+  //             "CreatedBy": "vamshi",
+  //             "LastUpdatedDate": "2022-11-26T22:08:26.090Z",
+  //             "LastUpdatedBy": null
+  //           }
+  //         ],
+  //         "errorMsg": null,
+  //         "procedureSuccess": true,
+  //         "procedureMessage": "Overall Inherent Risk Score fetched successfully"
+  //       },
+  //       "error": {
+  //         "errorCode": null,
+  //         "errorMessage": null
+  //       }
+  //     };
+  //     this.processControlTotalScore(data);
+  //   } else {
+  //     this.controlTotalScoreService.getAll().subscribe(res => {
+  //       next:
+  //       this.processControlTotalScore(res);
+  //     });
+  //   }
+  // }
+
+
   processControlTotalScore(data: any): void {
     if (data.success == 1) {
       if (data.result.recordset.ControlTotalScore.length > 0) {
@@ -1003,15 +1542,16 @@ export class MasterControlEnvironmentComponent implements OnInit {
     }
   }
 
+
   addControlTotalScoretagitem(data: any): void {
     if (this.iseditControlTotalScoredg) {
-      if (this.controlTotalScoreTags?.length ?? 0 != 0) {
-        data.RowNumber = (this.controlTotalScoreTags?.length ?? 0 + 1).toString();
-        this.controlTotalScoreTags.push(data);
+      if(this.controlTotalScoreTags?.length??0!=0){
+      data.RowNumber = (this.controlTotalScoreTags?.length??0 + 1).toString();
+      this.controlTotalScoreTags.push(data);
       }
-      else {
+      else{
         data.RowNumber = (1).toString();
-        this.controlTotalScoreTags = [];
+        this.controlTotalScoreTags=[];
         this.controlTotalScoreTags.push(data);
       }
     }
@@ -1037,6 +1577,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
         doc.RowNumber = n.toString();
         tempdata.push(doc);
       }
+
     });
     this.controlTotalScoreTags = tempdata;
   }
@@ -1054,6 +1595,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
         computation += " " + item.ConfigField;
       }
     });
+
     let data: any = {
       "computation": computation,
       "computationCode": computationCode,
@@ -1062,6 +1604,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
     this.controlTotalScoreService.addNew(data).subscribe(res => {
       next:
       if (res.success == 1) {
+
         this.CancelControlTotalScore();
         this.saveSuccess(res.message);
       } else {
@@ -1074,7 +1617,9 @@ export class MasterControlEnvironmentComponent implements OnInit {
       console.log("err::", "error");
     });
   }
+
   //#endregion Control total
+
   //#region Overall control environment
   displayedOverallControlEnvironmentRatingColumns: string[] = ['RowNumber', 'RatingName', 'Computation', 'ColorCode', 'Action', 'Status'];
   dataSourceOverallControlEnvironmentRating!: MatTableDataSource<any>;
@@ -1084,8 +1629,10 @@ export class MasterControlEnvironmentComponent implements OnInit {
     txtcolorname: new FormControl('', [Validators.required, Validators.minLength(1)]),
     txtRateId: new FormControl(0)
   });
+
   iseditOverallControlEnvironmentRatingdg: boolean = false;
   isCustomTextEnabled: boolean = false;
+  //txttag = new FormControl('');
   tagsOverallControlEnvironmentRating: Array<any> = [];
   sourcedataOverallControlEnvironmentRating: Array<any> = [];
   sourcedatascoreOverallControlEnvironmentRating: Array<any> = [];
@@ -1095,12 +1642,84 @@ export class MasterControlEnvironmentComponent implements OnInit {
   color: string = '';
   saveOverallControlEnvironmentRatingerror: string = "";
   beforeEditedFormulatext: any;
-
   getMasterOverallControlEnvironmentRatingData() {
+    //configService]
+    if (environment.dummyData) {
+      let data = {
+        "success": true,
+        "message": "Config Score And Rating fetched successfully",
+        "result": {
+          "status": 1,
+          "recordset": [
+            {
+              "ConfigScoreAndRatingID": 1,
+              "ConfigField": "+",
+              "ConfigDisplay": "+",
+              "IsOperator": true,
+              "ConfigScoreAndRatingScreenMappingID": 1,
+              "ConfigScreen": "ControlTotalScore"
+            },
+            {
+              "ConfigScoreAndRatingID": 2,
+              "ConfigField": "-",
+              "ConfigDisplay": "-",
+              "IsOperator": true,
+              "ConfigScoreAndRatingScreenMappingID": 2,
+              "ConfigScreen": "ControlTotalScore"
+            },
+            {
+              "ConfigScoreAndRatingID": 3,
+              "ConfigField": "*",
+              "ConfigDisplay": "*",
+              "IsOperator": true,
+              "ConfigScoreAndRatingScreenMappingID": 3,
+              "ConfigScreen": "ControlTotalScore"
+            },
+            {
+              "ConfigScoreAndRatingID": 4,
+              "ConfigField": "/",
+              "ConfigDisplay": "/",
+              "IsOperator": true,
+              "ConfigScoreAndRatingScreenMappingID": 4,
+              "ConfigScreen": "ControlTotalScore"
+            },
+            {
+              "ConfigScoreAndRatingID": 5,
+              "ConfigField": "(",
+              "ConfigDisplay": "(",
+              "IsOperator": true,
+              "ConfigScoreAndRatingScreenMappingID": 5,
+              "ConfigScreen": "ControlTotalScore"
+            },
+            {
+              "ConfigScoreAndRatingID": 6,
+              "ConfigField": ")",
+              "ConfigDisplay": ")",
+              "IsOperator": true,
+              "ConfigScoreAndRatingScreenMappingID": 6,
+              "ConfigScreen": "ControlTotalScore"
+            }
+          ],
+          "errorMsg": null,
+          "procedureSuccess": true,
+          "procedureMessage": "Config Score And Rating fetched successfully"
+        },
+        "error": {
+          "errorCode": null,
+          "errorMessage": null
+        }
+      };
+      this.processMasterOverallControlEnvironmentRatingData(data);
+    } else {
+      // this.configService.getControlEnvironmentRatingScreen().subscribe(res => {
+      //   next:
+      //   this.processMasterOverallControlEnvironmentRatingData(res);
+      // });
+    }
   }
-
   processMasterOverallControlEnvironmentRatingData(data: any): void {
     if (data.success == 1) {
+
       if (data.result.recordset.ControlEnvironmentRatingConfig.length > 0) {
         let docs: Array<any> = data.result.recordset.ControlEnvironmentRatingConfig
         let id = 0;
@@ -1124,7 +1743,9 @@ export class MasterControlEnvironmentComponent implements OnInit {
             });
           }
         }
+        //this.getgridOverallControlEnvironmentRatingdata();
       }
+
     }
     else {
       if (data.error.errorCode == "TOKEN_EXPIRED")
@@ -1133,10 +1754,58 @@ export class MasterControlEnvironmentComponent implements OnInit {
   }
 
   getgridOverallControlEnvironmentRatingdata(): void {
-    this.overallControlEnvironmentRatingService.getAll().subscribe(res => {
-      next:
-      this.processOverallControlEnvironmentRating(res);
-    });
+    if (environment.dummyData) {
+      let data = {
+        "success": true,
+        "message": "Overall Control Environment Rating fetched successfully",
+        "result": {
+          "status": 1,
+          "recordset": [
+            {
+              "OverallControlEnvironmentRatingID": 2,
+              "RiskRating": "Part. Effective",
+              "Computation": "4<Control Total Score>7",
+              "ComputationCode": null,
+              "ColourName": null,
+              "ColourCode": "Yellow",
+              "IsActive": true,
+              "IsDeleted": false,
+              "CreatedDate": "2022-11-29T23:27:28.147Z",
+              "CreatedBy": "Sangee",
+              "LastUpdatedDate": "2022-11-29T23:31:00.703Z",
+              "LastUpdatedBy": "Sngee"
+            },
+            {
+              "OverallControlEnvironmentRatingID": 3,
+              "RiskRating": "Partially Effective",
+              "Computation": "4<Control Total Score = 7",
+              "ComputationCode": null,
+              "ColourName": null,
+              "ColourCode": "Amber",
+              "IsActive": true,
+              "IsDeleted": false,
+              "CreatedDate": "2022-12-07T18:16:13.023Z",
+              "CreatedBy": "Sangee",
+              "LastUpdatedDate": "2022-12-07T18:16:13.023Z",
+              "LastUpdatedBy": null
+            }
+          ],
+          "errorMsg": null,
+          "procedureSuccess": true,
+          "procedureMessage": "Overall Control Environment Rating fetched successfully"
+        },
+        "error": {
+          "errorCode": null,
+          "errorMessage": null
+        }
+      };
+      this.processOverallControlEnvironmentRating(data);
+    } else {
+      this.overallControlEnvironmentRatingService.getAll().subscribe(res => {
+        next:
+        this.processOverallControlEnvironmentRating(res);
+      });
+    }
   }
 
   processOverallControlEnvironmentRating(data: any): void {
@@ -1151,12 +1820,14 @@ export class MasterControlEnvironmentComponent implements OnInit {
           let docs: Array<any> = data.result.recordset.OverallControlEnvironmentRating;
           docs.forEach((doc: any) => {
             id++;
+            //lineitem = {...this.sourcedata.find(value => value.Id?.toString() == doc)};
             doc.RowNumber = id.toString();
             computationarray = doc.ComputationCode?.split(',');
             customText = '';
             computationarray?.forEach((item: any) => {
               temptext = item.split('-');
               if (temptext.length > 1) {
+
                 lineitem = { ...this.sourcedataOverallControlEnvironmentRating.find(value => value.ConfigScoreAndRatingID?.toString() == temptext[0]) };
                 customText += " '" + temptext[1] + "'";
               }
@@ -1188,6 +1859,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
       id += 1;
       let temptext = item.split('-');
       if (temptext.length > 1) {
+
         lineitem = { ...this.sourcedataOverallControlEnvironmentRating.find(value => value.ConfigScoreAndRatingID?.toString() == temptext[0]) };
         lineitem.ConfigDisplay = temptext[1];
       }
@@ -1199,7 +1871,6 @@ export class MasterControlEnvironmentComponent implements OnInit {
     });
     this.color = data.ColorCode;
     this.OverallControlEnvironmentRatingForm.patchValue({ txtRateId: data.OverallControlEnvironmentRatingID, txtcolorcode: data.ColourCode, txtRateName: data.RiskRating, txtcolorname: data.ColourName });
-    this.OverallControlEnvironmentRatingForm.disable({ emitEvent: false });
   }
 
   addOverallControlEnvironmentRatingtagitem(data: any): void {
@@ -1214,7 +1885,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
     }
   }
 
-  CancelCustomtext() {
+  CancelCustomtext(){
     this.isCustomTextEnabled = false;
     this.clearMessage();
   }
@@ -1232,9 +1903,9 @@ export class MasterControlEnvironmentComponent implements OnInit {
     this.iseditOverallControlEnvironmentRatingdg = true;
     this.OverallControlEnvironmentRatingForm.reset();
     this.OverallControlEnvironmentRatingID = 0;
-    this.isCustomTextEnabled = false;
+    this.isCustomTextEnabled=false;
   }
-
+  
   editinitiate(): void {
     this.beforeOverallControlEnvironmentRatingtags = { ...this.tagsOverallControlEnvironmentRating };
     this.iseditOverallControlEnvironmentRatingdg = true;
@@ -1277,6 +1948,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
         doc.RowNumber = n.toString();
         tempdata.push(doc);
       }
+
     });
     this.tagsOverallControlEnvironmentRating = tempdata;
   }
@@ -1288,6 +1960,7 @@ export class MasterControlEnvironmentComponent implements OnInit {
   saveOverallControlEnvironmentRatingData(): void {
     let computation: string = "";
     let computationCode: string = "";
+
     this.tagsOverallControlEnvironmentRating.forEach((item: any) => {
       if (item.ConfigField === "Custom") {
         computationCode += (computationCode == "" ? "" : ",") + item.ConfigScoreAndRatingID + "-" + item.ConfigDisplay;
@@ -1299,23 +1972,23 @@ export class MasterControlEnvironmentComponent implements OnInit {
       }
     });
     if (this.OverallControlEnvironmentRatingForm.get('txtRateId')?.value == null || this.OverallControlEnvironmentRatingForm.get('txtRateId')?.value == 0) {
-      const rowValue = (this.OverallControlEnvironmentRatingForm.get('txtRateName')?.value)?.trim()
+      const rowValue =  (this.OverallControlEnvironmentRatingForm.get('txtRateName')?.value)?.trim()
       this.checkCharLength(rowValue, 'OverallControlEnvironmentRating').then((allowToSave) => {
         if (allowToSave) {
-          return;
+            return;
         }
         let data = {
-          "riskRating": rowValue,
-          "colourName": this.OverallControlEnvironmentRatingForm.get('txtcolorname')?.value,
-          "colourCode": this.OverallControlEnvironmentRatingForm.get('txtcolorcode')?.value,
-          "computation": computation,
-          "computationCode": computationCode,
-          "createdBy": "palani"
+          "riskRating"      : rowValue,
+          "colourName"      : this.OverallControlEnvironmentRatingForm.get('txtcolorname')?.value,
+          "colourCode"      : this.OverallControlEnvironmentRatingForm.get('txtcolorcode')?.value,
+          "computation"     : computation,
+          "computationCode" : computationCode,
+          "createdBy"       : "palani"
         }
         this.overallControlEnvironmentRatingService.addNew(data).subscribe(res => {
           next:
-          if (res.success == 1) {
-            this.CancelOverallControlEnvironmentRating();
+          if (res.success == 1) {  
+            this.CancelOverallControlEnvironmentRating();  
             this.saveSuccess(res.message);
           } else {
             if (res.error.errorCode == "TOKEN_EXPIRED")
@@ -1327,12 +2000,13 @@ export class MasterControlEnvironmentComponent implements OnInit {
           console.log("err::", "error");
         });
       })
+      
     }
     else {
-      const rowValue = (this.OverallControlEnvironmentRatingForm.get('txtRateName')?.value)?.trim()
+      const rowValue =  (this.OverallControlEnvironmentRatingForm.get('txtRateName')?.value)?.trim()
       this.checkCharLength(rowValue, 'OverallControlEnvironmentRating').then((allowToSave) => {
         if (allowToSave) {
-          return;
+            return;
         }
         let data = {
           "riskRating": (this.OverallControlEnvironmentRatingForm.get('txtRateName')?.value)?.trim(),
@@ -1346,7 +2020,9 @@ export class MasterControlEnvironmentComponent implements OnInit {
         this.overallControlEnvironmentRatingService.updateData(data).subscribe(res => {
           next:
           if (res.success == 1) {
+  
             this.CancelOverallControlEnvironmentRating();
+  
             this.saveSuccess(res.message);
           } else {
             if (res.error.errorCode == "TOKEN_EXPIRED")
@@ -1358,7 +2034,9 @@ export class MasterControlEnvironmentComponent implements OnInit {
           console.log("err::", "error");
         });
       });
+      
     }
+
   }
 
   //#endregion Overall control environment
@@ -1372,233 +2050,37 @@ export class MasterControlEnvironmentComponent implements OnInit {
 
   async checkCharLength(data: any, type: string): Promise<boolean> {
     if (data.length > 500) {
-      this.exceedCharLenErr = 'Length should not exceeds more than 500 characters';
-      this.type = type;
-      return true;
+        this.exceedCharLenErr = 'Length should not exceeds more than 500 characters';
+        this.type = type;
+        return true;
     } else {
-      this.clearMessage();
-      return false;
+        this.clearMessage();
+        return false;
     }
   }
 
   clearMessage() {
-    this.exceedCharLenErr = '';
-    this.type = '';
+      this.exceedCharLenErr = '';
+      this.type = '';
   }
 
-  async checkCharLengthDuplicate(data: any, type: string, allData: any): Promise<boolean> {
+  async checkCharLengthDuplicate(data: any, type: string,allData:any): Promise<boolean> {
     this.duplicate = Object.values(allData)
-      ?.filter((ele: any) => !ele.EditMode)
-      .some((ele: any) => ele[type]?.trim().toLowerCase() === data.trim().toLowerCase());
+    ?.filter((ele: any) => !ele.EditMode)
+    .some((ele: any) => ele[type]?.trim().toLowerCase() === data.trim().toLowerCase());
     if (data.length > 500) {
-      this.exceedCharLenErr = 'Length should not exceeds more than 500 characters';
-      this.type = type;
-      return true;
+        this.exceedCharLenErr = 'Length should not exceeds more than 500 characters';
+        this.type = type;
+        return true;
     } else if (this.duplicate) {
-      this.exceedCharLenErr = 'Record already exists';
-      this.type = type;
-      return this.duplicate ? this.exceedCharLenErr : false
+        this.exceedCharLenErr = 'Record already exists';
+        console.log("this.exceedCharLenErr",this.exceedCharLenErr)
+        this.type = type;
+        return this.duplicate ?  this.exceedCharLenErr : false
     } else {
-      this.clearMessage();
-      return false;
+        this.clearMessage();
+        return false;
     }
-  }
+}
 
-  // Control Type Start
-  get ControlTypeRows(): FormArray<FormGroup> {
-    return this.GridFormsControlType.get('GridRows') as FormArray<FormGroup>;
-  }
-
-  get ControlTypeGrid(): FormArray<FormGroup> {
-    return this.GridFormsControlType.get('GridRows') as FormArray<FormGroup>;
-  }
-
-  editControlTypeData(form: FormGroup, i: number) {
-    this.ControlTypeRows.at(i).get('isEditable')?.setValue(false);
-  }
-
-  cancelControlType(form: FormGroup, i: number) {
-    this.ControlTypeRows.at(i).get('isEditable')?.setValue(true);
-  }
-
-  processControlType(data: any): void {
-    if (data?.success === 1) {
-      const raw = data?.result?.recordset?.ControlTypes;
-      if (Array.isArray(raw) && raw.length > 0) {
-        const docs: {
-          ControlTypeID: number | null;
-          ControlType: string;
-          IsActive: boolean;
-          RowNumber: number;
-        }[] = raw
-          .filter((x: any) => x && typeof x === 'object')
-          .map((x: any) => ({
-            ControlTypeID: x.ControlTypeID != null ? Number(x.ControlTypeID) : null,
-            ControlType: (x.ControlType ?? '').toString().trim(),
-            IsActive: !!x.IsActive,
-            RowNumber: 0
-          }))
-          .filter(x => x.ControlType.length > 0);
-
-        docs.sort((a, b) => (a.ControlTypeID ?? 0) - (b.ControlTypeID ?? 0));
-
-        let id = 0;
-        docs.forEach(d => { d['RowNumber'] = ++id; });
-
-        this.GridFormsControlType = this.fb.group({
-          GridRows: this.fb.array(
-            docs.map((val: any) => this.fb.group({
-              ControlType: new FormControl(val.ControlType, [Validators.required, Validators.maxLength(500)]),
-              ControlTypeID: new FormControl(val.ControlTypeID),
-              IsActive: new FormControl(val.IsActive),
-              RowNumber: new FormControl(val.RowNumber),
-              action: new FormControl('existingRecord'),
-              isEditable: new FormControl(true),
-              isNewRow: new FormControl(false),
-            }))
-          )
-        });
-
-        this.dataSourceControlType = new MatTableDataSource(
-          (this.GridFormsControlType.get('GridRows') as FormArray).controls as FormGroup[]
-        );
-
-        this.dataSourceControlType.sortingDataAccessor = (row: FormGroup, column: string) => {
-          const v = (name: string) => row.get(name)?.value;
-          switch (column) {
-            case 'Index': return Number(v('RowNumber')) || 0;
-            case 'ControlType': return (v('ControlType') || '').toString().toLowerCase();
-            case 'ControlTypeID': return Number(v('ControlTypeID')) || 0;
-            default: return v(column);
-          }
-        };
-
-        if (this.ctSort) {
-          this.dataSourceControlType.sort = this.ctSort;
-          this.ctSort.active = 'ControlTypeID';
-          this.ctSort.direction = 'asc';
-          this.ctSort.sortChange.emit();
-        }
-      } else {
-        this.GridFormsControlType = this.fb.group({
-          GridRows: this.fb.array<FormGroup>([])
-        });
-        this.dataSourceControlType = new MatTableDataSource<FormGroup>([]);
-      }
-    } else {
-      if (data?.error?.errorCode === 'TOKEN_EXPIRED') {
-        this.utils.relogin(this._document);
-      } else {
-        this.saveControlTypeError = data?.error?.errorMessage || 'Failed to fetch Control Types';
-        this.GridFormsControlType = this.fb.group({
-          GridRows: this.fb.array<FormGroup>([])
-        });
-        this.dataSourceControlType = new MatTableDataSource<FormGroup>([]);
-      }
-    }
-  }
-
-  saveEditControlTypeData(form: FormGroup, i: number) {
-    const row = this.ControlTypeRows.at(i);
-
-    const payload = {
-      controlTypes: [{
-        ControlTypeID: row.get('ControlTypeID')?.value,
-        ControlType: row.get('ControlType')?.value,
-        isActive: row.get('IsActive')?.value ? 1 : 0
-      }]
-    };
-
-    this.configScoreRatingService.updateControlType(payload).subscribe(res => {
-      if (res?.success) {
-        row.get('isEditable')?.setValue(true);
-        next:
-        if (res.success == 1) {
-          this.CancelOverallControlEnvironmentRating();
-          this.saveSuccess(res.message);
-        } else {
-          if (res.error.errorCode == "TOKEN_EXPIRED")
-            this.utils.relogin(this._document);
-          else
-            this.saveOverallControlEnvironmentRatingerror = res.error.errorMessage;
-        }
-        error:
-        console.log("err::", "error");
-      } else {
-        this.saveControlTypeError = "Failed to update Control Type";
-      }
-    });
-  }
-
-  changedControlType(row: FormGroup, event: any, index: number) {
-    row.get('IsActive')?.setValue(event.checked);
-
-    const payload = {
-      controlTypes: [{
-        ControlTypeID: row.get('ControlTypeID')?.value,
-        ControlType: row.get('ControlType')?.value,
-        isActive: event.checked ? 1 : 0
-      }]
-    };
-
-    this.configScoreRatingService.updateControlType(payload).subscribe(res => {
-      if (res?.success) {
-        next:
-        if (res.success == 1) {
-          this.CancelOverallControlEnvironmentRating();
-          this.saveSuccess(res.message);
-        } else {
-          if (res.error.errorCode == "TOKEN_EXPIRED")
-            this.utils.relogin(this._document);
-          else
-            this.saveOverallControlEnvironmentRatingerror = res.error.errorMessage;
-        }
-        error:
-        console.log("err::", "error");
-      } else {
-        this.saveControlTypeError = "Failed to update Control Type";
-      }
-    });
-  }
-
-  initiateAddControlType() {
-    this.addControlTypeDialog = true;
-    this.controlTypeForm.reset({ ControlTypeID: null });
-  }
-
-  cancelAddControlType() {
-    this.addControlTypeDialog = false;
-  }
-
-  saveControlTypeData() {
-    const payload = {
-      controlTypes: [{
-        ControlTypeID: null,
-        ControlType: this.controlTypeForm.value.ControlType,
-        isActive: 1
-      }]
-    };
-
-    this.configScoreRatingService.addControlType(payload).subscribe(res => {
-      if (res?.success) {
-        this.addControlTypeDialog = false;
-        next:
-        if (res.success == 1) {
-          this.CancelOverallControlEnvironmentRating();
-          this.saveSuccess(res.message);
-        } else {
-          if (res.error.errorCode == "TOKEN_EXPIRED")
-            this.utils.relogin(this._document);
-          else
-            this.saveOverallControlEnvironmentRatingerror = res.error.errorMessage;
-        }
-        error:
-        console.log("err::", "error");
-
-      } else {
-        this.saveControlTypeError = "Failed to save Control Type";
-      }
-    });
-  }
-  // Control Type END
 }

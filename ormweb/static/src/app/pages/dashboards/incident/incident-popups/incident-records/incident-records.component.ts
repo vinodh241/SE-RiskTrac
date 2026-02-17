@@ -45,7 +45,7 @@ export class IncidentRecordsComponent implements OnInit {
     ngOnInit(): void {
         this.tableData = this.parent.id
         this.title = this.parent.title
-        // console.log("this.tableData",this.tableData)
+        console.log("this.tableData",this.tableData)
         this.dataSource = this.tableData
     }
 

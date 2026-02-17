@@ -7,10 +7,6 @@ import { MatModule } from 'src/app/modules/mat/mat.module';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ColorPickerModule } from 'ngx-color-picker';
-import { MatTableModule } from '@angular/material/table';
-import { MatSortModule } from '@angular/material/sort';
-import { MatTooltipModule } from '@angular/material/tooltip';
-
 
 
 @NgModule({
@@ -21,20 +17,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatModule,
     MatGridListModule,
     FlexLayoutModule,
-    ColorPickerModule,
-    MatTableModule,
-    MatSortModule,
-    MatTooltipModule
+    ColorPickerModule
   ],
-  exports: [
-    MatModule,
-    MatGridListModule,
-    FlexLayoutModule,
-    ColorPickerModule,
-    MatTableModule,
-    MatSortModule,
-    MatTooltipModule,
-    MasterRcsaComponent
-  ]
+  exports:[MasterRcsaComponent]
 })
 export class MasterRcsaModule { }

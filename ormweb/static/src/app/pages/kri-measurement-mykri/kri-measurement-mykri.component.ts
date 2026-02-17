@@ -13,7 +13,6 @@ import { DashboardService } from 'src/app/services/dashboard/dashboard.service';
 import { CommentsComponent } from 'src/app/pages/risk-metrics/comments/comments.component';
 import { ConfirmDialogComponent } from 'src/app/includes/utilities/popups/confirm/confirm-dialog.component';
 import { AlertComponent } from 'src/app/includes/utilities/popups/alert/alert.component';
-import { take } from 'rxjs/operators';
 
 export interface KriScoring {
     Indicator: string;
@@ -34,11 +33,13 @@ export interface KriScoring {
 }
 
 @Component({
-    selector: 'app-kri-measurement-mykri',
-    templateUrl: './kri-measurement-mykri.component.html',
-    styleUrls: ['./kri-measurement-mykri.component.scss']
+  selector: 'app-kri-measurement-mykri',
+  templateUrl: './kri-measurement-mykri.component.html',
+  styleUrls: ['./kri-measurement-mykri.component.scss']
 })
+
 export class KriMeasurementMykriComponent implements OnInit {
+
     mainColumn: string[] = [
         'KriCode',
         'Indicator',
@@ -53,6 +54,7 @@ export class KriMeasurementMykriComponent implements OnInit {
         'prev',
         'checkerComments'
     ];
+
     subColumn: string[] = [
         'tvalue-1',
         'tvalue-2',
@@ -64,6 +66,7 @@ export class KriMeasurementMykriComponent implements OnInit {
         'measurement',
         'kri'
     ];
+
     allColumnsForData: string[] = [
         'KriCode',
         'Indicator',
@@ -85,6 +88,7 @@ export class KriMeasurementMykriComponent implements OnInit {
         'prev',
         'checkerComments'
     ];
+
     dataSource: MatTableDataSource<KriScoring> = new MatTableDataSource();
     uploadFilename: any;
     uploadFile: FormData = new FormData();
@@ -115,16 +119,15 @@ export class KriMeasurementMykriComponent implements OnInit {
     isReviewedStatus: boolean = false;
     isExpanded: boolean = true;
     isPopoverVisible = false;
-    tooltipMessage: any;
+    tooltipMessage:any
     isInRange: boolean = false;
+
     public uploader: FileUploader = new FileUploader({
         isHTML5: true
     });
     isToolTip: any;
     filteredStatus: any;
     selectedRowFrequency: any;
-    private readonly monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    ReportKRIValidationtxt = `Only KRI's marked as measured will be reported (Button will be enabled with either "Total or Measured" filter being selected)`;
 
     constructor(
         public kriService: KriService,
@@ -135,9 +138,18 @@ export class KriMeasurementMykriComponent implements OnInit {
         @Inject(DOCUMENT) private _document: any,
     ) {
         kriService.gotMeasurements.subscribe(value => {
+            console.log('value: ', value);
             if (value) {
-                this.groupID = this.groupID > 0 ? this.groupID : "all"
-                this.unitID = this.unitID > 0 ? this.unitID : "all"
+                this.groupID        = this.groupID > 0 ? this.groupID : "all"
+                this.unitID         = this.unitID  > 0 ? this.unitID  : "all"
+                this.completedata = this.kriService?.kriMeasurments
+                this.completedata.forEach((item:any) => {
+                    if(item.StatusName == 'Not Measured' ){
+                    item.remarkdisable = true;
+                    }else{
+                    item.remarkdisable = false;
+                    }
+                  });
                 if (this.selectedRowFrequency && this.selectedRowFrequency !== 'total') {
                     if (this.groupID === 'all') {
                         this.dataSource.data = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
@@ -148,12 +160,14 @@ export class KriMeasurementMykriComponent implements OnInit {
                         this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.UnitID === this.unitID);
                     }
                     this.completedata = JSON.parse(JSON.stringify(this.dataSource.data));
+
                     if (this.filteredStatus) {
                         this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.StatusName === this.filteredStatus);
                     }
                     if (this.selectedRowFrequency) {
                         this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.MeasurementFrequency === this.selectedRowFrequency);
                     }
+
                 } else {
                     if (this.groupID === 'all') {
                         this.dataSource.data = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
@@ -164,27 +178,23 @@ export class KriMeasurementMykriComponent implements OnInit {
                         this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.UnitID === this.unitID);
                     }
                     this.completedata = JSON.parse(JSON.stringify(this.dataSource.data));
+
                     if (this.filteredStatus) {
                         this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.StatusName === this.filteredStatus);
                     }
                 }
+
+
+
+
+
+
                 setTimeout(() => {
                     this.dataSource.paginator = this.paginator
+                    // this.colorValues = "total"
                 }, 100);
             }
         });
-    }
-
-    ngOnInit(): void {
-        this.kriService.getKriMeasurementsNewData(1);
-        this.submited = false;
-        if (this.DashboardService.KeyRiskIndicatorScore.length > 0) {
-            this.model = this.DashboardService.KeyRiskIndicatorScore[0]
-            this.DashboardService.KeyRiskIndicatorScore = []
-            if (this.model) {
-                this.applyFilter("", this.model)
-            }
-        }
     }
 
     showPrevData() {
@@ -208,7 +218,6 @@ export class KriMeasurementMykriComponent implements OnInit {
     isUnitCount(): boolean {
         return this.kriService.unitCount == 1 || this.reportWithUnit;
     }
-
     dataNotMeasured(): boolean {
         var value = false
         this.completedata.forEach((kri: any) => {
@@ -263,9 +272,11 @@ export class KriMeasurementMykriComponent implements OnInit {
         }
         let remarks = myList.filter(d => (d.Remarks !== null))
         return { 'data': this.dataSource.data.length, 'myList': myList.length, 'remark': this.remarksNotNull(myList, remarks) }
+
     }
 
     applyFilter(event: any = "", KRICode = "") {
+
         if (event) {
             this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLocaleLowerCase()
             if (this.dataSource.paginator) {
@@ -282,26 +293,30 @@ export class KriMeasurementMykriComponent implements OnInit {
     }
 
     filterGroups(data: any): any {
-        this.unitSelected = '';
-        this.groupID = data.value;
-        this.groupID = this.groupID > 0 ? this.groupID : "all"
-        this.unitID = this.unitID > 0 ? this.unitID : "all"
+        console.log('data: ', data);
+        this.unitSelected   = '';
+        this.groupID        = data.value;
+        this.groupID        = this.groupID > 0 ? this.groupID : "all"
+        this.unitID         = this.unitID  > 0 ? this.unitID  : "all"
+
         this.kriService.selectedMeasurementRowGroup = data.value;
+
         if (this.selectedRowFrequency && this.selectedRowFrequency !== 'total') {
             if (this.groupID == 'all') {
-                this.dataSource.data = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
+                this.dataSource.data    = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
                 if (this.filteredStatus) {
                     this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.StatusName === this.filteredStatus);
                 }
                 if (this.selectedRowFrequency) {
                     this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.MeasurementFrequency === this.selectedRowFrequency);
                 }
-                this.completedata = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
+                this.completedata       = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
             } else if (Number(this.groupID) > 0) {
                 this.dataSource.data = this.kriService?.kriMeasurments.filter(
                     (nn: any) => nn.GroupID == Number(this.groupID)
                 );
                 this.completedata = JSON.parse(JSON.stringify(this.dataSource.data));
+
                 if (this.filteredStatus) {
                     this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.StatusName === this.filteredStatus);
                 }
@@ -309,21 +324,25 @@ export class KriMeasurementMykriComponent implements OnInit {
                     this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.MeasurementFrequency === this.selectedRowFrequency);
                 }
             }
-        } else {
+        } else  {
             if (this.groupID == 'all') {
                 this.dataSource.data = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
+
                 if (this.filteredStatus) {
                     this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.StatusName === this.filteredStatus);
                 }
-                this.completedata = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
+                this.completedata       = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
+
             } else if (Number(this.groupID) > 0) {
-                this.dataSource.data = this.kriService?.kriMeasurments.filter((nn: any) => nn.GroupID == Number(this.groupID));
-                this.completedata = JSON.parse(JSON.stringify(this.dataSource.data));
+                this.dataSource.data    = this.kriService?.kriMeasurments.filter((nn: any) => nn.GroupID == Number(this.groupID));
+                this.completedata       = JSON.parse(JSON.stringify(this.dataSource.data));
+
                 if (this.filteredStatus) {
                     this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.StatusName === this.filteredStatus);
                 }
             }
         }
+
         const key = 'UnitName';
         var unitCount;
         const arrayUniqueByKey = [
@@ -337,13 +356,15 @@ export class KriMeasurementMykriComponent implements OnInit {
         } else {
             this.reportWithUnit = false;
         }
+
     }
 
     filterUnits(data: any) {
-        this.unitID = data.value;
-        this.groupID = this.groupID > 0 ? this.groupID : "all"
-        this.unitID = this.unitID > 0 ? this.unitID : "all"
+        this.unitID     = data.value;
+        this.groupID    = this.groupID > 0 ? this.groupID : "all"
+        this.unitID     = this.unitID  > 0 ? this.unitID  : "all"
         this.kriService.selectedMeasurementRowGroup = data.value;
+
         if (this.selectedRowFrequency && this.selectedRowFrequency !== 'total') {
             if (this.groupID === 'all') {
                 this.dataSource.data = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
@@ -354,12 +375,14 @@ export class KriMeasurementMykriComponent implements OnInit {
                 this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.UnitID === this.unitID);
             }
             this.completedata = JSON.parse(JSON.stringify(this.dataSource.data));
+
             if (this.filteredStatus) {
                 this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.StatusName === this.filteredStatus);
             }
             if (this.selectedRowFrequency) {
                 this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.MeasurementFrequency === this.selectedRowFrequency);
             }
+
         } else {
             if (this.groupID === 'all') {
                 this.dataSource.data = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
@@ -370,6 +393,7 @@ export class KriMeasurementMykriComponent implements OnInit {
                 this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.UnitID === this.unitID);
             }
             this.completedata = JSON.parse(JSON.stringify(this.dataSource.data));
+
             if (this.filteredStatus) {
                 this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.StatusName === this.filteredStatus);
             }
@@ -390,12 +414,15 @@ export class KriMeasurementMykriComponent implements OnInit {
         return this.colorValues == data
     }
 
-    colorValueTotal(data: any, freq: any) {
-        return this.colorValues == data + freq
+    colorValueTotal(data:any,freq:any){
+        return this.colorValues ==  data + freq
     }
 
     colorValueData(frequency: any, data: any): any {
-        return this.colorValues == data + frequency
+        // console.log('data: ', data);
+        // console.log('frequency: ', frequency);
+        // console.log(this.colorValues)
+        return this.colorValues ==  data + frequency
     }
 
     textColor(): any {
@@ -436,78 +463,152 @@ export class KriMeasurementMykriComponent implements OnInit {
                     else row.ThresholdValue = "1"
                     break
             }
+
             let kris = this.kriService.kriThresholds.filter((kri: any) => kri.Value == row.ThresholdValue)
             if (kris.length > 0)
                 row.ColorCode = kris[0].ColorCode
         }
+        // if (row.Measurement == '' || row.Measurement == null || row.Measurement == undefined || row.Remarks == '' || row.Remarks == null || row.Remarks == undefined) {
+        //     row.StatusName = "Not Measured";
+        // } else {
+        //     row.StatusName = "Measured";
+        // }
     }
 
+    // onChangeRemarks(row: any): void {
+    //     if (row.Measurement == '' || row.Measurement == null || row.Measurement == undefined || row.Remarks == '' || row.Remarks == null || row.Remarks == undefined) {
+    //         row.StatusName = "Not Measured";
+    //     } else {
+    //         row.StatusName = "Measured";
+    //     }
+    // }
+
     isLastMonth(): boolean {
-        // const now = new Date();
-        // const bufferRaw = this.kriService?.BufferDays;
-        // const gracePeriodDays = Number.isFinite(bufferRaw) ? Number(bufferRaw) : 0;
-        // const freq = (this.kriService?.kriMeasurmentsReportingFrequncy || "").trim();
-        // console.log('isLastMonth-freq::', freq);
-        // console.log('isLastMonth-gracePeriodDays::', gracePeriodDays);
-        // let periodStart: Date | null = null;
-        // let periodEnd: Date | null = null;
-        // switch (freq) {
-        //     case "Monthly": {
-        //         // Last completed month: start = first day of previous month, end = last day of previous month
-        //         const prevMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        //         periodStart = new Date(prevMonthDate.getFullYear(), prevMonthDate.getMonth(), 1);
-        //         periodEnd = new Date(prevMonthDate.getFullYear(), prevMonthDate.getMonth() + 1, 0); // last day prev month
-        //         break;
-        //     }
-        //     case "Quarterly": {
-        //         // Determine which quarter the previous completed month belonged to
-        //         // Find current month index (0-11). We want previous quarter (the quarter that ended before the current month).
-        //         // Compute previous-month date, then quarter containing that month.
-        //         const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        //         const monthIdx = prevMonth.getMonth();
-        //         const quarter = Math.floor(monthIdx / 3); // 0..3
-        //         const quarterStartMonth = quarter * 3;
-        //         periodStart = new Date(prevMonth.getFullYear(), quarterStartMonth, 1);
-        //         periodEnd = new Date(prevMonth.getFullYear(), quarterStartMonth + 3, 0); // last day of quarter
-        //         break;
-        //     }
-        //     case "Semi Annual": {
-        //         // Two halves: Jan-Jun, Jul-Dec. Use the half that contains previous month.
-        //         const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        //         const m = prevMonth.getMonth();
-        //         const halfStartMonth = m < 6 ? 0 : 6; // 0 or 6
-        //         periodStart = new Date(prevMonth.getFullYear(), halfStartMonth, 1);
-        //         periodEnd = new Date(prevMonth.getFullYear(), halfStartMonth + 6, 0); // last day of half
-        //         break;
-        //     }
-        //     case "Annually": {
-        //         // Previous calendar year
-        //         const prevYear = now.getFullYear() - 1;
-        //         periodStart = new Date(prevYear, 0, 1); // Jan 1 last year
-        //         periodEnd = new Date(prevYear, 12, 0);   // Dec 31 last year
-        //         break;
-        //     }
-        //     default:
-        //         return false;
-        // }
-        // if (!periodStart || !periodEnd) return false;
-        // // Compute grace end: periodEnd + gracePeriodDays, but set to end-of-day
-        // const graceEnd = new Date(periodEnd);
-        // graceEnd.setDate(graceEnd.getDate() + gracePeriodDays);
-        // graceEnd.setHours(23, 59, 59, 999); // inclusive through the end of that day
-        // // Normalize now to current timestamp (no change, but explicit)
-        // const nowTs = now.getTime();
-        // // Return true only if now is within [periodStart (00:00:00.000), graceEnd (23:59:59.999)]
-        // const startOfPeriod = new Date(periodStart);
-        // startOfPeriod.setHours(0, 0, 0, 0);
-        // console.log("nowTs (Local):", new Date(nowTs).toLocaleString());
-        // console.log("startOfPeriod (Local):", new Date(startOfPeriod).toLocaleString());
-        // console.log("graceEnd (Local):", new Date(graceEnd).toLocaleString());
-        // console.log("isLastMonth", nowTs >= startOfPeriod.getTime() && nowTs <= graceEnd.getTime());
-        // console.log("this.filteredStatus:", this.filteredStatus);
-        // console.log("this.colorValues:", this.colorValues);
-        // return nowTs >= startOfPeriod.getTime() && nowTs <= graceEnd.getTime();
-        return true;
+        let date = new Date()
+        let isLast = false
+        switch (this.kriService.kriMeasurmentsReportingFrequncy) {
+            case "Monthly":
+                isLast = true
+                break
+            case "Quarterly":
+                isLast = [2, 5, 8, 11].includes(date.getMonth())
+                break
+            case "Semi Annual":
+                isLast = [5, 11].includes(date.getMonth())
+                break
+            case "Annually":
+                isLast = [11].includes(date.getMonth())
+                break
+        }
+        return isLast
+    }
+
+    getQuarter() {
+        var finaltype;
+        var date = new Date();
+        var month = Math.floor(date.getMonth() / 3) + 1;
+        month -= month > 4 ? 4 : 0;
+        var year = date.getFullYear();
+        switch (month) {
+            case 1:
+                finaltype = "Jan-Mar " + year;
+                break;
+            case 2:
+                finaltype = "Apr-Jun " + year;
+                break;
+            case 3:
+                finaltype = "Jul-Sep " + year
+                break;
+            case 4:
+                finaltype = "Oct-Dec " + year
+                break;
+            default:
+                break;
+        }
+        return finaltype;
+    }
+
+    getSemiAnnual() {
+        var finaltype;
+        var date = new Date();
+        var month = Math.floor(date.getMonth() / 6) + 1;
+        month -= month > 6 ? 6 : 0;
+        var year = date.getFullYear();
+        switch (month) {
+            case 1:
+                finaltype = "Jan-Jun " + year;
+                break;
+            case 2:
+                finaltype = "Jul-Dec " + year;
+                break;
+            default:
+                break;
+        }
+        return finaltype;
+    }
+
+    getMonth() {
+        var finaltype;
+        var date = new Date();
+        var month = Math.floor(date.getMonth()) + 1;
+        var year = date.getFullYear();
+        switch (month) {
+            case 1:
+                finaltype = "Jan " + year;
+                break;
+            case 2:
+                finaltype = "Feb " + year;
+                break;
+            case 3:
+                finaltype = "Mar " + year;
+                break;
+            case 4:
+                finaltype = "Apr " + year;
+                break;
+            case 5:
+                finaltype = "May " + year;
+                break;
+            case 6:
+                finaltype = "Jun " + year;
+                break;
+            case 7:
+                finaltype = "Jul " + year;
+                break;
+            case 8:
+                finaltype = "Aug " + year;
+                break;
+            case 9:
+                finaltype = "Sep " + year;
+                break;
+            case 10:
+                finaltype = "Oct " + year;
+                break;
+            case 11:
+                finaltype = "Nov " + year;
+                break;
+            case 12:
+                finaltype = "Dec " + year;
+                break;
+            default:
+                break;
+        }
+        return finaltype;
+    }
+
+    getAnnual() {
+        var finaltype;
+        var date = new Date();
+        var month = Math.floor(date.getMonth() / 12) + 1;
+        month -= month > 6 ? 6 : 0;
+        var year = date.getFullYear();
+        switch (month) {
+            case 1:
+                finaltype = "Jan-Dec " + year;
+                break;
+            default:
+                break;
+        }
+        return finaltype;
     }
 
     saveKRIs(): void {
@@ -516,32 +617,28 @@ export class KriMeasurementMykriComponent implements OnInit {
             if (metric?.Measurement != metric?.MeasurementOld
                 || metric?.Remarks != metric?.RemarksOld
                 || (metric?.evidences && metric?.evidences.length > 0 ? (metric?.evidences.map((ele: any) => ele.EvidenceID)).join() : '') != metric?.evidencesOld) {
-                const FrequencyID = metric?.MeasurementFrequencyID;
-                const reportFrequencyData = this.kriService.reportFrequencyData;
-                const matchedFrequency = reportFrequencyData?.find(
-                    (item: any) => item.FrequencyID === FrequencyID
-                );
-
-                // console.log('saveKRIs-matchedFrequency::', matchedFrequency);
-                const periodType = matchedFrequency?.Period;
-                if (
-                    metric?.Measurement != null &&
-                    metric.Measurement.toString().trim() !== ''
-                ) {
-                    data.push({
-                        metricID: metric.MetricID,
-                        period: periodType,
-                        value: metric.Measurement,
-                        remark: metric.Remarks,
-                        IsReported: null,
-                        EvidenceID: metric?.evidences?.length
-                            ? metric.evidences.map((ele: any) => ele.EvidenceID).join(',')
-                            : ''
-                    });
+                var periodType;
+                if (metric.MeasurementFrequency == 'Monthly') {
+                    periodType = this.getMonth();
+                } else if (metric.MeasurementFrequency == 'Quarterly') {
+                    periodType = this.getQuarter();
+                } else if (metric.MeasurementFrequency == 'Semi Annual') {
+                    periodType = this.getSemiAnnual();
+                } else {
+                    periodType = this.getAnnual();
                 }
+                data.push({
+                    "metricID": metric.MetricID,
+                    "period": periodType,
+                    "value": metric.Measurement,
+                    "remark": metric.Remarks,
+                    "IsReported": null,
+                    "EvidenceID": metric?.evidences && metric?.evidences.length > 0 ? (metric?.evidences.map((ele: any) => ele.EvidenceID)).join() : ''
+                })
             }
         });
         this.submited = true;
+
         this.kriService.setKriMetricsScoring(data, this.submited);
     }
 
@@ -567,7 +664,6 @@ export class KriMeasurementMykriComponent implements OnInit {
         confirm.afterClosed().subscribe(result => {
             if (result) {
                 this.kriService.setKriMetricsReport(data1, this.submited);
-                return;
             }
         })
     }
@@ -591,19 +687,20 @@ export class KriMeasurementMykriComponent implements OnInit {
         let service;
         service = this.completedata;
         let data = 0
-        if (mdata != '') {
+        if(mdata != ''){
             for (let i in service) {
                 if (service[i].StatusName === mdata) {
                     data++
                 }
             }
-        } else {
+        }else{
             data = service.length;
         }
         return data
     }
 
     reportedStatus(val: any, data: any): any {
+        console.log('data: ', data);
         this.filteredStatus = data;
         this.model = ''
         this.dataSource.filter = " "
@@ -611,10 +708,12 @@ export class KriMeasurementMykriComponent implements OnInit {
             this.dataSource.paginator.firstPage()
         let listData: any = []
         let service = this.completedata;
+        console.log('this.completedata: ', this.completedata);
         if (val == 'total') {
             for (let i in service) {
-                let status = service[i].StatusName
-                if (status === data) {
+                // let status = data != "Rejected" ? service[i].StatusName  : service[i].StatusName
+                let status =  service[i].StatusName
+                if (status === data ) {
                     listData.push(service[i])
                     setTimeout(() => this.dataSource.paginator = this.paginator);
                 }
@@ -622,7 +721,7 @@ export class KriMeasurementMykriComponent implements OnInit {
             }
         } else {
             for (let i in service) {
-                let status = service[i].StatusName
+                let status =  service[i].StatusName
                 if (status === data && service[i].MeasurementFrequency === val) {
                     listData.push(service[i])
                     setTimeout(() => this.dataSource.paginator = this.paginator);
@@ -630,6 +729,8 @@ export class KriMeasurementMykriComponent implements OnInit {
                 setTimeout(() => this.dataSource.paginator = this.paginator);
             }
         }
+        console.log('listData: ', listData);
+
         this.dataSource.data = listData
         this.colorValues = data + val;
         this.selectedRow = data + val;
@@ -640,8 +741,10 @@ export class KriMeasurementMykriComponent implements OnInit {
         let reportStatusCount;
         if (measurementFrequency === 'total') {
             reportStatusCount = this.completedata?.filter((data: any) => data.StatusName === status);
+
         } else {
             reportStatusCount = this.completedata?.filter((data: any) => data.MeasurementFrequency === measurementFrequency && data.StatusName === status);
+
         }
         return reportStatusCount?.length;
     }
@@ -699,13 +802,14 @@ export class KriMeasurementMykriComponent implements OnInit {
 
     measured(data: any): any {
         this.filteredStatus = data
-        if (data != '') {
+        if(data != ''){
             this.model = ''
             this.dataSource.filter = " "
             if (this.dataSource.paginator)
                 this.dataSource.paginator.firstPage()
             let listData: any = []
             let service = this.completedata;
+            console.log('this.completedata: ', this.completedata);
             for (let i in service) {
                 if (service[i].StatusName === data) {
                     listData.push(service[i])
@@ -714,10 +818,11 @@ export class KriMeasurementMykriComponent implements OnInit {
                 setTimeout(() => this.dataSource.paginator = this.paginator);
             }
             this.dataSource.data = listData
+            console.log('listData: ', listData);
             this.colorValues = data;
             this.selectedRow = data;
         }
-        else {
+        else{
             this.dataSource.data = this.completedata;
             this.colorValues = data;
             this.selectedRow = data;
@@ -740,12 +845,15 @@ export class KriMeasurementMykriComponent implements OnInit {
             setTimeout(() => this.dataSource.paginator = this.paginator);
         }
         this.dataSource.data = listData;
+
         this.colorValues = data + frequency
         this.selectedRow = data + frequency
         this.selectedRowFrequency = frequency;
     }
 
     measurementFrequencyData(data: any) {
+        console.log("datadatadata",data)
+        // this.filteredStatus = data;
         this.selectedRowFrequency = data;
         this.kriService.selectedMeasurementRowFrequency = data;
         this.model = '';
@@ -888,10 +996,10 @@ export class KriMeasurementMykriComponent implements OnInit {
                 Target: item.Target ? item.Target.toString() + '%' : '0%',
                 "KRI Type": item.KriType,
                 "Threshold Value 1": item.ThresholdValue1 >= 0 ? (item.ThresholdValue1 <= item.ThresholdValue2 ? ">=" : "<=") + item.ThresholdValue1.toString() + '%' : '',
-                'Threshold Value 2': item.ThresholdValue2 ? (item.ThresholdValue2 <= item.ThresholdValue3 ? ">=" : "<=") + item.ThresholdValue2.toString() + '%' : '',
+                'Threshold Value 2': item.ThresholdValue2 ? (item.ThresholdValue2 <= item.ThresholdValue3 ? ">=" : "<=") + item.ThresholdValue2.toString() +'%': '',
                 'Threshold Value 3': item.ThresholdValue3 ? (item.ThresholdValue3 <= item.ThresholdValue4 ? ">=" : "<=") + item.ThresholdValue3.toString() + '%' : '',
-                'Threshold Value 4': item.ThresholdValue4 ? (item.ThresholdValue4 <= item.ThresholdValue5 ? ">=" : "<=") + item.ThresholdValue4.toString() + '%' : '',
-                'Threshold Value 5': item.ThresholdValue5 ? item.ThresholdValue5.toString() + '%' : '0%',
+                'Threshold Value 4': item.ThresholdValue4 ? (item.ThresholdValue4 <= item.ThresholdValue5 ? ">=" : "<=") + item.ThresholdValue4.toString() + '%': '',
+                'Threshold Value 5': item.ThresholdValue5 ? item.ThresholdValue5.toString() + '%': '0%',
                 Period: item.Period,
                 Date: item.Date ? new Date(item.Date).toLocaleDateString('en-US', {
                     month: '2-digit', day: '2-digit', year: 'numeric'
@@ -937,21 +1045,24 @@ export class KriMeasurementMykriComponent implements OnInit {
     }
 
     showComments(element: any): void {
-        let comments = element.CommentData
+        console.log('element: ', element);
+            let comments = element.CommentData
             ? element.CommentData.filter((x: any) => x.IsVisible && x.CommentBody != "") || []
             : [];
-        const info = this.dialog.open(CommentsComponent, {
-            minWidth: '28vw',
-            maxWidth: '60vw',
-            minHeight: '30vh',
-            maxHeight: '60vh',
-            panelClass: 'dark',
-            data: {
-                title: 'Previous Comments',
-                comments: comments,
-            },
-        }
+            const info = this.dialog.open(CommentsComponent, {
+                minWidth: '28vw',
+                maxWidth: '60vw',
+                minHeight: '30vh',
+                maxHeight: '60vh',
+                panelClass: 'dark',
+                data: {
+                    title: 'Previous Comments',
+                    comments: comments,
+                },
+            }
         );
+        console.log("comments",comments)
+
     }
 
     showFrequency(): MatDialogRef<AlertComponent> {
@@ -961,6 +1072,9 @@ export class KriMeasurementMykriComponent implements OnInit {
             <p><strong>Reporting Frequency Semi-Annually:</strong> Button will be enabled in the last month of the semi-annual period once all KRIs are reported.</p>
             <p><strong>Reporting Frequency Annually:</strong> Button will be enabled in the last month of the annual period once all KRIs are reported.</p>
         `;
+
+        console.log('frequency:', frequency);
+
         const dialogRef = this.dialog.open(AlertComponent, {
             width: '462px',
             maxWidth: '60vw',
@@ -972,57 +1086,52 @@ export class KriMeasurementMykriComponent implements OnInit {
                 content: frequency
             }
         });
+
         return dialogRef;
     }
 
     toggleMenu() {
-        this.isExpanded = !this.isExpanded;
+    this.isExpanded = !this.isExpanded;
     }
 
     togglePopover() {
         this.isPopoverVisible = !this.isPopoverVisible;
     }
 
-    isMeasurementInRange(val: any): boolean {
-        let inRange = false;
-        let rawValue = val.Measurement;
-        if (rawValue === null || rawValue === undefined || rawValue === '') {
+
+    isMeasurementInRange(val: any,event:any): any {
+        let Value1Range:any;
+        let minRange:any;
+        let maxRange:any;
+        this.isInRange = false;
+
+        if(event != null){
+            if (val.ThresholdValue1 > val.ThresholdValue5) {
+                this.isInRange = event <= val.ThresholdValue1 && event >= val.ThresholdValue5;
+                minRange  = val.ThresholdValue5;
+                maxRange  = val.ThresholdValue1;
+                Value1Range = 100;
+            } else if (val.ThresholdValue1 < val.ThresholdValue5) {
+                this.isInRange = event >= val.ThresholdValue1 && event <= val.ThresholdValue5;
+                minRange  = val.ThresholdValue1;
+                maxRange  = val.ThresholdValue5;
+                Value1Range = val.ThresholdValue1
+            }
+
+            if (this.isInRange) {
+                val.remarkdisable = false;
+            } else {
+                this.popupInfo(minRange, maxRange).afterClosed().subscribe(() => {
+                    val.remarkdisable = true;
+                    val.Measurement = null;
+                });
+            }
+
+            return this.isInRange;
+        }else{
             val.remarkdisable = true;
             val.Measurement = null;
-            return false;
         }
-        const value = Number(rawValue);
-        if (Number.isNaN(value)) {
-            val.remarkdisable = true;
-            val.Measurement = null;
-            return false;
-        }
-        const t1 = val?.ThresholdValue1 ?? null;
-        const t5 = val?.ThresholdValue5 ?? null;
-        if (t1 === null || t5 === null || t1 === undefined || t5 === undefined) {
-            val.remarkdisable = true;
-            val.Measurement = null;
-            return false;
-        }
-        const thresh1 = Number(t1);
-        const thresh5 = Number(t5);
-        if (Number.isNaN(thresh1) || Number.isNaN(thresh5)) {
-            val.remarkdisable = true;
-            val.Measurement = null;
-            return false;
-        }
-        const minRange = Math.min(thresh1, thresh5);
-        const maxRange = Math.max(thresh1, thresh5);
-        inRange = value >= minRange && value <= maxRange;
-        if (inRange) {
-            val.remarkdisable = false;
-            return true;
-        }
-        this.popupInfo(minRange, maxRange).afterClosed().pipe(take(1)).subscribe(() => {
-            val.remarkdisable = true;
-            val.Measurement = null;
-        });
-        return false;
     }
 
     popupInfo(Value1: any, Value5: any): MatDialogRef<AlertComponent> {
@@ -1034,21 +1143,34 @@ export class KriMeasurementMykriComponent implements OnInit {
                 content: `Please select the measurement value in the range of ${Value1} - ${Value5}`
             }
         });
+
         return dialogRef;
     }
 
-    isReportKRI() {
-        return (
-            this.isLastMonth() &&
-            !this.utils.isReadOnlyUserORM() &&
-            this.isUnitCount() &&
-            this.colorValues !== 'total' &&
-            this.filteredStatus !== 'Measured' &&
-            this.filteredStatus !== ''
-        );
+
+    ngOnInit(): void {
+        this.kriService.getKriMeasurementsNewData(1);
+        this.submited = false;
+        console.log("ngonint");
+        if (this.DashboardService.KeyRiskIndicatorScore.length > 0) {
+            this.model = this.DashboardService.KeyRiskIndicatorScore[0]
+            this.DashboardService.KeyRiskIndicatorScore = []
+            if (this.model) {
+                this.applyFilter("", this.model)
+            }
+        }
     }
 
-    resetFilter() {
+
+    tooltip(){
+        if((!this.isLastMonth() || this.utils.isReadOnlyUserORM() || (this.isDataModified() && !this.remarksFilled) || this.dataNotMeasured() || this.isReportedCount()) || !this.isUnitCount()  || (this.filteredStatus != '' && this.colorValues != 'total') ){
+           return "Once all KRIs for any department are measured, you can report those KRIs. If all KRIs for all departments are measured, you can report all at once. (Make sure no filter is selected in the left side filter section.)"
+        }else{
+            return ""
+        }
+    }
+
+    resetFilter(){
         this.groupSelected = "all";
         this.dataSource.filter = "";
         this.unitSelected = "all";
@@ -1060,4 +1182,7 @@ export class KriMeasurementMykriComponent implements OnInit {
         this.kriService.getKriMeasurementsNewData(1);
         this.selectedRowFrequency = ''
     }
+
 }
+
+

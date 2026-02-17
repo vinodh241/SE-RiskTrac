@@ -6,28 +6,37 @@ networks:
     external: true  # Uncomment if you created the network outside
 
 services:
+  authapi:
+    image: vinod9072/authapi:v1
+    container_name: authapi
+    ports:
+      - "6001:6001"
+
   umapi:
     image: vinod9072/umapi:v1
     container_name: umapi
-  umweb:
-    image: vinod9072/umweb:v1
-    container_name: umweb
+    ports:
+      - "6002:6002"
 
   ormapi:
     image: vinod9072/ormapi:v1
     container_name: ormapi
-  
-  # ormweb:
-  #    image: vinod9072/ormweb:v1
-  #    container_name: ormweb
+    ports:
+      - "6003:6003"
 
   # bcmapi:
   #   image: vinod9072/bcmapi:v1
   #   container_name: bcmapi
+  #   ports:
+  #     - "6004:6004"
 
-  authapi:
-    image: vinod9072/authapi:v1
-    container_name: authapi
+  umweb:
+    image: vinod9072/umweb:v1
+    container_name: umweb
+
+  # ormweb:
+  #   image: vinod9072/ormweb:v1
+  #   container_name: ormweb
 
   hostweb:
     image: vinod9072/hostweb:v1
@@ -36,13 +45,17 @@ services:
   # bcmweb:
   #   image: bcmweb:v1
   #   container_name: bcmweb
-  
+
   nginx:
     image: vinod9072/nginx:v1
     container_name: nginx
     ports:
-    - "81:81"
+      - "80:80"
     depends_on:
+      - authapi
+      - umapi
+      - ormapi
+      - hostweb
       - umweb
     networks:
       - default

@@ -27,11 +27,9 @@ mat-card-content.tablecontent {
   font-weight: bold;
   color: red;
 }
-
-.d-flex {
+.d-flex{
   display: flex
 }
-
 .mat-row:nth-child(even) {
   background-color: #ced2d04d !important;
 }
@@ -100,7 +98,7 @@ tr.Tableheader th {
 }
 
 .mat-toolbar {
-  height: 6.4vh;
+    height: 6.4vh;
 }
 
 .mat-elevation-z8 {
@@ -264,7 +262,6 @@ mat-dialog-content,
 .TextboxSpan {
   color: rgb(255, 255, 255);
   font-weight: bold;
-  text-align: center;
 }
 
 .submitassessment {
@@ -288,11 +285,11 @@ mat-dialog-content,
   padding: 0px !important;
 }
 
-.active {
-  background-color: rgba(255, 255, 255, 0.2);
+.active{
+  background-color: rgba(255,255,255,0.2);
 }
 
-.hideExcel {
+.hideExcel{
   opacity: 0.5;
   pointer-events: none;
   cursor: default;
@@ -304,72 +301,18 @@ mat-dialog-content,
 }
 
 .mat-header-cell {
-  border-right: 1px solid #fff;
-  background-color: #E7E7E7;
+    border-right: 1px solid #fff;
+    background-color: #E7E7E7;
 }
 
-.mat-cell {
-  border-right: 1px solid #eee;
-  padding: 0 5px !important;
-}
+ .mat-cell{
+    border-right: 1px solid #eee;
+    padding: 0 5px !important;
+ }
 
-.mat-sort-header-content {
-  text-align: center;
-  display: flex;
-  align-items: center;
-  margin-left: 1vh;
-}
-
-.submitassessment[disabled] {
-  background-color: #bfbfbf !important;
-  color: white !important;
-  opacity: 0.8;
-  cursor: not-allowed !important;
-}
-
-.submitassessment[disabled] img {
-  filter: grayscale(100%) brightness(1.2);
-}
-
-  .applyFilter button, .applyFilter button:focus {
-    width: 24vh;
-    min-height: 3.5vh;
-    // height: 4.5vh;
-    padding: 0.3vh 0.6vw;
-    box-shadow: 0.3vh 0.4vh 0.4vh 0px rgba(0, 0, 0, 0.28);
-    border-left: 2vw solid #000;
-    border-right: none;
-    border-top: none;
-    border-bottom: none;
-    transition: width 2s;
-    border-radius: 0.5vh;
-    color: white;
-    background: linear-gradient(92deg, #245A8C 44.75%, #1DA34A 108.73%);
-    margin-right: 0.5vw;
-    line-height: 1;
-}
-.btn {
-    outline: none;
-}
-
-.assesment-button {    
-  display: flex;
-  justify-content: flex-end;
-  align-items: baseline;
-}
-
-.adHocRiskBtn {
-  height: 5vh; 
-  margin-left:8px;
-  position: relative;
-}
-
-
-.plusIcon {
-  width: 1vw;
-  //  margin-right:6px;
-  position: absolute;
-  top: 50%;
-  left: -14%;
-  transform: translateY(-50%);
+ .mat-sort-header-content {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    margin-left: 1vh;
 }

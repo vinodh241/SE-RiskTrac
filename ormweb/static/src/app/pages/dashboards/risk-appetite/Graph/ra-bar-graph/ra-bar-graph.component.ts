@@ -57,10 +57,8 @@ export class RaBarGraphComponent implements OnInit {
   ngOnInit(): void {
     this.dashboardservice.gotRAMaster.subscribe((value) => {
       if (value == true) {
-        this.formattedData = this.dashboardservice.RAMaster?.Formatted_DATA; 
-        this.RiskData = (this.formattedData && Array.isArray(this.formattedData)) 
-          ? this.formattedData.filter((item:any) => item.CollectionStatusName !== "Not Started" && item.StatusID !== null && item.StatusID !== 1 && item.StatusID !== 2 )
-          : []; 
+        this.formattedData = this.dashboardservice.RAMaster.Formatted_DATA; 
+        this.RiskData = this.formattedData.filter((item:any) => item.CollectionStatusName !== "Not Started" && item.StatusID !== null && item.StatusID !== 1 && item.StatusID !== 2 ); 
         // console.log('this.RiskData : ',this.RiskData )
          
 
@@ -70,8 +68,8 @@ export class RaBarGraphComponent implements OnInit {
           this.yearData = this.dashboardservice.yearValue;
           this.quaterSelectedValue =
               this.dashboardservice.quaterValue;
-          // console.log('this.yearData', this.yearData);
-          // console.log('this.quaterData', this.quaterSelectedValue);
+          console.log('this.yearData', this.yearData);
+          console.log('this.quaterData', this.quaterSelectedValue);
          
           this.quarterData = [];
           const currentDate = new Date();
@@ -107,9 +105,7 @@ export class RaBarGraphComponent implements OnInit {
           // console.log('previousQuarters', previousQuarters);
 
           for (const quarter of previousQuarters) {
-            const filteredData = (this.RiskData && Array.isArray(this.RiskData))
-              ? this.RiskData.filter((item: any) => item.Quater === quarter && item.RiskMetricLevel === 3)
-              : [];
+            const filteredData = this.RiskData.filter((item: any) => item.Quater === quarter && item.RiskMetricLevel === 3);
             this.quarterData.push({
               name: quarter,
               y: filteredData.length,

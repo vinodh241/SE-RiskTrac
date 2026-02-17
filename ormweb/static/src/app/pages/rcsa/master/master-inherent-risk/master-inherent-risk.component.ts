@@ -3,6 +3,7 @@ import { DOCUMENT } from '@angular/common';
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { InfoComponent } from 'src/app/includes/utilities/popups/info/info.component';
@@ -14,6 +15,7 @@ import { OverAllInherentRiskScoreService } from 'src/app/services/rcsa/master/in
 import { ProcessService } from 'src/app/services/rcsa/master/inherent-risk/process.service';
 import { RiskCategoryService } from 'src/app/services/rcsa/master/inherent-risk/risk-category.service';
 import { UtilsService } from 'src/app/services/utils/utils.service';
+import { environment } from 'src/environments/environment';
 
 export interface TagDataModel {
     ConfigField: string,
@@ -22,31 +24,22 @@ export interface TagDataModel {
     ConfigScoreAndRatingID?: number;
     IsOperator: boolean;
 }
-
 @Component({
     selector: 'app-master-inherent-risk',
     templateUrl: './master-inherent-risk.component.html',
     styleUrls: ['./master-inherent-risk.component.scss']
 })
 export class MasterInherentRiskComponent implements OnInit {
-    displayedRiskCategoryColumns: string[] = [
-        'RowNumber',
-        'Category',
-        'CorporateObjective',   // <-- new column
-        'Status',
-        'Action'
-    ];
+
+    displayedRiskCategoryColumns: string[] = ['RowNumber', 'Category', 'Action', 'Status'];
     dataSourceRiskCategory = new MatTableDataSource<any>();
     addRiskCategorydg: boolean = false;
     gridDataSourceRiskCategory: any;
     riskCategoryForm = new FormGroup({
         txtRiskCategoryName: new FormControl('', [Validators.required, Validators.minLength(2)]),
-        txtRiskCategoryID: new FormControl(0),
-        // ddlCorporateObjectiveID: [null, Validators.required]
-        ddlCorporateObjectiveID: new FormControl<number | null>(null, {
-            validators: [Validators.required]
-        })
+        txtRiskCategoryID: new FormControl(0)
     });
+
     displayedProcessRiskColumns: string[] = ['Index', 'Name', 'Action', 'Status'];
     dataSourceProcessRisk = new MatTableDataSource<any>();
     addProcessRiskdg: boolean = false;
@@ -56,23 +49,17 @@ export class MasterInherentRiskComponent implements OnInit {
     });
     gridDataSourceProcessRisk: any;
     GridFormsProcessRisk!: FormGroup;
+
     RiskCategoryGridForms!: FormGroup;
     isEditableNew: boolean = true;
     saveRiskCategoryerror: String = "";
     saveProcessRiskerror: string = "";
     showText: number = 1;
     exceedCharLenErr: any;
-    duplicate: any
+    duplicate:any
     type: any;
     // @ts-ignore
     @ViewChild(MatSort) sort: MatSort;
-    corporateObjectives: Array<{
-        CorporateObjectiveID: number;
-        CorporateObjectiveName: string;
-        Description?: string;
-        IsActive: boolean;
-        IsDeleted: boolean;
-    }> = [];
 
     constructor(
         private _liveAnnouncer: LiveAnnouncer,
@@ -89,194 +76,417 @@ export class MasterInherentRiskComponent implements OnInit {
         private fb: FormBuilder,
         private _formBuilder: FormBuilder,
         @Inject(DOCUMENT) private _document: any
-    ) { }
+    ) {
 
-    ngAfterViewInit() {
     }
 
+    ngAfterViewInit() {
+
+    }
     ngOnInit(): void {
+
         this.RiskCategoryGridForms = this._formBuilder.group({
             GridRows: this._formBuilder.array([])
         });
+
         this.GridFormsProcessRisk = this._formBuilder.group({
             GridRows: this._formBuilder.array([])
         });
+
         this.GridFormsInherentLikelihoodRating = this._formBuilder.group({
             GridRows: this._formBuilder.array([])
         });
+
         this.GridFormsInherentImpactRate = this._formBuilder.group({
             GridRows: this._formBuilder.array([])
         });
-
-        // Make Overall Inherent Risk Rating form read-only
-        // this.masterInherentRiskRatingForm.disable({ emitEvent: false });
-
         this.getpageloaddata();
     }
 
     getpageloaddata(): void {
-        this.configScoreRatingService.getMasterInherentRiskScreen().subscribe(data => {
-            next: {
-                if (data.success == 1) {
-                    this.processRiskCategory(data);
-                    this.processRisk(data);
-                    this.processInherentLikelihoodRate(data);
-                    this.processInherentImpactRate(data);
-                    this.processInherentRiskScoreMasterData(data);
-                    this.processInherentRiskScore(data);
-                    this.processInherentRiskRatingMasterData(data);
-                    this.processInherentRiskRating(data);
-                } else {
-                    if (data.error.errorCode == "TOKEN_EXPIRED")
-                        this.utils.relogin(this._document);
+
+        if (environment.dummyData) {
+            let data = {
+                "success": 1,
+                "message": "Data fetch from DB successful.",
+                "result": {
+                    "recordset": {
+                        "RiskCategory": [
+                            {
+                                "Category": "Rate Name1",
+                                "IsActive": false,
+                                "RiskCategoryID": 1
+
+                            },
+                            {
+                                "Category": "Rate Name2",
+                                "IsActive": true,
+                                "RiskCategoryID": 2
+                            }
+                        ],
+                        "Process": [
+                            {
+                                "Name": "Low Risk",
+                                "IsActive": "1",
+                                "ProcessID": 1
+                            },
+                            {
+                                "Name": "Moderate Risk",
+                                "IsActive": "0",
+                                "ProcessID": 2
+                            },
+                            {
+                                "Name": "High Risk",
+                                "IsActive": "0",
+                                "ProcessID": 3
+                            }
+                        ],
+                        "InherentLikelihoodRating": [
+                            {
+                                "Rating": "Rare",
+                                "Score": 1,
+                                "IsActive": false,
+                                "InherentLikelihoodRatingID": 1
+                            },
+                            {
+                                "Rating": "Rate2",
+                                "Score": 2,
+                                "IsActive": true,
+                                "InherentLikelihoodRatingID": 2
+                            }
+                        ],
+                        "InherentImpactRating": [
+                            {
+                                "Rating": "Rate",
+                                "Score": 1,
+                                "IsActive": false,
+                                "InherentImpactRatingID": 1
+                            },
+                            {
+                                "Rating": "Rate2",
+                                "Score": 2,
+                                "IsActive": true,
+                                "InherentImpactRatingID": 2
+                            }
+                        ],
+                        "InherentRiskScoreConfig": [
+                            {
+                                "ConfigScoreAndRatingID": 1,
+                                "ConfigField": "+",
+                                "ConfigDisplay": "+",
+                                "IsOperator": true,
+                                "ConfigScoreAndRatingScreenMappingID": 1,
+                                "ConfigScreen": "ControlTotalScore"
+                            },
+                            {
+                                "ConfigScoreAndRatingID": 2,
+                                "ConfigField": "-",
+                                "ConfigDisplay": "-",
+                                "IsOperator": true,
+                                "ConfigScoreAndRatingScreenMappingID": 2,
+                                "ConfigScreen": "ControlTotalScore"
+                            },
+                            {
+                                "ConfigScoreAndRatingID": 3,
+                                "ConfigField": "*",
+                                "ConfigDisplay": "*",
+                                "IsOperator": true,
+                                "ConfigScoreAndRatingScreenMappingID": 3,
+                                "ConfigScreen": "ControlTotalScore"
+                            },
+                            {
+                                "ConfigScoreAndRatingID": 4,
+                                "ConfigField": "/",
+                                "ConfigDisplay": "/",
+                                "IsOperator": true,
+                                "ConfigScoreAndRatingScreenMappingID": 4,
+                                "ConfigScreen": "ControlTotalScore"
+                            },
+                            {
+                                "ConfigScoreAndRatingID": 5,
+                                "ConfigField": "InherentImpactRatingID",
+                                "ConfigDisplay": "InherentImpactRatingID",
+                                "IsOperator": false,
+                                "ConfigScoreAndRatingScreenMappingID": 5,
+                                "ConfigScreen": "ControlTotalScore"
+                            },
+                            {
+                                "ConfigScoreAndRatingID": 6,
+                                "ConfigField": ")",
+                                "ConfigDisplay": ")",
+                                "IsOperator": true,
+                                "ConfigScoreAndRatingScreenMappingID": 6,
+                                "ConfigScreen": "ControlTotalScore"
+                            }
+                        ],
+                        "OverallInherentRiskScore": [
+                            {
+                                "OverallInherentRiskScoreID": 1,
+                                "Computation": "InherentImpactRatingID + (InherentLikelihoodRatingID)",
+                                "ComputationCode": "1",
+                                "IsActive": true,
+                                "IsDeleted": false,
+                                "CreatedDate": "2022-11-26T22:08:26.090Z",
+                                "CreatedBy": "vamshi",
+                                "LastUpdatedDate": "2022-11-26T22:08:26.090Z",
+                                "LastUpdatedBy": null
+                            }
+                        ],
+                        "InherentRiskRatingConfig": [
+                            {
+                                "ConfigScoreAndRatingID": 1,
+                                "ConfigField": "+",
+                                "ConfigDisplay": "+",
+                                "IsOperator": true,
+                                "ConfigScoreAndRatingScreenMappingID": 1,
+                                "ConfigScreen": "ControlTotalScore"
+                            },
+                            {
+                                "ConfigScoreAndRatingID": 2,
+                                "ConfigField": "-",
+                                "ConfigDisplay": "-",
+                                "IsOperator": true,
+                                "ConfigScoreAndRatingScreenMappingID": 2,
+                                "ConfigScreen": "ControlTotalScore"
+                            },
+                            {
+                                "ConfigScoreAndRatingID": 3,
+                                "ConfigField": "*",
+                                "ConfigDisplay": "*",
+                                "IsOperator": true,
+                                "ConfigScoreAndRatingScreenMappingID": 3,
+                                "ConfigScreen": "ControlTotalScore"
+                            },
+                            {
+                                "ConfigScoreAndRatingID": 4,
+                                "ConfigField": "/",
+                                "ConfigDisplay": "/",
+                                "IsOperator": true,
+                                "ConfigScoreAndRatingScreenMappingID": 4,
+                                "ConfigScreen": "ControlTotalScore"
+                            },
+                            {
+                                "ConfigScoreAndRatingID": 5,
+                                "ConfigField": "(",
+                                "ConfigDisplay": "(",
+                                "IsOperator": true,
+                                "ConfigScoreAndRatingScreenMappingID": 5,
+                                "ConfigScreen": "ControlTotalScore"
+                            },
+                            {
+                                "ConfigScoreAndRatingID": 6,
+                                "ConfigField": ")",
+                                "ConfigDisplay": ")",
+                                "IsOperator": true,
+                                "ConfigScoreAndRatingScreenMappingID": 6,
+                                "ConfigScreen": "ControlTotalScore"
+                            }
+                        ],
+                        "OverallInherentRiskRating": [
+                            {
+                                "OverallInherentRiskRatingID": 1,
+                                "RiskRating": "Low Risk",
+                                "Computation": "Overall Inherent Risk Score <=4",
+                                "ComputationCode": null,
+                                "ColourName": null,
+                                "ColourCode": "Green",
+                                "IsActive": true,
+                                "IsDeleted": false,
+                                "CreatedDate": "2022-11-20T22:28:12.360Z",
+                                "CreatedBy": "vamshi",
+                                "LastUpdatedDate": "2022-11-26T22:16:34.723Z",
+                                "LastUpdatedBy": "venu"
+                            },
+                            {
+                                "OverallInherentRiskRatingID": 2,
+                                "RiskRating": "Moderate Risk",
+                                "Computation": "",
+                                "ComputationCode": null,
+                                "ColourName": null,
+                                "ColourCode": "Amber",
+                                "IsActive": true,
+                                "IsDeleted": false,
+                                "CreatedDate": "2022-11-20T22:29:29.617Z",
+                                "CreatedBy": "vamshi",
+                                "LastUpdatedDate": "2022-11-20T22:29:29.617Z",
+                                "LastUpdatedBy": null
+                            },
+                            {
+                                "OverallInherentRiskRatingID": 3,
+                                "RiskRating": "High Risk",
+                                "Computation": "14 > Overall Inherent Risk Score",
+                                "ComputationCode": null,
+                                "ColourName": null,
+                                "ColourCode": "Red",
+                                "IsActive": false,
+                                "IsDeleted": false,
+                                "CreatedDate": "2022-11-20T22:30:10.063Z",
+                                "CreatedBy": "vamshi",
+                                "LastUpdatedDate": "2022-11-21T20:42:48.740Z",
+                                "LastUpdatedBy": "venu"
+                            },
+                            {
+                                "OverallInherentRiskRatingID": 4,
+                                "RiskRating": "Very High Risk",
+                                "Computation": "",
+                                "ComputationCode": null,
+                                "ColourName": null,
+                                "ColourCode": "Purple",
+                                "IsActive": true,
+                                "IsDeleted": false,
+                                "CreatedDate": "2022-11-21T20:46:08.777Z",
+                                "CreatedBy": "vamshi",
+                                "LastUpdatedDate": "2022-11-21T20:46:08.777Z",
+                                "LastUpdatedBy": null
+                            },
+                            {
+                                "OverallInherentRiskRatingID": 5,
+                                "RiskRating": "Very High Risk",
+                                "Computation": "24 > Overall Inherent Risk Score",
+                                "ComputationCode": null,
+                                "ColourName": null,
+                                "ColourCode": "Purple",
+                                "IsActive": true,
+                                "IsDeleted": false,
+                                "CreatedDate": "2022-11-21T20:46:33.490Z",
+                                "CreatedBy": "vamshi",
+                                "LastUpdatedDate": "2022-11-21T20:46:33.490Z",
+                                "LastUpdatedBy": null
+                            },
+                            {
+                                "OverallInherentRiskRatingID": 6,
+                                "RiskRating": "Critical High Risk",
+                                "Computation": "Overall Inherent Risk Score > 30",
+                                "ComputationCode": null,
+                                "ColourName": null,
+                                "ColourCode": "Red",
+                                "IsActive": true,
+                                "IsDeleted": false,
+                                "CreatedDate": "2022-11-26T22:17:20.663Z",
+                                "CreatedBy": "vamshi",
+                                "LastUpdatedDate": "2022-11-26T22:17:20.663Z",
+                                "LastUpdatedBy": null
+                            }
+                        ]
+
+                    }
+                },
+                "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1",
+                "error": {
+                    "errorCode": null,
+                    "errorMessage": null
                 }
-            }
-        });
+            };
+            this.processRiskCategory(data);
+            this.processRisk(data);
+            this.processInherentLikelihoodRate(data);
+            this.processInherentImpactRate(data);
+            this.processInherentRiskScoreMasterData(data);
+            this.processInherentRiskScore(data);
+            this.processInherentRiskRatingMasterData(data);
+            this.processInherentRiskRating(data);
+        } else {
+            this.configScoreRatingService.getMasterInherentRiskScreen().subscribe(data => {
+                next: {
+                    if (data.success == 1) {
+                        this.processRiskCategory(data);
+                        this.processRisk(data);
+                        this.processInherentLikelihoodRate(data);
+                        this.processInherentImpactRate(data);
+                        this.processInherentRiskScoreMasterData(data);
+                        this.processInherentRiskScore(data);
+                        this.processInherentRiskRatingMasterData(data);
+                        this.processInherentRiskRating(data);
+                    } else {
+                        if (data.error.errorCode == "TOKEN_EXPIRED")
+                            this.utils.relogin(this._document);
+                    }
+                }
+            });
+        }
     }
     //#region RiskCategory
 
+
     processRiskCategory(data: any): void {
-        if (data?.success !== 1) {
-            if (data?.error?.errorCode === 'TOKEN_EXPIRED') {
-                this.utils.relogin(this._document);
+
+        if (data.success == 1) {
+            if (data.result.recordset.RiskCategory.length > 0) {
+                let docs: any = this.gridDataSourceRiskCategory = data.result.recordset.RiskCategory;
+                if (docs) {
+                    let id = 0;
+                    docs.forEach((doc: any) => {
+                        id++;
+                        doc.RowNumber = id;
+                    });
+                    this.RiskCategoryGridForms = this.fb.group({
+                        GridRows: this.fb.array(docs.map((val: any) => this.fb.group({
+                            Category: new FormControl(val.Category, [Validators.required]),
+                            RiskCategoryID: new FormControl(val.RiskCategoryID),
+                            IsActive: new FormControl(val.IsActive),
+                            RowNumber: new FormControl(val.RowNumber),
+                            action: new FormControl('existingRecord'),
+                            isEditable: new FormControl(true),
+                            isNewRow: new FormControl(false),
+                        })
+                        )) //end of fb array
+                    }); // end of form group cretation
+
+                    this.dataSourceRiskCategory = new MatTableDataSource((
+                        this.RiskCategoryGridForms.get('GridRows') as FormArray).controls);
+                    this.dataSourceRiskCategory.sort = this.sort;
+                }
             }
-            return;
+        } else {
+            if (data.error.errorCode == "TOKEN_EXPIRED")
+                this.utils.relogin(this._document);
         }
-
-        // 1) Master list for the dropdown
-        this.corporateObjectives = (data?.result?.recordset?.CorporateObjectiveMaster || []).filter((o: any) => o?.IsActive && !o?.IsDeleted);
-
-        console.log('this.corporateObjectives::', this.corporateObjectives);
-
-        // 2) Grid rows
-        const docs = (data?.result?.recordset?.RiskCategory || []).slice(); // shallow copy
-        if (!docs.length) {
-            // still create an empty form so template bindings don't blow up
-            this.RiskCategoryGridForms = this.fb.group({
-                GridRows: this.fb.array([])
-            });
-            this.dataSourceRiskCategory = new MatTableDataSource(
-                (this.RiskCategoryGridForms.get('GridRows') as FormArray).controls
-            );
-            this.dataSourceRiskCategory.sort = this.sort;
-            return;
-        }
-
-        // add RowNumber
-        docs.forEach((doc: any, idx: number) => {
-            doc.RowNumber = idx + 1;
-        });
-
-        const rows = docs.map((val: any) =>
-            this.fb.group({
-                Category: [val?.Category ?? '', [Validators.required]],
-                RiskCategoryID: [val?.RiskCategoryID ?? 0],
-                CorporateObjectiveID: [val?.CorporateObjectiveID ?? null, [Validators.required]],
-                CorporateObjectiveName: [val?.CorporateObjectiveName ?? null],
-                IsActive: [val?.IsActive === false ? false : true],       // default true
-                IsDeleted: [!!val?.IsDeleted],
-                RowNumber: [val?.RowNumber ?? 0],
-                action: ['existingRecord'],
-                isEditable: [true],                                       // true = view mode
-                isNewRow: [false]
-            })
-        );
-
-        this.RiskCategoryGridForms = this.fb.group({
-            GridRows: this.fb.array(rows)
-        });
-
-        // 3) Table datasource: use the FormArray's controls (FormGroup per row)
-        this.dataSourceRiskCategory = new MatTableDataSource(
-            (this.RiskCategoryGridForms.get('GridRows') as FormArray).controls
-        );
-        this.dataSourceRiskCategory.sort = this.sort;
     }
-
-
-    editRiskCategoryData(gridForm: FormGroup, i: number): void {
-        const row = (gridForm.get('GridRows') as FormArray).at(i) as FormGroup;
-        row.get('isEditable')?.patchValue(false); // enter edit mode
+    editRiskCategoryData(GridFormElement: any, i: number) {
+        GridFormElement.get('GridRows').at(i).get('isEditable').patchValue(false);
     }
-
-    onCorporateObjectiveChange(rowGroup: FormGroup, selectedId: number): void {
-        const match = this.corporateObjectives.find(o => o.CorporateObjectiveID === selectedId);
-        rowGroup.patchValue({
-            CorporateObjectiveName: match ? match.CorporateObjectiveName : null
-        });
-    }
-
-
 
     // On click of correct button in table (after click on edit) this method will call
-    saveEditRiskCategoryData(GridFormElement: any, i: any): void {
-        const row = GridFormElement.get('GridRows').at(i);
-        if (!row) { return; }
-        const name: string = (row.get('Category')?.value ?? '').toString().trim();
-        const corporateObjectiveID = row.get('CorporateObjectiveID')?.value;
-        // basic validation (in addition to any validators on the form)
-        if (!name) {
-            this.saveRiskCategoryerror = 'Risk Category Name is required.';
-            return;
-        }
-        if (corporateObjectiveID == null) {
-            this.saveRiskCategoryerror = 'Corporate Objective is required.';
-            return;
-        }
-        this.checkCharLength(name, 'RiskCategory').then((allowToSave: boolean) => {
-            // your original behavior: when allowToSave === true, exit early
+    saveEditRiskCategoryData(GridFormElement: any, i: any) {
+        const rowValue = (GridFormElement.get('GridRows').at(i).get('Category')?.value).trim();        
+        this.checkCharLength(rowValue, 'RiskCategory').then((allowToSave) => {
             if (allowToSave) {
                 return;
             }
-            // sync CorporateObjectiveName from master list
-            const obj = (this.corporateObjectives || []).find(
-                (o: any) => o.CorporateObjectiveID === corporateObjectiveID
-            );
-            if (obj && row.get('CorporateObjectiveName')?.value !== obj.CorporateObjectiveName) {
-                row.patchValue({ CorporateObjectiveName: obj.CorporateObjectiveName });
+            GridFormElement.get('GridRows').at(i).get('isEditable').patchValue(true);
+            let data = {
+                "category": (GridFormElement.get('GridRows').at(i).get('Category')?.value).trim(),
+                "createdBy": "palani",
+                "id": GridFormElement.get('GridRows').at(i).get('RiskCategoryID')?.value
             }
-            // set row back to view mode immediately (matches your original code path)
-            row.get('isEditable')?.patchValue(true);
-            const data = {
-                // existing fields
-                category: name,
-                // createdBy: this.currentUser || 'palani',
-                id: row.get('RiskCategoryID')?.value,
-                // NEW: send corporate objective info as part of the update
-                corporateObjectiveID: corporateObjectiveID,
-                corporateObjectiveName: obj ? obj.CorporateObjectiveName : null,
-                // optional: preserve status flags if your API expects them
-                isActive: row.get('IsActive')?.value,
-                isDeleted: row.get('IsDeleted')?.value
-            };
-            this.riskCategoryService.updateData(data).subscribe({
-                next: (res: any) => {
-                    if (res?.success == 1) {
-                        this.cancelRiskCategory();
-                        this.addRiskCategorydg = false;
-                        this.saveSuccess(res.message);
-                    } else {
-                        if (res?.error?.errorCode === 'TOKEN_EXPIRED') {
-                            this.utils.relogin(this._document);
-                        } else {
-                            this.saveRiskCategoryerror = res?.error?.errorMessage || 'Unable to update Risk Category.';
-                        }
-                        this.CancelRiskCategory(GridFormElement, i);
-                    }
-                },
-                error: (err: any) => {
-                    console.log('err::', err);
-                    this.saveRiskCategoryerror = 'Something went wrong while updating. Please try again.';
+            this.riskCategoryService.updateData(data).subscribe(res => {
+                next:
+                if (res.success == 1) {
+
+                    this.cancelRiskCategory();
+                    this.addRiskCategorydg = false;
+                    this.saveSuccess(res.message);
+                } else {
+                    if (res.error.errorCode == "TOKEN_EXPIRED")
+                        this.utils.relogin(this._document);
+                    else
+                        this.saveRiskCategoryerror = res.error.errorMessage;
                     this.CancelRiskCategory(GridFormElement, i);
                 }
+                error:
+                console.log("err::", "error");
             });
-        });
+        })
+
+        
     }
 
     // On click of cancel button in the table (after click on edit) this method will call and reset the previous data
-    CancelRiskCategory(gridForm: FormGroup, i: number): void {
-        const row = (gridForm.get('GridRows') as FormArray).at(i) as FormGroup;
-        row.get('isEditable')?.patchValue(true);  // back to view mode
+    CancelRiskCategory(GridFormElement: any, i: any) {
+        let obj = this.gridDataSourceRiskCategory.find((a: any) => a.RiskCategoryID == GridFormElement.get('GridRows').at(i).get('RiskCategoryID')?.value)
+        GridFormElement.get('GridRows').at(i).get('Category').patchValue(obj?.Category);
+        GridFormElement.get('GridRows').at(i).get('isEditable').patchValue(true);
+        this.clearMessage();
     }
 
     initiatAddRiskCategory(): void {
@@ -291,59 +501,33 @@ export class MasterInherentRiskComponent implements OnInit {
     }
 
     saveRiskCategoryData(): void {
-        // only handle "add" path here; updates go via saveEditRiskCategoryData
-        const idCtrl = this.riskCategoryForm.get('txtRiskCategoryID');
-        if (idCtrl?.value !== 0 && idCtrl?.value != null) { return; }
-        const nameCtrl = this.riskCategoryForm.get('txtRiskCategoryName');
-        const objCtrl = this.riskCategoryForm.get('ddlCorporateObjectiveID');
-        const rowValueRaw = (nameCtrl?.value ?? '').toString().trim();
-        const corporateObjectiveID = objCtrl?.value;
-        // basic validation (in addition to form validators)
-        if (!rowValueRaw) {
-            this.saveRiskCategoryerror = 'Risk Category Name is required.';
-            return;
-        }
-        if (corporateObjectiveID == null) {
-            this.saveRiskCategoryerror = 'Corporate Objective is required.';
-            return;
-        }
-        this.checkCharLength(rowValueRaw, 'RiskCategory').then((allowToSave) => {
-            // your existing logic: if allowToSave === true, you early-return
-            if (allowToSave) {
-                return;
-            }
-            // look up the readable name from master list
-            const obj = (this.corporateObjectives || []).find(
-                o => o.CorporateObjectiveID === corporateObjectiveID
-            );
-            const data = {
-                // keep your original keys
-                category: rowValueRaw,
-                // createdBy: this.currentUser || 'palani',
-                // NEW: send Corporate Objective info
-                corporateObjectiveID: corporateObjectiveID,
-                corporateObjectiveName: obj ? obj.CorporateObjectiveName : null,
-            };
-            this.riskCategoryService.addNew(data).subscribe({
-                next: (res: any) => {
-                    if (res?.success == 1) {
+        if (this.riskCategoryForm.get('txtRiskCategoryID')?.value == 0 || this.riskCategoryForm.get('txtRiskCategoryID')?.value == null) {
+            const rowValue = (this.riskCategoryForm.get('txtRiskCategoryName')?.value)?.trim();        
+            this.checkCharLength(rowValue, 'RiskCategory').then((allowToSave) => {
+                if (allowToSave) {
+                    return;
+                }
+                let data = { "category": rowValue, "createdBy": "palani" }
+                this.riskCategoryService.addNew(data).subscribe(res => {
+                    next:
+                    if (res.success == 1) {
+
                         this.cancelRiskCategory();
                         this.addRiskCategorydg = false;
                         this.saveSuccess(res.message);
                     } else {
-                        if (res?.error?.errorCode === 'TOKEN_EXPIRED') {
+                        if (res.error.errorCode == "TOKEN_EXPIRED")
                             this.utils.relogin(this._document);
-                        } else {
-                            this.saveRiskCategoryerror = res?.error?.errorMessage || 'Unable to save Risk Category.';
-                        }
+                        else
+                            this.saveRiskCategoryerror = res.error.errorMessage;
                     }
-                },
-                error: (err: any) => {
-                    console.log('err::', err);
-                    this.saveRiskCategoryerror = 'Something went wrong while saving. Please try again.';
-                }
-            });
-        });
+                    error:
+                    console.log("err::", "error");
+                });
+            })
+            
+        }
+
     }
 
     saveSuccess(content: string): void {
@@ -358,6 +542,7 @@ export class MasterInherentRiskComponent implements OnInit {
                 content: content
             }
         });
+
         confirm.afterOpened().subscribe(result => {
             setTimeout(() => {
                 confirm.close();
@@ -377,7 +562,6 @@ export class MasterInherentRiskComponent implements OnInit {
     setRiskCategoryValue(data: any): void {
         this.riskCategoryForm.patchValue({ txtRiskCategoryName: data.Category, txtRiskCategoryID: data.RatingCategoryID });
     }
-
     resetRiskCategory(): void {
         this.riskCategoryForm.reset();
     }
@@ -405,10 +589,16 @@ export class MasterInherentRiskComponent implements OnInit {
     }
 
     // #endregion
+
+
     //#region ProcessRisk
+
     // @ts-ignore
     @ViewChild(MatSort) sortProcess: MatSort;
+
+
     processRisk(data: any): void {
+
         if (data.success == 1) {
             if (data.result.recordset.Process.length > 0) {
                 let docs: any = this.gridDataSourceProcessRisk = data.result.recordset.Process;
@@ -430,9 +620,11 @@ export class MasterInherentRiskComponent implements OnInit {
                         })
                         )) //end of fb array
                     }); // end of form group cretation
+
                     this.dataSourceProcessRisk = new MatTableDataSource((
                         this.GridFormsProcessRisk.get('GridRows') as FormArray).controls);
                     this.dataSourceProcessRisk.sort = this.sortProcess
+
                 }
             }
         } else {
@@ -440,14 +632,13 @@ export class MasterInherentRiskComponent implements OnInit {
                 this.utils.relogin(this._document);
         }
     }
-
     editProcessRiskData(GridFormElement: any, i: number) {
         GridFormElement.get('GridRows').at(i).get('isEditable').patchValue(false);
     }
 
     //On click of correct button in table (after click on edit) this method will call
     saveEditProcessRiskData(GridFormElement: any, i: any) {
-        const rowValue = (GridFormElement.get('GridRows').at(i).get('Name')?.value).trim();
+        const rowValue =(GridFormElement.get('GridRows').at(i).get('Name')?.value).trim();
         this.checkCharLength(rowValue, 'Process').then((allowToSave) => {
             if (allowToSave) {
                 return;
@@ -461,6 +652,7 @@ export class MasterInherentRiskComponent implements OnInit {
             this.processService.updateData(data).subscribe(res => {
                 next:
                 if (res.success == 1) {
+
                     this.cancelProcessRisk();
                     this.addProcessRiskdg = false;
                     this.saveSuccess(res.message);
@@ -474,7 +666,9 @@ export class MasterInherentRiskComponent implements OnInit {
                 error:
                 console.log("err::", "error");
             });
+
         })
+        
     }
 
     //On click of cancel button in the table (after click on edit) this method will call and reset the previous data
@@ -507,6 +701,7 @@ export class MasterInherentRiskComponent implements OnInit {
                 this.processService.addNew(data).subscribe(res => {
                     next:
                     if (res.success == 1) {
+
                         this.cancelProcessRisk();
                         this.addProcessRiskdg = false;
                         this.saveSuccess(res.message);
@@ -519,10 +714,12 @@ export class MasterInherentRiskComponent implements OnInit {
                     error:
                     console.log("err::", "error");
                 });
-            })
-        }
-    }
 
+            })
+            
+        }
+
+    }
     editProcessRisk(row: any): void {
         this.resetProcessRisk();
         this.setProcessRiskValue(row);
@@ -533,10 +730,10 @@ export class MasterInherentRiskComponent implements OnInit {
     setProcessRiskValue(data: any): void {
         this.processRiskForm.patchValue({ txtratename: data.Name, txtrateid: data.ProcessID });
     }
-
     resetProcessRisk(): void {
         this.processRiskForm.reset();
     }
+
     changedProcessRisk(data: any, event: any): void {
         let obj = {
             // "id": data.ProcessRiskID,
@@ -554,15 +751,17 @@ export class MasterInherentRiskComponent implements OnInit {
                 else
                     this.saveProcessRiskerror = res.error.errorMessage;
                 event.source.checked = !event.source.checked;
+
             }
             error:
             console.log("err::", "error");
         });
         console.log(obj);
     }
-
     // #endregion
+
     //#region "InherentLikelihoodRate"
+
     saveInherentLikelihoodRateerror: string = "";
     displayedInherentLikelihoodRateColumns: string[] = ['Index', 'RatingName', 'RatingScore', 'Action', 'Status'];
     dataSourceInherentLikelihoodRate = new MatTableDataSource<any>();
@@ -572,6 +771,7 @@ export class MasterInherentRiskComponent implements OnInit {
         txtInherentLikelihoodScore: new FormControl('', [Validators.required, Validators.minLength(1)]),
         txtInherentLikelihoodRateID: new FormControl(0)
     });
+
     GridFormsInherentLikelihoodRating!: FormGroup;
     gridDataSourceInherentLikelihoodRate: any;
     // @ts-ignore
@@ -619,21 +819,22 @@ export class MasterInherentRiskComponent implements OnInit {
     saveEditInherentLikelihoodRateData(GridFormElement: any, i: any) {
         const rowvalue = (GridFormElement.get('GridRows').at(i).get('Rating')?.value).trim();
         // this.checkCharLength(rowvalue, 'InherentLikelihoodRating')
-        let filteredRecords = this.gridDataSourceInherentLikelihoodRate.filter((ob: any, inx: any) => inx != i);
-        this.checkCharLengthDuplicate(rowvalue, 'Rating', filteredRecords).then((allowToSave) => {
+        let filteredRecords = this.gridDataSourceInherentLikelihoodRate.filter((ob:any, inx:any) => inx != i);
+        this.checkCharLengthDuplicate(rowvalue, 'Rating',filteredRecords).then((allowToSave) => {
             if (allowToSave) {
                 return;
             }
             GridFormElement.get('GridRows').at(i).get('isEditable').patchValue(true);
             let data = {
-                "rating": rowvalue,
-                "score": GridFormElement.get('GridRows').at(i).get('Score')?.value,
-                "id": GridFormElement.get('GridRows').at(i).get('InherentLikelihoodRatingID')?.value,
-                "createdBy": "palani"
+                "rating"    : rowvalue,
+                "score"     : GridFormElement.get('GridRows').at(i).get('Score')?.value,
+                "id"        : GridFormElement.get('GridRows').at(i).get('InherentLikelihoodRatingID')?.value,
+                "createdBy" : "palani"
             }
             this.inherentLikelihoodRankService.updateData(data).subscribe(res => {
                 next:
                 if (res.success == 1) {
+
                     this.cancelInherentLikelihoodRate();
                     this.addInherentLikelihoodRatedg = false;
                     this.saveSuccess(res.message);
@@ -647,7 +848,7 @@ export class MasterInherentRiskComponent implements OnInit {
                 error:
                 console.log("err::", "error");
             });
-        })
+        })        
     }
 
     // On click of cancel button in the table (after click on edit) this method will call and reset the previous data
@@ -658,7 +859,6 @@ export class MasterInherentRiskComponent implements OnInit {
         GridFormElement.get('GridRows').at(i).get('isEditable').patchValue(true);
         this.clearMessage();
     }
-
     initiatAddInherentLikelihoodRate(): void {
         this.addInherentLikelihoodRatedg = true;
     }
@@ -679,12 +879,12 @@ export class MasterInherentRiskComponent implements OnInit {
     setInherentLikelihoodRateValue(data: any): void {
         this.inherentLikelihoodRateForm.patchValue({ txtInherentLikelihoodRate: data.Rating, txtInherentLikelihoodScore: data.Score, txtInherentLikelihoodRateID: data.InherentLikelihoodRatingID });
     }
-
     resetInherentLikelihoodRate(): void {
         this.inherentLikelihoodRateForm.reset();
     }
 
     changedInherentLikelihoodRate(data: any, event: any): void {
+        
         let obj = {
             // "id": data.InherentLikelihoodRatingID,
             // "isActive": !data.IsActive
@@ -711,7 +911,7 @@ export class MasterInherentRiskComponent implements OnInit {
         if (this.inherentLikelihoodRateForm.get('txtInherentLikelihoodRateID')?.value == 0 || this.inherentLikelihoodRateForm.get('txtInherentLikelihoodRateID')?.value == null) {
             const rowvalue = (this.inherentLikelihoodRateForm.get('txtInherentLikelihoodRate')?.value)?.trim();
             // this.checkCharLength(rowvalue, 'InherentLikelihoodRating')
-            this.checkCharLengthDuplicate(rowvalue, 'Rating', this.gridDataSourceInherentLikelihoodRate).then((allowToSave) => {
+            this.checkCharLengthDuplicate(rowvalue, 'Rating',this.gridDataSourceInherentLikelihoodRate).then((allowToSave) => {
                 if (allowToSave) {
                     return;
                 }
@@ -723,6 +923,7 @@ export class MasterInherentRiskComponent implements OnInit {
                 this.inherentLikelihoodRankService.addNew(data).subscribe(res => {
                     next:
                     if (res.success == 1) {
+    
                         this.cancelInherentLikelihoodRate();
                         this.addInherentLikelihoodRatedg = false;
                         this.saveSuccess(res.message);
@@ -735,23 +936,26 @@ export class MasterInherentRiskComponent implements OnInit {
                     error:
                     console.log("err::", "error");
                 });
-            });
+
+            });            
         }
         else {
+
             const rowvalue = (this.inherentLikelihoodRateForm.get('txtInherentLikelihoodRate')?.value)?.trim();
-            this.checkCharLengthDuplicate(rowvalue, 'Rating', this.gridDataSourceInherentLikelihoodRate).then((allowToSave) => {
+            this.checkCharLengthDuplicate(rowvalue, 'Rating',this.gridDataSourceInherentLikelihoodRate).then((allowToSave) => {
                 if (allowToSave) {
                     return;
                 }
                 let data = {
-                    "rating": rowvalue,
-                    "score": this.inherentLikelihoodRateForm.get('txtInherentLikelihoodScore')?.value,
-                    "id": this.inherentLikelihoodRateForm.get('txtInherentLikelihoodRateID')?.value,
-                    "createdBy": "palani"
+                    "rating"    : rowvalue,
+                    "score"     : this.inherentLikelihoodRateForm.get('txtInherentLikelihoodScore')?.value,
+                    "id"        : this.inherentLikelihoodRateForm.get('txtInherentLikelihoodRateID')?.value,
+                    "createdBy" : "palani"
                 }
                 this.inherentLikelihoodRankService.updateData(data).subscribe(res => {
                     next:
                     if (res.success == 1) {
+    
                         this.cancelInherentLikelihoodRate();
                         this.addInherentLikelihoodRatedg = false;
                         this.saveSuccess(res.message);
@@ -764,11 +968,11 @@ export class MasterInherentRiskComponent implements OnInit {
                     error:
                     console.log("err::", "error");
                 });
-            })
+            })            
         }
     }
-
     // #endregion 
+
     // #region inherent-impact-rate
     saveInherentImpactRateerror: string = "";
     displayedInherentImpactRateColumns: string[] = ['Index', 'RatingName', 'RatingScore', 'Action', 'Status'];
@@ -780,9 +984,11 @@ export class MasterInherentRiskComponent implements OnInit {
         txtInherentImpactScore: new FormControl('', [Validators.required, Validators.minLength(1)]),
         txtInherentImpactRateID: new FormControl(0)
     });
+
     GridFormsInherentImpactRate!: FormGroup;
     // @ts-ignore
     @ViewChild(MatSort) sortInherentImpactRate: MatSort;
+
     processInherentImpactRate(data: any): void {
         if (data.success == 1) {
             if (data.result.recordset.InherentImpactRating.length > 0) {
@@ -830,14 +1036,15 @@ export class MasterInherentRiskComponent implements OnInit {
             }
             GridFormElement.get('GridRows').at(i).get('isEditable').patchValue(true);
             let data = {
-                "rating": rowvalue,
-                "score": GridFormElement.get('GridRows').at(i).get('Score')?.value,
-                "id": GridFormElement.get('GridRows').at(i).get('InherentImpactRatingID')?.value,
-                "createdBy": "palani"
+                "rating"    : rowvalue,
+                "score"     : GridFormElement.get('GridRows').at(i).get('Score')?.value,
+                "id"        : GridFormElement.get('GridRows').at(i).get('InherentImpactRatingID')?.value,
+                "createdBy" : "palani"
             }
             this.inherentImpactRateService.updateData(data).subscribe(res => {
                 next:
                 if (res.success == 1) {
+
                     this.cancelInherentImpactRate();
                     this.addInherentImpactRatedg = false;
                     this.saveSuccess(res.message);
@@ -850,8 +1057,8 @@ export class MasterInherentRiskComponent implements OnInit {
                 }
                 error:
                 console.log("err::", "error");
-            });
-        })
+            });           
+        })        
     }
 
     // On click of cancel button in the table (after click on edit) this method will call and reset the previous data
@@ -891,6 +1098,8 @@ export class MasterInherentRiskComponent implements OnInit {
 
     changedInherentImpactRate(data: any, event: any): void {
         let obj = {
+            // "id": data.InherentImpactRatingID,
+            // "isActive": !data.IsActive
             "id": data.get('InherentImpactRatingID')?.value,
             "isActive": !data.get('IsActive')?.value
         }
@@ -925,6 +1134,7 @@ export class MasterInherentRiskComponent implements OnInit {
                 this.inherentImpactRateService.addNew(data).subscribe(res => {
                     next:
                     if (res.success == 1) {
+    
                         this.cancelInherentImpactRate();
                         this.addInherentImpactRatedg = false;
                         this.saveSuccess(res.message);
@@ -937,7 +1147,7 @@ export class MasterInherentRiskComponent implements OnInit {
                     error:
                     console.log("err::", "error");
                 });
-            })
+            })           
         }
         else {
             const rowvalue = (this.inherentImpactRateForm.get('txtInherentImpactRate')?.value)?.trim();
@@ -946,14 +1156,15 @@ export class MasterInherentRiskComponent implements OnInit {
                     return;
                 }
                 let data = {
-                    "rating": (this.inherentImpactRateForm.get('txtInherentImpactRate')?.value)?.trim(),
-                    "score": this.inherentImpactRateForm.get('txtInherentImpactScore')?.value,
-                    "id": this.inherentImpactRateForm.get('txtInherentImpactRateID')?.value,
-                    "createdBy": "palani"
+                    "rating"    : (this.inherentImpactRateForm.get('txtInherentImpactRate')?.value)?.trim(),
+                    "score"     : this.inherentImpactRateForm.get('txtInherentImpactScore')?.value,
+                    "id"        : this.inherentImpactRateForm.get('txtInherentImpactRateID')?.value,
+                    "createdBy" : "palani"
                 }
                 this.inherentImpactRateService.updateData(data).subscribe(res => {
                     next:
                     if (res.success == 1) {
+    
                         this.cancelInherentImpactRate();
                         this.addInherentImpactRatedg = false;
                         this.saveSuccess(res.message);
@@ -967,10 +1178,12 @@ export class MasterInherentRiskComponent implements OnInit {
                     console.log("err::", "error");
                 });
             })
+            
         }
-    }
 
+    }
     // #endregion 
+
     // #region overallinherentRiskScore
     iseditinherentRiskScoredg: boolean = false;
     txttag = new FormControl('');
@@ -1001,6 +1214,7 @@ export class MasterInherentRiskComponent implements OnInit {
                                 this.sourcedatainherentRiskScore.push(doc);
                             });
                         }
+
                         id = 0;
                         this.sourcedatainherentRiskScoreoperator = [];
                         let trueFilterData = docs.filter((s: any) => s.IsOperator === true);
@@ -1015,6 +1229,7 @@ export class MasterInherentRiskComponent implements OnInit {
                 }
                 //this.getInherentRiskScoredata();
             }
+
         }
         else {
             if (data.error.errorCode == "TOKEN_EXPIRED")
@@ -1071,11 +1286,20 @@ export class MasterInherentRiskComponent implements OnInit {
                 doc.RowNumber = n.toString();
                 tempdata.push(doc);
             }
+
         });
         this.inherentRiskScoreTags = tempdata;
     }
 
     saveInherentRiskScoreData(): void {
+        // const rowvalue = formValue.get('GridRows').at(index).get('ControlVerificationClosure')?.value;
+        // this.checkCharLength(rowvalue, 'ConfirmationVerificationClosure').then((allowToSave) => {
+        //     if (allowToSave) {
+        //         return;
+        //     }
+
+
+        // })
         let computation: string = "";
         let computationCode: string = "";
         this.inherentRiskScoreTags.forEach((item: any) => {
@@ -1088,6 +1312,7 @@ export class MasterInherentRiskComponent implements OnInit {
                 computation += " " + item.ConfigField;
             }
         });
+
         let data: any = {
             "computation": computation,
             "computationCode": computationCode,
@@ -1097,6 +1322,7 @@ export class MasterInherentRiskComponent implements OnInit {
             next:
             if (res.success == 1) {
                 this.CancelInherentRiskScore();
+                // this.getInherentRiskScoredata();
                 this.saveSuccess(res.message);
             } else {
                 if (res.error.errorCode == "TOKEN_EXPIRED")
@@ -1108,8 +1334,12 @@ export class MasterInherentRiskComponent implements OnInit {
             console.log("err::", "error");
         });
     }
+
+
     // #endregion 
+
     // #region overallinherentRiskrating
+
     displayedInherentRiskRatingColumns: string[] = ['RowNumber', 'RatingName', 'Computation', 'ColorCode', 'Action', 'Status'];
     dataSourceInherentRiskRating!: MatTableDataSource<any>;
     masterInherentRiskRatingForm = new FormGroup({
@@ -1122,7 +1352,9 @@ export class MasterInherentRiskComponent implements OnInit {
     isCustomTextEnabledInherentRiskRating: boolean = false;
     inherentRiskRatingTags: Array<TagDataModel> = [];
     sourcedataInherentRiskRating: Array<TagDataModel> = [];
+    //sourcedataInherentRiskRatingScore: any;
     sourcedataInherentRiskRatingScore: Array<TagDataModel> = [];
+    //sourcedatascore: Array<TagDataModel> = [];
     sourcedataInherentRiskRatingoperator: Array<TagDataModel> = [];
     beforeInherentRiskRatingTags: Array<TagDataModel> = [];
     overallInherentRiskID: number = 0;
@@ -1131,7 +1363,9 @@ export class MasterInherentRiskComponent implements OnInit {
     beforeEditedFormulatext: string = "";
 
     processInherentRiskRatingMasterData(data: any): void {
+
         if (data.success == 1) {
+
             let id = 0;
             if (data.result.recordset.InherentRiskRatingConfig.length > 0) {
                 let docs: Array<TagDataModel> = data.result.recordset.InherentRiskRatingConfig
@@ -1167,6 +1401,7 @@ export class MasterInherentRiskComponent implements OnInit {
     }
 
     processInherentRiskRating(data: any): void {
+
         if (data.success == 1) {
             if (data.result.recordset.OverallInherentRiskRating.length > 0) {
                 let lineitem: any;
@@ -1178,12 +1413,14 @@ export class MasterInherentRiskComponent implements OnInit {
                     let docs: Array<any> = data.result.recordset.OverallInherentRiskRating;
                     docs.forEach((doc: any) => {
                         id++;
+                        //lineitem = {...this.sourcedata.find(value => value.Id?.toString() == doc)};
                         doc.RowNumber = id.toString();
                         computationarray = doc.ComputationCode?.split(',');
                         customText = '';
                         computationarray?.forEach((item: any) => {
                             temptext = item.split('-');
                             if (temptext.length > 1) {
+
                                 lineitem = { ...this.sourcedataInherentRiskRating.find(value => value.ConfigScoreAndRatingID?.toString() == temptext[0]) };
                                 customText += " '" + temptext[1] + "'";
                             }
@@ -1202,7 +1439,6 @@ export class MasterInherentRiskComponent implements OnInit {
                 this.utils.relogin(this._document);
         }
     }
-
     editInherentRiskRating(data: any): void {
         this.iseditInherentRiskRatingdg = true;
         this.inherentRiskRatingTags = [];
@@ -1215,6 +1451,7 @@ export class MasterInherentRiskComponent implements OnInit {
             id += 1;
             let temptext = item.split('-');
             if (temptext.length > 1) {
+
                 lineitem = { ...this.sourcedataInherentRiskRating.find(value => value.ConfigScoreAndRatingID?.toString() == temptext[0]) };
                 lineitem.ConfigDisplay = temptext[1];
             }
@@ -1226,7 +1463,6 @@ export class MasterInherentRiskComponent implements OnInit {
         });
         this.color = data.ColorCode;
         this.masterInherentRiskRatingForm.patchValue({ txtrateid: data.OverallInherentRiskRatingID, txtcolorcode: data.ColourCode, txtratename: data.RiskRating, txtcolorname: data.ColourName });
-        this.masterInherentRiskRatingForm.disable({ emitEvent: false });
     }
 
     addInherentRiskRatingtagitem(data: TagDataModel): void {
@@ -1242,12 +1478,12 @@ export class MasterInherentRiskComponent implements OnInit {
     }
 
     addCustomTextInherentRiskRating(data: any) {
+
         let lineitem: any = { ...this.sourcedataInherentRiskRating.find(value => value.ConfigField === "Custom") };
         lineitem.ConfigDisplay = data;
         this.inherentRiskRatingTags.push(lineitem);
         this.isCustomTextEnabledInherentRiskRating = false;
     }
-
     initiateInherentRiskRatingAdd(): void {
         this.inherentRiskRatingTags = [];
         this.iseditInherentRiskRatingdg = true;
@@ -1255,8 +1491,8 @@ export class MasterInherentRiskComponent implements OnInit {
         this.overallInherentRiskID = 0;
         this.beforeEditedFormulatext = "";
         this.isCustomTextEnabledInherentRiskRating = false;
-    }
 
+    }
     editInherentRiskRatinginitiate(): void {
         this.beforeInherentRiskRatingTags = { ...this.inherentRiskRatingTags };
         this.iseditInherentRiskRatingdg = true;
@@ -1278,21 +1514,21 @@ export class MasterInherentRiskComponent implements OnInit {
                 doc.RowNumber = n.toString();
                 tempdata.push(doc);
             }
+
         });
         this.inherentRiskRatingTags = tempdata;
     }
-
-    CancelCustomtext() {
+    CancelCustomtext(){
         this.isCustomTextEnabledInherentRiskRating = false;
-    }
+      }
 
     colorchangedInherentRiskRating(): void {
         this.masterInherentRiskRatingForm.patchValue({ txtcolorcode: this.color });
     }
-
     saveInherentRiskRatingData(): void {
         let computation: string = "";
         let computationCode: string = "";
+
         this.inherentRiskRatingTags.forEach((item: any) => {
             if (item.ConfigField === "Custom") {
                 computationCode += (computationCode == "" ? "" : ",") + item.ConfigScoreAndRatingID + "-" + item.ConfigDisplay;
@@ -1304,22 +1540,24 @@ export class MasterInherentRiskComponent implements OnInit {
             }
         });
         if (this.masterInherentRiskRatingForm.get('txtrateid')?.value == null || this.masterInherentRiskRatingForm.get('txtrateid')?.value == 0) {
+            
             const rowvalue = (this.masterInherentRiskRatingForm.get('txtratename')?.value)?.trim();
             this.checkCharLength(rowvalue, 'OverallInherentRiskRating').then((allowToSave) => {
                 if (allowToSave) {
                     return;
                 }
                 let data = {
-                    "riskRating": rowvalue,
-                    "colourName": this.masterInherentRiskRatingForm.get('txtcolorname')?.value,
-                    "colourCode": this.masterInherentRiskRatingForm.get('txtcolorcode')?.value,
-                    "computation": computation,
-                    "computationCode": computationCode,
-                    "createdBy": "palani"
+                    "riskRating"        : rowvalue,
+                    "colourName"        : this.masterInherentRiskRatingForm.get('txtcolorname')?.value,
+                    "colourCode"        : this.masterInherentRiskRatingForm.get('txtcolorcode')?.value,
+                    "computation"       : computation,
+                    "computationCode"   : computationCode,
+                    "createdBy"         : "palani"
                 }
                 this.overAllInherentRiskRatingService.addNew(data).subscribe(res => {
                     next:
                     if (res.success == 1) {
+    
                         this.CancelInherentRiskRating();
                         this.iseditInherentRiskRatingdg = false;
                         this.saveSuccess(res.message);
@@ -1332,7 +1570,8 @@ export class MasterInherentRiskComponent implements OnInit {
                     error:
                     console.log("err::", "error");
                 });
-            })
+
+            })            
         }
         else {
             const rowvalue = (this.masterInherentRiskRatingForm.get('txtratename')?.value)?.trim();
@@ -1341,17 +1580,18 @@ export class MasterInherentRiskComponent implements OnInit {
                     return;
                 }
                 let data = {
-                    "riskRating": rowvalue,
-                    "colourName": this.masterInherentRiskRatingForm.get('txtcolorname')?.value,
-                    "colourCode": this.masterInherentRiskRatingForm.get('txtcolorcode')?.value,
-                    "id": this.masterInherentRiskRatingForm.get('txtrateid')?.value,
-                    "computation": computation,
-                    "computationCode": computationCode,
-                    "lastUpdatedBy": "palani"
+                    "riskRating"        : rowvalue,
+                    "colourName"        : this.masterInherentRiskRatingForm.get('txtcolorname')?.value,
+                    "colourCode"        : this.masterInherentRiskRatingForm.get('txtcolorcode')?.value,
+                    "id"                : this.masterInherentRiskRatingForm.get('txtrateid')?.value,
+                    "computation"       : computation,
+                    "computationCode"   : computationCode,
+                    "lastUpdatedBy"     : "palani"
                 }
                 this.overAllInherentRiskRatingService.updateData(data).subscribe(res => {
                     next:
                     if (res.success == 1) {
+    
                         this.CancelInherentRiskRating();
                         this.iseditInherentRiskRatingdg = false;
                         this.saveSuccess(res.message);
@@ -1365,7 +1605,9 @@ export class MasterInherentRiskComponent implements OnInit {
                     console.log("err::", "error");
                 });
             })
+            
         }
+
     }
 
     changedInherentRiskRating(data: any, event: any): void {
@@ -1391,7 +1633,6 @@ export class MasterInherentRiskComponent implements OnInit {
     }
 
     // #endregion 
-
     keyPressNumber(event: any) {
         const pattern = /[0-9\ ]/;
         let inputChar = String.fromCharCode(event.charCode);
@@ -1410,25 +1651,24 @@ export class MasterInherentRiskComponent implements OnInit {
             return false;
         }
     }
-
     clearMessage() {
         this.exceedCharLenErr = '';
         this.type = '';
     }
 
-    async checkCharLengthDuplicate(data: any, type: string, allData: any): Promise<boolean> {
+    async checkCharLengthDuplicate(data: any, type: string,allData:any): Promise<boolean> {
         this.duplicate = Object.values(allData)
-            ?.filter((ele: any) => !ele.EditMode)
-            .some((ele: any) => ele[type]?.trim().toLowerCase() === data.trim().toLowerCase());
+        ?.filter((ele: any) => !ele.EditMode)
+        .some((ele: any) => ele[type]?.trim().toLowerCase() === data.trim().toLowerCase());
         if (data.length > 500) {
             this.exceedCharLenErr = 'Length should not exceeds more than 500 characters';
             this.type = type;
             return true;
         } else if (this.duplicate) {
             this.exceedCharLenErr = 'Record already exists';
-            console.log("this.exceedCharLenErr", this.exceedCharLenErr)
+            console.log("this.exceedCharLenErr",this.exceedCharLenErr)
             this.type = type;
-            return this.duplicate ? this.exceedCharLenErr : false
+            return this.duplicate ?  this.exceedCharLenErr : false
         } else {
             this.clearMessage();
             return false;

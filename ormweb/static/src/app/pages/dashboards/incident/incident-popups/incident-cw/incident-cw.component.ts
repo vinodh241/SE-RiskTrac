@@ -46,23 +46,23 @@ export class IncidentCwComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // console.log("this.parent.id",this.parent.dataId)
+    console.log("this.parent.id",this.parent.dataId)
     this.tableData = this.parent.id
-    this.currency = this.tableData[0]?.Currency
+    // this.currency = this.tableData[0]?.Currency
     this.title = this.parent.title
     this.id = this.parent.dataId
             if(this.id == "1"){
                 this.openFlag = true
-                // console.log("1")
+                console.log("1")
             }else if(this.id == "2"){
                 this.overdueFlag = true
-                // console.log("2")
+                console.log("2")
             }else if(this.id == "3"){
                 this.rejectedFlag = true
-                // console.log("3")
+                console.log("3")
             }
 
-    // console.log("this.tableData",this.tableData)
+    console.log("this.tableData",this.tableData)
 
     // console.log("🚀 ~ file: incident-cw.component.ts:43 ~ IncidentCwComponent ~ ngOnInit ~ this.tableData:", this.tableData)
   }

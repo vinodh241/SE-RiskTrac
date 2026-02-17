@@ -66,28 +66,19 @@ export class SelfAssessmentsService extends RestService {
     return this.post("/rcsa/scheduleassessment/get-all-schedule-assessment-summary-by-status-data", data);
   }
 
-  submitSelfAssessment(data: any) {
-    return this.post("/rcsa/scheduleassessment/submit-self-assessment-by-schedule-assessment", data);
+  submitSelfAssessment(data:any){
+    return this.post("/rcsa/scheduleassessment/submit-self-assessment-by-schedule-assessment",data);
   }
 
-
-  uploadSelfAssessmentEvidence(data: any) {
-    return this.upload("/rcsa/scheduleassessment/upload-rcsa", data);
-  }
-
-  downloadSelfAssessmentEvidence(data: any) {
-    return this.post("/rcsa/scheduleassessment/download-rcsa", data);
-  }
   
-  deleteSelfAssessmentEvidence(data: any) {
-    return this.post("/rcsa/scheduleassessment/delete-rcsa", data);
+  uploadSelfAssessmentEvidence(data:any){
+    return this.upload("/rcsa/scheduleassessment/upload-rcsa",data);
   }
 
-  addAdhocrisk(data: any) {
-    return this.post("/rcsa/scheduleassessment/add-ad-hoc-risk-data", data);
+  downloadSelfAssessmentEvidence(data:any){
+    return this.post("/rcsa/scheduleassessment/download-rcsa",data);
   }
-
-  updateAdhocrisk(data: any) {
-    return this.post("/rcsa/scheduleassessment/add-ad-hoc-risk-data", data);
+  deleteSelfAssessmentEvidence(data:any){
+    return this.post("/rcsa/scheduleassessment/delete-rcsa",data);
   }
 }

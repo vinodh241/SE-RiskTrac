@@ -8,7 +8,7 @@
             <mat-card class="paddingZero"
                 style="background: #E3E3E3 url(./assets/rcsa/rd-left-img.png) no-repeat center bottom; height: 100%;">
                 <div>
-                    <!-- <div class="topDate" >
+                    <div class="topDate" >
                         <span>Data Shown: </span>
                         <span *ngIf="selectedModule=='Incidents'">
                             {{startDate | date: 'dd MMM yyyy'}} - {{endDate | date: 'dd MMM yyyy'}}
@@ -19,7 +19,7 @@
                         <span *ngIf="selectedModule!='Incidents' && selectedModule!='Risk Appetite'">
                             {{minStartDate | date: 'dd MMM yyyy'}} - {{maxEndDate | date: 'dd MMM yyyy'}}
                         </span>
-                    </div> -->
+                    </div>
                     <div class="dashFilter">
                         <mat-card-content class="side-card-content">
                             <div class="w50 padd1vhRight">
@@ -99,7 +99,7 @@
                             </div>
                             <!-- KRI LEFT SIDE  -->
                             <div *ngIf="selectedModule=='KRI'">
-                                <!-- <h5>Measurement Frequency</h5>
+                                <h5>Measurement Frequency</h5>
                                 <mat-form-field appearance="fill">
                                     <mat-select [(ngModel)]="selectedMeasureFreq">
                                         <mat-option [value]="'All'">All</mat-option>
@@ -107,16 +107,7 @@
                                             {{item}}
                                         </mat-option>
                                     </mat-select>
-                                </mat-form-field> -->                                
-                                <h5>Month</h5>
-                                <mat-form-field appearance="fill">
-                                <mat-select [(ngModel)]="selectedMonth" (selectionChange)="onMonthChange($event.value)">
-                                    <mat-option *ngFor="let m of monthsList" [value]="m.period">
-                                    {{ m.name }}   <!-- only month name shown -->
-                                    </mat-option>
-                                </mat-select>
                                 </mat-form-field>
-                                                            
                                 <h5>KRI Type</h5>
                                 <mat-form-field appearance="fill">
                                     <mat-select [(ngModel)]="selectedKriType">
@@ -245,8 +236,7 @@
             <app-report-kri *ngIf="selectedModule=='KRI'" [selectedMeasureFreq]="selectedMeasureFreq"
                 [presentQuarter]="quarter" [selectedKriType]="selectedKriType" [selectedKriValue]="selectedKriValue"
                 [selectedKriStatus]="selectedKriStatus" [yearValue]="yearFilter" [quarterValue]="quarterFilter"
-                [quarterNumber]="presentQuater" [qStartDate]="minStartDate" [qEndDate]="maxEndDate"
-                [selectedMonth]="selectedMonth"></app-report-kri>
+                [quarterNumber]="presentQuater" [qStartDate]="minStartDate" [qEndDate]="maxEndDate"></app-report-kri>
             <app-report-rcsa *ngIf="selectedModule=='RCSA'" [selectedRCSUnit]="selectedRCSUnit"
                 [selectedRCSStatus]="selectedRCSStatus" [selectedInherentRating]="selectedInherentRating"
                 [selectedResidualRating]="selectedResidualRating" [yearValue]="yearFilter"

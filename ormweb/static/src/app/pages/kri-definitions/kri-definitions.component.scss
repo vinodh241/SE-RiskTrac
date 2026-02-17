@@ -153,20 +153,3 @@ td.mat-cell {
     opacity: 0.5 !important;
   }
   
-.truncate-text {
-  display: inline-block;
-  max-width: 200px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  vertical-align: middle;
-}
-
-
-.truncate-text.Indicator {
-  max-width: 400px;
-}
-
-.truncate-text.Kritype {
-  max-width: 100px;
-}

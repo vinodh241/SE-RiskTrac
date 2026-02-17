@@ -15,7 +15,7 @@ const APP_SERVER = {
      * DEV          - DEV for DEV environment
      */
     ENVIRONMENT_NAME        : "QA",
-    APP_START_PORT          : 46004,         // Port for API server run on
+    APP_START_PORT          : 6004,         // Port for API server run on
     APP_AUTHENTICATION_MODE : 1,             /**
                                                 Values for APP_AUTHENTICATION_MODE
                                                 1 - AD (Active Directory) Authentication,
@@ -25,7 +25,7 @@ const APP_SERVER = {
     APP_ADMIN_USER_NAME     : "",
     APP_ADMIN_PASSWORD      : "",
     PATH                    : PATH_OBJ.join(__dirname, '../'),
-    ALLOWED_ORIGINS         : ["http://localhost:5000","http://localhost:46004"]      // Alowed origins list, else we will get CORS policy error.
+    ALLOWED_ORIGINS         : ["https://serisktrac.secureyes.net","http://localhost:6004"]      // Alowed origins list, else we will get CORS policy error.
 };
 
 /**

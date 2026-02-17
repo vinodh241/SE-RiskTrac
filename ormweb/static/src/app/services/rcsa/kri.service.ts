@@ -81,8 +81,6 @@ export class KriService extends RestService {
     public kriMeasurementGroups: any;
     public kriThresholds: any;
     public kriMeasurmentsReportingFrequncy: any;
-    public kriMeasurmentsReportingEndDate: any;
-    
 
     public kriDefine: any;
     public kriGroups!: any;
@@ -712,7 +710,8 @@ export class KriService extends RestService {
     setKriMetricsReport(data: any): void {
         this.post("/operational-risk-management/kri/set-kri-metrics-report", { data }).subscribe(res => {
             if (res.success == 1) {
-                 this.popupInfo("Success", "KRI Reported Successfully");
+                // this.processMeasurement(res)
+                this.popupInfo("Success", "KRI Reported Successfully");
             } else {
                 if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
                     this.utils.relogin(this._document);
@@ -734,7 +733,7 @@ export class KriService extends RestService {
         this.kriMeasurementGroups = response.result.groups
         this.kriMeasurementUnits = response.result.units
         this.kriThresholds = response.result.thresholds
-        this.kriMeasurmentsReportingFrequncy = response.result.reportingFrequency[0].ReportingFrequency;
+        this.kriMeasurmentsReportingFrequncy = response.result.reportingFrequency[0].ReportingFrequency
         this.gotMeasurements.next(true)
     }
 

@@ -210,35 +210,3 @@
     overflow: hidden !important;
   }
 
-
-  .topNewSectionFiled {
-    display: flex;
-    flex-direction: row;
-    margin-top: 1vh;
-  }
-
-.topFirstField {
-  margin-right: 2vw;
-  width: 25%;
-}
-
-.topFirstField:last-child {
-  width: calc(50% - 4vw);
-  margin-right: 0;
-}
-
-.w49{
-  width: calc(55% - 2vw);
-}
-
-.w100 {
-  width: 100%;
-}
-
-.wMax100 {
-  max-width: 100%;
-}
-
-.w50plus {
-  width: calc(50% + 2vw);
-}

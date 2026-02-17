@@ -72,7 +72,7 @@ export class CmViewallComponent implements OnInit {
       
       let currMonth = currentDate.getMonth() + 1;
       let currQuarter = Math.ceil(currMonth / 3);
-      // console.log("currQuarter",currQuarter)
+      console.log("currQuarter",currQuarter)
 
       this.quarterFilter = 'Q' + ((this.quaterData !== undefined && this.quaterData > 0) ? this.quaterData : currQuarter) + '-' + this.yearData.toString().substr(2, 2);   
       const currentQuarterParts = this.quarterFilter.split('-');
@@ -88,7 +88,7 @@ export class CmViewallComponent implements OnInit {
       }
 
       const previousQuarter = 'Q' + previousQuarterNumber + '-' + previousYear.toString().substr(-2);
-      // console.log('previousQuarter: ----->>>> ',previousQuarter)
+      console.log('previousQuarter: ----->>>> ',previousQuarter)
 
       // let previousQuarter = "Q" + (Math.floor((currentDate.getMonth() - 3) / 3) + 1) + "-" + currentDate.getFullYear().toString().substr(-2);
       this.prevQuarterData = this.RawData.filter((item: any) => item.Quater === previousQuarter);
@@ -139,7 +139,7 @@ export class CmViewallComponent implements OnInit {
       for (let i in groupData){
         this.metricGroupData.push(groupData[i])
       }
-      // console.log('this: metricGroupData new ', this.metricGroupData);
+      console.log('this: metricGroupData new ', this.metricGroupData);
 
 
       this.matchedData.push({
@@ -207,13 +207,13 @@ export class CmViewallComponent implements OnInit {
         }    
         unitData.Unitnamecount++;
       });
-      // console.log('prevQuarterData new :', prevGroupData);
+      console.log('prevQuarterData new :', prevGroupData);
   
       for (let i in prevGroupData){
         this.metricGroupPrevData.push(prevGroupData[i])
       }
     
-      // console.log('this.metricGroupPrevData new: ',this.metricGroupPrevData);
+      console.log('this.metricGroupPrevData new: ',this.metricGroupPrevData);
        // 1st array - Current quarter records with common GroupName and UnitName name in both current and previous quarters
       const currentQuarterCommonRecords = this.metricGroupData.filter((record: any) => {
         const matchingPrevRecord = this.metricGroupPrevData.find((prevRecord: any) => {
@@ -221,7 +221,7 @@ export class CmViewallComponent implements OnInit {
         });
         return matchingPrevRecord !== undefined; // Filter out records without a match in the previous quarter
       });
-      // console.log('currentQuarterCommonRecords: ',currentQuarterCommonRecords)
+      console.log('currentQuarterCommonRecords: ',currentQuarterCommonRecords)
       // 2nd array - Previous quarter records with common GroupName and UnitName name in both current and previous quarters
       const prevQuarterCommonRecords = this.metricGroupPrevData.filter((prevRecord: any) => {
         const matchingCurrentRecord = this.metricGroupData.find((record: any) => {
@@ -310,7 +310,7 @@ export class CmViewallComponent implements OnInit {
           });
         
       });    
-//  console.log('this.combinedData: 1st',this.combinedData);
+ console.log('this.combinedData: 1st',this.combinedData);
       currentQuarterUniqueRecords.forEach((groupData: any) => {
         const currgroupName = groupData.GroupName;
         const currunitData = groupData.unitData;
@@ -350,7 +350,7 @@ export class CmViewallComponent implements OnInit {
       }
       return 0;
     });
-    // console.log('this.combinedData: 2nd',this.combinedData);
+    console.log('this.combinedData: 2nd',this.combinedData);
     this.cacheSpan('groupsName', (d: any) => d.groupsName,sortedData);
 
   }

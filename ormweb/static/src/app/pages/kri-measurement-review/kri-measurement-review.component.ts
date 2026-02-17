@@ -37,102 +37,101 @@ export interface KriScoring {
 }
 
 @Component({
-    selector: 'app-kri-measurement-review',
-    templateUrl: './kri-measurement-review.component.html',
-    styleUrls: ['./kri-measurement-review.component.scss']
+  selector: 'app-kri-measurement-review',
+  templateUrl: './kri-measurement-review.component.html',
+  styleUrls: ['./kri-measurement-review.component.scss']
 })
 export class KriMeasurementReviewComponent implements OnInit {
 
-    uploadFilename: any;
-    uploadFile: FormData = new FormData();
-    filename: any = '';
-    invalidfile: boolean = false;
-    invalidfilesize = false;
-    uploaderror: string = '';
+  uploadFilename: any;
+  uploadFile: FormData = new FormData();
+  filename: any = '';
+  invalidfile: boolean = false;
+  invalidfilesize = false;
+  uploaderror: string = '';
 
-    mainColumn: string[] = [];
+  mainColumn: string[] = [];
 
-    subColumn: string[] = [
-        'tvalue-1',
-        'tvalue-2',
-        'tvalue-3',
-        'tvalue-4',
-        'tvalue-5',
-        'Period',
-        'date',
-        'measurement',
-        'kri'
-    ];
+  subColumn: string[] = [
+    'tvalue-1',
+    'tvalue-2',
+    'tvalue-3',
+    'tvalue-4',
+    'tvalue-5',
+    'Period',
+    'date',
+    'measurement',
+    'kri'
+  ];
 
-    allColumnsForData: string[] = [];
+  allColumnsForData: string[] = [];
 
     statusData = [
         { id: 'Approve', value: 2, isSelected: false },
         { id: 'Reject', value: 3, isSelected: false },
     ];
-    dataSource: MatTableDataSource<KriScoring> = new MatTableDataSource();
-    reportFrequencey: any;
-    colorValues: any = "total"
-    @ViewChild(MatPaginator) paginator: MatPaginator | any;
-    @ViewChild(MatSort) sort: MatSort | undefined;
-    @ViewChild(MatTable) myTable: MatTable<any> | any;
-    groupID: any;
-    unitID: any;
-    groupSelected = 'all';
-    unitSelected = 'all';
-    department: any = "all";
-    reportWithUnit: boolean = false;
-    submited: any = false;
-    remarksFilled: boolean = false
-    completedata: any;
-    model: any = '';
-    isCollapsed = false;
-    selectedRow: any;
-    showPrevDataDetails: boolean = false;
-    isShowModal: boolean = false;
-    saveerror: string = "";
-    commentBody: string = "";
-    isReviewedStatus: boolean = false;
-    selectedOption: string = '';
-    approveChecked: boolean = false;
-    rejectChecked: boolean = false;
-    submitButton: boolean = false;
-    KRIReviewData: any[] = []
-    isPowerUserRole: boolean = false;
-    isRiskManagementUnit: boolean = false;
-    isStandardUser: boolean = false;
-    isReadOnly: boolean = false;
-    isExpanded: boolean = true;
-    checkedAll: any = null
-    public uploader: FileUploader = new FileUploader({
-        isHTML5: true
-    });
-    checkedData: any;
-    allData: any;
-    commentData: any;
-    element: any;
-    wait: any;
-    dataHide: boolean = false
-    isValid: boolean = false;
+  dataSource: MatTableDataSource<KriScoring> = new MatTableDataSource();
+  reportFrequencey: any;
+  colorValues: any = "total"
+  @ViewChild(MatPaginator) paginator: MatPaginator | any;
+  @ViewChild(MatSort) sort: MatSort | undefined;
+  @ViewChild(MatTable) myTable: MatTable<any> | any;
+  groupID: any;
+  unitID: any;
+  groupSelected = 'all';
+  unitSelected = 'all';
+  department:any = "all";
+  reportWithUnit: boolean = false;
+  submited:any = false;
+  remarksFilled: boolean = false
+  completedata: any;
+  model: any = '';
+  isCollapsed = false;
+  selectedRow: any;
+  showPrevDataDetails: boolean = false;
+  isShowModal: boolean = false;
+  saveerror: string = "";
+  commentBody: string = "";
+  isReviewedStatus: boolean = false;
+  selectedOption: string = '';
+  approveChecked: boolean = false;
+  rejectChecked: boolean = false;
+  submitButton:boolean = false;
+  KRIReviewData:any[] = []
+  isPowerUserRole:boolean=false;
+  isRiskManagementUnit:boolean=false;
+  isStandardUser:boolean=false;
+  isReadOnly:boolean=false;
+  isExpanded: boolean = true;
+  checkedAll: any = null
+  public uploader: FileUploader = new FileUploader({
+      isHTML5: true
+  });
+  checkedData: any;
+  allData: any;
+  commentData: any;
+  element: any;
+  wait:any;
+  dataHide:boolean = false
+  isValid: boolean = false;
     isValidSave: boolean = false;
     isSaved: boolean = false;
-    dataApprovedRejected: any[] = [];
-    isDisabled: boolean = false
+    dataApprovedRejected: any[]=[];
+    isDisabled:boolean = false
     disableData: any;
     dataRejected: any;
     dataApprove: any;
-    allApprovedRejected: boolean = false
-    isSubmit: boolean = false
+    allApprovedRejected:boolean = false
+    isSubmit:boolean = false
     filterKRIData: any;
-    isEnabledIcon: boolean = false
+    isEnabledIcon:boolean = false
     rejectReported: boolean = false;
     rejectedMetrics: any;
     selectedStatus: any;
-    toolTipButton: string = `Partial submission is not allowed. Review all reported metrics department-wise to enable the submit button. 
-    Additionally, ensure that the approved/rejected filter is not selected and the Unit dropdown is selected.`;
+    toolTipButton: any;
     filteredStatus: any;
     filteredReportedStatus: any;
-    filteredStatusALL: any
+    filteredStatusALL : any
     selectedRowFrequency: any;
 
     constructor(
@@ -145,9 +144,9 @@ export class KriMeasurementReviewComponent implements OnInit {
         @Inject(DOCUMENT) private _document: any
     ) {
         // this.kriService.getkrireporteddata();
-        this.isPowerUserRole = this.utils.isPowerUserRole();
-        this.isRiskManagementUnit = this.utils.isRiskManagementUnit();
-        this.isStandardUser = this.utils.isStandardUser();
+        this.isPowerUserRole        = this.utils.isPowerUserRole();
+        this.isRiskManagementUnit   = this.utils.isRiskManagementUnit();
+        this.isStandardUser         = this.utils.isStandardUser();
         kriService.gotMeasurements.subscribe((value) => {
             if (value) {
                 this.dataApprovedRejected = []
@@ -161,8 +160,11 @@ export class KriMeasurementReviewComponent implements OnInit {
                     this.dataHide = true;
                 }
 
-                this.groupID = this.groupID > 0 ? this.groupID : "all"
-                this.unitID = this.unitID > 0 ? this.unitID : "all"
+                this.groupID    = this.groupID > 0 ? this.groupID : "all"
+                this.unitID     = this.unitID  > 0 ? this.unitID  : "all"
+
+                console.log(' this.unitID  --->',  this.unitID);
+                console.log(' this.groupID --->',  this.groupID);
 
                 if (this.selectedRowFrequency && this.selectedRowFrequency !== 'total') {
                     if (this.groupID === 'all') {
@@ -203,7 +205,7 @@ export class KriMeasurementReviewComponent implements OnInit {
 
 
                 if (this.kriService.kriReviewerUser) {
-                    this.allColumnsForData = [
+                    this.allColumnsForData= [
                         'rejectApproveBtn',
                         'KriCode',
                         'Indicator',
@@ -225,8 +227,8 @@ export class KriMeasurementReviewComponent implements OnInit {
                         'prev',
                         'sendEmail',
                         'checkerComments'
-                    ]
-                    this.mainColumn = [
+                      ]
+                      this.mainColumn = [
                         'rejectApproveBtn',
                         'KriCode',
                         'Indicator',
@@ -241,10 +243,10 @@ export class KriMeasurementReviewComponent implements OnInit {
                         'prev',
                         'sendEmail',
                         'checkerComments'
-                    ];
+                      ];
                     //   console.log('this.allColumnsForData -f '+this.allColumnsForData)
                 } else {
-                    this.allColumnsForData = [
+                     this.allColumnsForData= [
                         'KriCode',
                         'Indicator',
                         'MeasurementFrequency',
@@ -265,8 +267,8 @@ export class KriMeasurementReviewComponent implements OnInit {
                         'prev',
                         'sendEmail',
                         'checkerComments'
-                    ]
-                    this.mainColumn = [
+                      ]
+                      this.mainColumn = [
                         'KriCode',
                         'Indicator',
                         'MeasurementFrequency',
@@ -280,7 +282,7 @@ export class KriMeasurementReviewComponent implements OnInit {
                         'prev',
                         'sendEmail',
                         'checkerComments'
-                    ];
+                      ];
                 }
                 // this.kriService.kriMeasurments.forEach((ele: any) => {
                 //     if (ele.ReportStatusID == 2 && ele.IsReviewed == false && ele.IsSaved == false) {
@@ -292,25 +294,25 @@ export class KriMeasurementReviewComponent implements OnInit {
                 //         this.isDisabled = false
                 //     }
                 // });
-                //         if(this.kriService.kriMeasurments.filter((ele: any) => ele.IsSaved == true).length > 0){
-                //             this.submitButton = true;
-                //         }else{
-                //             this.submitButton = false
-                //         }
-                // this.submitButton =  this.kriService.kriMeasurments.filter((ele: any) => ele.IsSaved == true && ele.KRI_Status != "Measured" && ele.KRI_Status != "Reported").length > 0;
-                // console.log("🚀 ~ file: kri-measurement-review.component.ts:229 ~ KriMeasurementReviewComponent ~ kriService.gotMeasurements.subscribe ~  this.submitButton:",  this.submitButton)
-                kriService.kriMeasurments.forEach((element: any) => {
-                    if (element.KRI_Status === 'Reported') {
-                        element.CommentBody = '';
-                    }
-                });
+        //         if(this.kriService.kriMeasurments.filter((ele: any) => ele.IsSaved == true).length > 0){
+        //             this.submitButton = true;
+        //         }else{
+        //             this.submitButton = false
+        //         }
+        // this.submitButton =  this.kriService.kriMeasurments.filter((ele: any) => ele.IsSaved == true && ele.KRI_Status != "Measured" && ele.KRI_Status != "Reported").length > 0;
+        // console.log("🚀 ~ file: kri-measurement-review.component.ts:229 ~ KriMeasurementReviewComponent ~ kriService.gotMeasurements.subscribe ~  this.submitButton:",  this.submitButton)
+        kriService.kriMeasurments.forEach((element:any) => {
+            if (element.KRI_Status === 'Reported') {
+                element.CommentBody = '';
+            }
+        });
 
-                kriService.kriMeasurments.forEach((element: any) => {
-                    element.CommentBody = !(element.IsVisible && element.IsSaved) ? element.CommentBody : '';
-                });
+        kriService.kriMeasurments.forEach((element: any) => {
+            element.CommentBody = !(element.IsVisible && element.IsSaved) ? element.CommentBody : '';
+          });
 
 
-                this.emailEnable(kriService.kriMeasurments);
+        this.emailEnable(kriService.kriMeasurments);
 
                 setTimeout(() => {
                     this.dataSource.paginator = this.paginator;
@@ -322,13 +324,10 @@ export class KriMeasurementReviewComponent implements OnInit {
     }
     ngOnInit(): void {
         this.dataApprovedRejected = []
-        this.allApprovedRejected = this.dataSource.data.some((obj: any) => (obj.ReportStatusID == 2 || obj.ReportStatusID == 3) && obj.IsReviewed == true)
-
-        
-        
+        this.allApprovedRejected =  this.dataSource.data.some((obj:any) => (obj.ReportStatusID == 2  || obj.ReportStatusID == 3) && obj.IsReviewed == true)
 
         this.kriService.getkrireporteddata();
-        this.kriService?.kriMeasurments?.forEach((element: any) => {
+        this.kriService.kriMeasurments.forEach((element:any) => {
             if (element.KRI_Status === 'Reported') {
                 element.CommentBody = '';
             }
@@ -441,16 +440,14 @@ export class KriMeasurementReviewComponent implements OnInit {
     filterGroups(data: any): any {
         // console.log('data: ', data);
 
-        // console.log("Data Source Data: ", this.dataSource.data);
-
-        this.allApprovedRejected = this.dataSource.data.every((obj: any) => (obj.ReportStatusID == 2 || obj.ReportStatusID == 3) && obj.IsReviewed == true)
-        this.checkedAll = null;
+        this.allApprovedRejected = this.dataSource.data.every((obj:any) => (obj.ReportStatusID == 2  || obj.ReportStatusID == 3) && obj.IsReviewed == true)
+        this.checkedAll  = null;
         this.checkedData = null;
 
-        this.unitSelected = '';
-        this.groupID = data.value;
-        this.groupID = this.groupID > 0 ? this.groupID : "all"
-        this.unitID = this.unitID > 0 ? this.unitID : "all"
+        this.unitSelected   = '';
+        this.groupID        = data.value;
+        this.groupID        = this.groupID > 0 ? this.groupID : "all"
+        this.unitID         = this.unitID  > 0 ? this.unitID  : "all"
         // console.log('✌️ this.groupID ---> g',  this.groupID);
         // console.log('✌️  this.unitID  ---> g',   this.unitID );
 
@@ -460,14 +457,14 @@ export class KriMeasurementReviewComponent implements OnInit {
 
         if (this.selectedRowFrequency && this.selectedRowFrequency !== 'total') {
             if (this.groupID == 'all') {
-                this.dataSource.data = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
+                this.dataSource.data    = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
                 if (this.filteredStatus) {
                     this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.KRI_Status === this.filteredStatus);
                 }
                 if (this.selectedRowFrequency) {
                     this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.MeasurementFrequency === this.selectedRowFrequency);
                 }
-                this.completedata = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
+                this.completedata       = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
             } else if (Number(this.groupID) > 0) {
                 this.dataSource.data = this.kriService?.kriMeasurments.filter(
                     (nn: any) => nn.GroupID == Number(this.groupID)
@@ -481,14 +478,14 @@ export class KriMeasurementReviewComponent implements OnInit {
                     this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.MeasurementFrequency === this.selectedRowFrequency);
                 }
             }
-        } else {
+        } else  {
             if (this.groupID == 'all') {
-                this.dataSource.data = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
+                this.dataSource.data    = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
 
                 if (this.filteredStatus) {
                     this.dataSource.data = this.dataSource.data.filter((nn: any) => nn.KRI_Status === this.filteredStatus);
                 }
-                this.completedata = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
+                this.completedata       = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
 
             } else if (Number(this.groupID) > 0) {
                 this.dataSource.data = this.kriService?.kriMeasurments.filter(
@@ -515,23 +512,20 @@ export class KriMeasurementReviewComponent implements OnInit {
         } else {
             this.reportWithUnit = false;
         }
-        this.rejectReported = this.dataSource.data.some((obj: any) => (obj.KRI_Status == "Rejected" || obj.KRI_Status == "Reported"))
+        this.rejectReported         = this.dataSource.data.some((obj:any) =>(obj.KRI_Status == "Rejected" || obj.KRI_Status == "Reported"))
         // console.log("this.rejectReported",this.rejectReported)
-        this.allApprovedRejected = this.dataSource.data.every((obj: any) => (obj.KRI_Status == "Measured" || obj.KRI_Status == "Not Measured"))
+        this.allApprovedRejected    = this.dataSource.data.every((obj:any) =>(obj.KRI_Status == "Measured" || obj.KRI_Status == "Not Measured"))
         // console.log("this.allApprovedRejected",this.allApprovedRejected)
-        this.rejectedMetrics = this.dataSource.data.every((obj: any) => ((obj.KRI_Status == "Rejected" && obj.IsReported == true && obj.IsSaved == false)))
+        this.rejectedMetrics        = this.dataSource.data.every((obj:any) =>((obj.KRI_Status == "Rejected" && obj.IsReported == true && obj.IsSaved == false)))
         // console.log("this.rejectedMetrics",this.rejectedMetrics)
         this.dataRejectedSubmit()
 
     }
 
     filterUnits(data: any) {
-        this.unitID = data.value;
-        this.groupID = this.groupID > 0 ? this.groupID : "all"
-        this.unitID = this.unitID > 0 ? this.unitID : "all"
-
-        console.log("Data Source Data: ", this.dataSource.data);
-        
+        this.unitID     = data.value;
+        this.groupID    = this.groupID > 0 ? this.groupID : "all"
+        this.unitID     = this.unitID  > 0 ? this.unitID  : "all"
 
         // console.log('✌️  this.unitID  --->',   this.unitID );
         // console.log('✌️ this.groupID --->',  this.groupID);
@@ -574,11 +568,11 @@ export class KriMeasurementReviewComponent implements OnInit {
 
             this.reportWithUnit = true;
         }
-        this.rejectReported = this.dataSource.data.some((obj: any) => (obj.KRI_Status == "Rejected" || obj.KRI_Status == "Reported"))
+        this.rejectReported         = this.dataSource.data.some((obj:any) =>(obj.KRI_Status == "Rejected" || obj.KRI_Status == "Reported"))
         // console.log("this.rejectReported",this.rejectReported)
-        this.allApprovedRejected = this.dataSource.data.some((obj: any) => (obj.KRI_Status == "Measured" || obj.KRI_Status == "Not Measured"))
+        this.allApprovedRejected    = this.dataSource.data.some((obj:any) =>(obj.KRI_Status == "Measured" || obj.KRI_Status == "Not Measured"))
         // console.log("this.allApprovedRejected",this.allApprovedRejected)
-        this.rejectedMetrics = this.dataSource.data.some((obj: any) => ((obj.KRI_Status == "Rejected" && obj.IsReported == true && obj.IsSaved == false)))
+        this.rejectedMetrics        = this.dataSource.data.some((obj:any) =>((obj.KRI_Status == "Rejected" && obj.IsReported == true && obj.IsSaved == false)))
         this.selectedStatus = null;
         this.dataRejectedSubmit()
     }
@@ -601,8 +595,8 @@ export class KriMeasurementReviewComponent implements OnInit {
         return this.colorValues == data;
     }
 
-    colorValueTotal(data: any, freq: any) {
-        return this.colorValues == data + freq
+    colorValueTotal(data:any,freq:any){
+        return this.colorValues ==  data + freq
     }
 
     colorValueData(frequency: any, data: any): any {
@@ -817,8 +811,8 @@ export class KriMeasurementReviewComponent implements OnInit {
                     EvidenceID:
                         metric?.evidences && metric?.evidences.length > 0
                             ? metric?.evidences
-                                .map((ele: any) => ele.EvidenceID)
-                                .join()
+                                  .map((ele: any) => ele.EvidenceID)
+                                  .join()
                             : '',
                 });
             }
@@ -910,7 +904,7 @@ export class KriMeasurementReviewComponent implements OnInit {
         }
         listData.forEach((element: any) => {
             element.CommentBody = !(element.IsVisible && element.IsSaved) ? element.CommentBody : '';
-        });
+          });
         this.dataSource.data = listData;
         this.colorValues = 'total';
     }
@@ -948,7 +942,7 @@ export class KriMeasurementReviewComponent implements OnInit {
 
         listData.forEach((element: any) => {
             element.CommentBody = !(element.IsVisible && element.IsSaved) ? element.CommentBody : '';
-        });
+          });
 
         this.dataSource.data = listData;
         // this.dataSource.data.filter((rec:any) => rec.StatusName == data)
@@ -975,7 +969,7 @@ export class KriMeasurementReviewComponent implements OnInit {
         }
         listData.forEach((element: any) => {
             element.CommentBody = !(element.IsVisible && element.IsSaved) ? element.CommentBody : '';
-        });
+          });
         this.dataSource.data = listData;
         this.colorValues = data + frequency;
         this.selectedRow = data + frequency;
@@ -998,7 +992,7 @@ export class KriMeasurementReviewComponent implements OnInit {
         }
         listData.forEach((element: any) => {
             element.CommentBody = !(element.IsVisible && element.IsSaved) ? element.CommentBody : '';
-        });
+          });
         this.dataSource.data = listData;
         this.colorValues = data;
         this.selectedRow = data;
@@ -1163,17 +1157,17 @@ export class KriMeasurementReviewComponent implements OnInit {
                 Target: item.Target ? item.Target.toString() + '%' : '0%',
                 'KRI Type': item.KriType,
                 "Threshold Value 1": item.ThresholdValue1 >= 0 ? (item.ThresholdValue1 <= item.ThresholdValue2 ? ">=" : "<=") + item.ThresholdValue1.toString() + '%' : '',
-                'Threshold Value 2': item.ThresholdValue2 ? (item.ThresholdValue2 <= item.ThresholdValue3 ? ">=" : "<=") + item.ThresholdValue2.toString() + '%' : '',
+                'Threshold Value 2': item.ThresholdValue2 ? (item.ThresholdValue2 <= item.ThresholdValue3 ? ">=" : "<=") + item.ThresholdValue2.toString() +'%': '',
                 'Threshold Value 3': item.ThresholdValue3 ? (item.ThresholdValue3 <= item.ThresholdValue4 ? ">=" : "<=") + item.ThresholdValue3.toString() + '%' : '',
-                'Threshold Value 4': item.ThresholdValue4 ? (item.ThresholdValue4 <= item.ThresholdValue5 ? ">=" : "<=") + item.ThresholdValue4.toString() + '%' : '',
-                'Threshold Value 5': item.ThresholdValue5 ? item.ThresholdValue5.toString() + '%' : '0%',
+                'Threshold Value 4': item.ThresholdValue4 ? (item.ThresholdValue4 <= item.ThresholdValue5 ? ">=" : "<=") + item.ThresholdValue4.toString() + '%': '',
+                'Threshold Value 5': item.ThresholdValue5 ? item.ThresholdValue5.toString() + '%': '0%',
                 Period: item.Period,
                 Date: item.Date
                     ? new Date(item.Date).toLocaleDateString('en-US', {
-                        month: '2-digit',
-                        day: '2-digit',
-                        year: 'numeric',
-                    })
+                          month: '2-digit',
+                          day: '2-digit',
+                          year: 'numeric',
+                      })
                     : '',
                 Measurement:
                     item.Measurement != null
@@ -1289,7 +1283,7 @@ export class KriMeasurementReviewComponent implements OnInit {
     }
 
     sendIndividualEmailReminder(metricId: number) {
-        // console.log("🚀 ~ file: kri-measurement-review.component.ts:1090 ~ KriMeasurementReviewComponent ~ sendIndividualEmailReminder ~ metricId:", metricId)
+        console.log("🚀 ~ file: kri-measurement-review.component.ts:1090 ~ KriMeasurementReviewComponent ~ sendIndividualEmailReminder ~ metricId:", metricId)
         const confirm = this.dialog.open(ConfirmDialogComponent, {
             id: 'InfoComponent',
             disableClose: true,
@@ -1322,15 +1316,15 @@ export class KriMeasurementReviewComponent implements OnInit {
     }
 
     openDialog(): void {
-        this.dataRejected = this.kriService.kriMeasurments.filter((x: any) => x.isChecked == false && x.ReportStatusID == 2 && x.IsSaved).some((y: any) => y.CommentBody.length == 0)
-        // console.log("Data Rejected KRI Measurement Review Component: ", this.dataRejected);
-        this.dataApprove = this.kriService.kriMeasurments.filter((x: any) => x.isChecked == true && x.ReportStatusID == 3 && x.IsSaved).some((y: any) => y.CommentBody.length == 0)
-        // console.log("Data Approve KRI Measurement Review Component: ", this.dataApprove);
-        this.allData = this.dataSource.data.filter(
-            (x: any) => ['Approved', 'Rejected'].includes(x.KRI_Status)
-        );
+       this.dataRejected = this.kriService.kriMeasurments.filter((x: any) => x.isChecked == false && x.ReportStatusID == 2 && x.IsSaved).some((y: any) => y.CommentBody.length == 0)
+        // console.log("🚀 ~ file: kri-measurement-review.component.ts:1150 ~ KriMeasurementReviewComponent ~ openDialog ~ ):", this.kriService.kriMeasurments.filter((x: any) => x.isChecked == false && x.ReportStatusID == 2 && x.CommentBody.length == 0))
+        // console.log("🚀 ~ file: kri-measurement-review.component.ts:1147 ~ KriMeasurementReviewComponent ~ openDialog ~ this.dataRejected:", this.kriService.kriMeasurments.filter((x: any) => x.isChecked == false && x.ReportStatusID == 2).some((y: any) => y.CommentBody.length == 0))
+        this.dataApprove = this.kriService.kriMeasurments.filter((x: any) => x.isChecked == true && x.ReportStatusID == 1 && x.IsSaved).some((y: any) => y.CommentBody.length == 0)
+
         if (this.dataRejected || this.dataApprove) {
             //console.log("inside if")
+
+            this.allData = this.dataSource.data
             const dialog = this.dialog.open(
                 KriSendEmailReminderDialogComponent,
                 {
@@ -1340,31 +1334,35 @@ export class KriMeasurementReviewComponent implements OnInit {
                     data: {
                         allData: this.allData,
                         id: this.checkedData,
-                        save: this.isSubmit
+                        save:this.isSubmit
                     },
                 }
             );
             dialog.afterClosed().subscribe((result) => {
-                if (result) {
-                    this.isSubmit = true
-                }
-
+                if(result)
+                this.isSubmit = true
             });
+            // this.isSubmit = true
         } else {
-            const metricIds: string = this.allData.filter((ele: any) => ele.IsSaved == true && ele.isChecked != null).map((metric: any) => metric.MetricID).join(',');
-            const confirm = this.dialog.open(ConfirmDialogComponent, {
-                id: 'InfoComponent',
-                disableClose: true,
-                minWidth: '300px',
-                panelClass: 'dark',
-                data: {
-                    title: 'Confirm Submission',
-                    content: "Are you sure you want to Submit the KRI's?",
-                },
-            });
-            confirm.afterClosed().subscribe((result) => {
-                if (result) {
-                    this.kriService.submitReviewerDetails({ metricIDs: metricIds }).subscribe(
+            const metricIds: string = this.dataSource.data
+            .filter(
+                (ele: any) => ele.IsSaved == true && ele.isChecked != null
+            )
+            .map((metric: any) => metric.MetricID)
+            .join(',');
+        const confirm = this.dialog.open(ConfirmDialogComponent, {
+            id: 'InfoComponent',
+            disableClose: true,
+            minWidth: '300px',
+            panelClass: 'dark',
+            data: {
+                title: 'Confirm Submission',
+                content: "Are you sure you want to Submit the KRI's?",
+            },
+        });
+        confirm.afterClosed().subscribe((result) => {
+            if (result) {
+                this.kriService.submitReviewerDetails({ metricIDs: metricIds }).subscribe(
                         (res: any) => {
                             if (res.success === 1) {
                                 this.saveSuccess(res.message);
@@ -1383,10 +1381,12 @@ export class KriMeasurementReviewComponent implements OnInit {
                             console.log('err::', error);
                         }
                     );
-                }
-            });
-        }
-        this.allApprovedRejected = this.dataSource.data.every((obj: any) => obj.ReportStatusID == 2 || obj.ReportStatusID == 3)
+            }
+        });
+
+    }
+    // this.isSubmit = true;
+    this.allApprovedRejected =  this.dataSource.data.every((obj:any) => obj.ReportStatusID == 2  || obj.ReportStatusID == 3)
     }
 
     approvedRejectedDetails(event: any, value: string, rowData: any) {
@@ -1414,12 +1414,12 @@ export class KriMeasurementReviewComponent implements OnInit {
         // }
         // console.log('✌️  this.dataApprovedRejected --->',   this.dataApprovedRejected);
         this.dataApprovedRejected.forEach((metric: any) => {
-            if (metric.isChecked !== null) {
+            if (metric.isChecked !== null){
                 this.KRIReviewData.push({
                     metricID: metric.MetricID,
                     measurementID: metric.MeasurementID,
-                    commentBody: metric.CommentBody ? metric.CommentBody : '',
-                    isApproved: metric.isChecked == null ? metric.IsReviewedData : metric.isChecked == true ? '1' : '0',
+                    commentBody: metric.CommentBody ? metric.CommentBody :'',
+                    isApproved: metric.isChecked == null ? metric.IsReviewedData : metric.isChecked == true ? '1': '0',
                 });
             }
         });
@@ -1428,24 +1428,24 @@ export class KriMeasurementReviewComponent implements OnInit {
         });
         // console.log("🚀 ~ file: kri-measurement-review.component.ts:1215 ~ KriMeasurementReviewComponent ~ this.dataApprovedRejected.forEach ~ this.dataApprovedRejected:", this.dataApprovedRejected)
         // this.dataApprovedRejected = []
-        if (this.dataApprovedRejected.length > 0) {
-            // this.KRIReviewData = this.KRIReviewData.filter((ele:any) => ele.commentBody.trim() != "")
-            this.kriService.saveReviewerDetails(this.KRIReviewData).subscribe((res: any) => {
-                next: {
-                    if (res.success == 1) {
-                        this.dataApprovedRejected.splice(0, this.dataApprovedRejected.length);
-                        // console.log(" this.KRIReviewData",this.KRIReviewData)
-                        this.saveSuccess(res.message);
-                    } else {
-                        if (res.error.errorCode == 'TOKEN_EXPIRED')
-                            this.utils.relogin(this._document);
-                        else this.saveerror = res.error.errorMessage;
-                    }
-                    error: console.log('err::', 'error');
+        if(this.dataApprovedRejected.length > 0){
+        // this.KRIReviewData = this.KRIReviewData.filter((ele:any) => ele.commentBody.trim() != "")
+        this.kriService.saveReviewerDetails(this.KRIReviewData).subscribe((res: any) => {
+            next: {
+                if (res.success == 1) {
+                    this.dataApprovedRejected.splice(0, this.dataApprovedRejected.length);
+                    // console.log(" this.KRIReviewData",this.KRIReviewData)
+                    this.saveSuccess(res.message);
+                } else {
+                    if (res.error.errorCode == 'TOKEN_EXPIRED')
+                        this.utils.relogin(this._document);
+                    else this.saveerror = res.error.errorMessage;
                 }
-                this.KRIReviewData = [];
-                this.isSubmit = false;
-            })
+                error: console.log('err::', 'error');
+            }
+            this.KRIReviewData = [];
+            this.isSubmit = false;
+        })
         } else {
             this.popupInfo("Information", "Data was not changed", false, null);
         }
@@ -1483,7 +1483,7 @@ export class KriMeasurementReviewComponent implements OnInit {
                 if (measurementFrequency === 'total') {
                     reportStatusCount = this.completedata.filter((data: any) => data.KRI_Status === status);
                 } else {
-                    reportStatusCount = this.completedata.filter((data: any) => data.MeasurementFrequency === measurementFrequency &&
+                    reportStatusCount = this.completedata.filter((data: any) =>data.MeasurementFrequency === measurementFrequency &&
                         data.KRI_Status === status);
                 }
             }
@@ -1493,7 +1493,7 @@ export class KriMeasurementReviewComponent implements OnInit {
                 if (measurementFrequency === 'total') {
                     reportStatusCount = this.completedata.filter((data: any) => data.KRI_Status === status);
                 } else {
-                    reportStatusCount = this.completedata.filter((data: any) => data.MeasurementFrequency === measurementFrequency &&
+                    reportStatusCount = this.completedata.filter((data: any) =>data.MeasurementFrequency === measurementFrequency &&
                         data.KRI_Status === status);
                 }
             }
@@ -1520,7 +1520,7 @@ export class KriMeasurementReviewComponent implements OnInit {
 
     reportedStatus(val: any, data: any): any {
         this.filteredStatus = data;
-        // console.log('this.filteredStatus: ', this.filteredStatus);
+        console.log('this.filteredStatus: ', this.filteredStatus);
         this.model = '';
         this.dataSource.filter = ' ';
         if (this.dataSource.paginator) this.dataSource.paginator.firstPage();
@@ -1554,7 +1554,7 @@ export class KriMeasurementReviewComponent implements OnInit {
 
         listData.forEach((element: any) => {
             element.CommentBody = !(element.IsVisible && element.IsSaved) ? element.CommentBody : '';
-        });
+          });
 
 
         this.dataSource.data = listData;
@@ -1562,19 +1562,19 @@ export class KriMeasurementReviewComponent implements OnInit {
         this.selectedRow = data + val;
 
         this.selectedRowFrequency = val;
-        this.selectedStatus = data;
+        this.selectedStatus  = data;
     }
 
     reject(data: any, value: boolean) {
         this.isSubmit = true
-        if (data.isChecked == false && data.IsSaved == true) {
+        if(data.isChecked == false && data.IsSaved == true){
             // console.log("inside if")
             this.popupCheckBox()
         }
         // Remove any existing record with the same metric ID
         this.dataSource.data.forEach((x: any) => {
             if (x.MetricID === data.MetricID) {
-                if (x.isChecked === null || x.isChecked == true) {
+                if (x.isChecked === null  || x.isChecked == true) {
                     x.isChecked = value;
                     x.isSavedSubmit = true;
                     this.dataApprovedRejected.push(x);
@@ -1589,7 +1589,7 @@ export class KriMeasurementReviewComponent implements OnInit {
 
     approve(data: any, value: boolean) {
         this.isSubmit = true
-        if (data.isChecked == true && data.IsSaved == true) {
+        if(data.isChecked == true && data.IsSaved == true){
             this.popupCheckBox()
         }
         // Remove any existing record with the same metric ID
@@ -1623,7 +1623,7 @@ export class KriMeasurementReviewComponent implements OnInit {
         if (latestMetricIndex !== -1) {
             this.dataApprovedRejected = this.dataApprovedRejected.filter((x: any, index: number) => index === latestMetricIndex || x.MetricID !== metric.MetricID);
         }
-        // console.log("🚀 ~ file: kri-measurement-review.component.ts:1378 ~ KriMeasurementReviewComponent ~ removeMetricFromApprovedRejected ~   this.dataApprovedRejected:", this.dataApprovedRejected)
+        console.log("🚀 ~ file: kri-measurement-review.component.ts:1378 ~ KriMeasurementReviewComponent ~ removeMetricFromApprovedRejected ~   this.dataApprovedRejected:",   this.dataApprovedRejected)
 
     }
 
@@ -1645,7 +1645,7 @@ export class KriMeasurementReviewComponent implements OnInit {
         this.isSubmit = true
         this.checkedData = value;
         this.dataSource.data.forEach((x: any) => {
-            if (x.KRI_Status != 'Measured' && x.KRI_Status != 'Not Measured' && x.KRI_Status != null && x.IsSaved != false ) {
+            if ( x.KRI_Status != 'Measured' && x.KRI_Status != 'Not Measured' && x.KRI_Status != null && x.IsSaved != false ) {
                 if (data == null || data != value) {
                     this.checkedAll = value;
                     x.isChecked = value;
@@ -1672,14 +1672,10 @@ export class KriMeasurementReviewComponent implements OnInit {
         this.isSubmit = true
         this.checkedData = value;
         this.dataSource.data.forEach((x: any) => {
-            if (x.KRI_Status != 'Measured' && x.KRI_Status != 'Not Measured' && x.KRI_Status != null && x.IsSaved != false) {
-                
-                
+            if ( x.KRI_Status != 'Measured' && x.KRI_Status != 'Not Measured' && x.KRI_Status != null && x.IsSaved != false) {
                 if (data == null || data != value) {
                     this.checkedAll = value;
-                    
                     x.isChecked = value;
-                    
                     x.isSavedSubmit = true;
 
                     const existingIndex = this.dataApprovedRejected.findIndex((item: any) => item.MetricID === x.MetricID);
@@ -1689,12 +1685,9 @@ export class KriMeasurementReviewComponent implements OnInit {
                         this.dataApprovedRejected[existingIndex] = { ...x };
                     }
                 } else if (data == value && data.isChecked !== true) {
-                    // console.log("🚀 ~ file: kri-measurement-review.component.ts:1517 ~ KriMeasurementReviewComponent ~ this.dataSource.data.forEach ~ this.checkedAll:", this.checkedAll)
+                    console.log("🚀 ~ file: kri-measurement-review.component.ts:1517 ~ KriMeasurementReviewComponent ~ this.dataSource.data.forEach ~ this.checkedAll:", this.checkedAll)
                     this.checkedAll = null;
-                    
-                    
                     x.isChecked = null;
-                    
                     this.dataApprovedRejected = this.dataApprovedRejected.filter((item: any) => item.MetricID !== x.MetricID);
                 }
             }
@@ -1704,20 +1697,20 @@ export class KriMeasurementReviewComponent implements OnInit {
     }
 
     viewPreviousComments(element: any): void {
-        let comments = element.CommentData
+            let comments = element.CommentData
             ? element.CommentData.filter((x: any) => x.IsVisible && x.CommentBody != "") || []
             : [];
-        const info = this.dialog.open(CommentsComponent, {
-            minWidth: '28vw',
-            maxWidth: '60vw',
-            minHeight: '30vh',
-            maxHeight: '60vh',
-            panelClass: 'dark',
-            data: {
-                title: 'Previous Comments',
-                comments: comments,
-            },
-        });
+            const info = this.dialog.open(CommentsComponent, {
+                minWidth: '28vw',
+                maxWidth: '60vw',
+                minHeight: '30vh',
+                maxHeight: '60vh',
+                panelClass: 'dark',
+                data: {
+                    title: 'Previous Comments',
+                    comments: comments,
+                },
+            });
     }
 
 
@@ -1725,24 +1718,25 @@ export class KriMeasurementReviewComponent implements OnInit {
         this.isExpanded = !this.isExpanded;
     }
 
-    getTooltipMessage(element: any): any {
+    getTooltipMessage(element: any):any {
         if (element.KRI_Status === 'Measured' || element.KRI_Status === 'Not Measured') {
-            return 'Button is disabled as this KRI has not been Reported';
-        } else if (element.IsSaved === false && (element.ReportStatusID === 3 || element.ReportStatusID === 2)) {
-            return 'This KRI has been already  reviewed and submitted';
-        } else {
-            return ''
-        }
+          return 'Button is disabled as this KRI has not been Reported';
+        }else if(element.IsSaved === false && (element.ReportStatusID === 3 || element.ReportStatusID === 2)){
+        return 'This KRI has been already  reviewed and submitted';
+      }else{
+        return ''
+      }
     }
 
-    commentDataInput(ele: any) {
+    commentDataInput(ele:any){
+        console.log("ele",ele)
         this.isSubmit = true
 
         this.dataSource.data.forEach((x: any) => {
             if (x.MetricID === ele.MetricID) {
                 x.CommentBody = ele.CommentBody;
-                this.dataApprovedRejected.push(x);
-                this.dataApprovedRejected.push(x);
+            this.dataApprovedRejected.push(x);
+                    this.dataApprovedRejected.push(x);
             }
         });
         this.removeMetricFromApprovedRejected(ele);
@@ -1750,103 +1744,94 @@ export class KriMeasurementReviewComponent implements OnInit {
     }
 
     dataRejectedSubmit(): any {
-        // if (this.selectedRowFrequency) {
-        //     return true;
-        // } else if ((this.selectedStatus === 'Approved' || this.selectedStatus === 'Rejected') && this.completedata.filter((ob: any) => ob.KRI_Status == this.selectedStatus)?.some((ele: any) => (ele.KRI_Status == "Approved" && ele.IsReviewed == true) || (ele.IsReviewed == false && ele.IsSaved == true) || (ele.KRI_Status == "Reported" || ele.KRI_Status == "Not Measured" || ele.KRI_Status == "Measured") && (ele.IsReviewed == false || ele.IsReviewed == null))) {
-        //     return true;
-        // } else if (this.dataSource.data.some((ele: any) => (ele.KRI_Status == "Reported" || ele.KRI_Status == "Not Measured" || ele.KRI_Status == "Measured") && (ele.IsReviewed == false || ele.IsReviewed == null))) {
-        //     return true;
-        // } else if (this.dataSource.data.some((ele: any) => (ele.KRI_Status == "Rejected") && (ele.IsReviewed == false || ele.IsReviewed == null) && ele.IsSaved == false)) {
-        //     return true;
-        // } else if (this.dataSource.data.some((ele: any) => (ele.KRI_Status == "Rejected") && (ele.IsReviewed == false || ele.IsReviewed == null) && ele.IsSaved == true)) {
-        //     return false;
-        // } else if ((this.groupID != 0 && this.unitID != 0) && this.filteredStatusALL == "all" && (this.dataSource.data.some((ele: any) => (ele.KRI_Status == "Rejected") && (ele.IsReviewed == false || ele.IsReviewed == null) && ele.IsSaved == true))) {
-        //     return false;
-        // } else {
-        //     return false;
-        // }
-        const hasApprovedOrRejected = this.dataSource.data.some(
-            (x: any) => ['Approved', 'Rejected'].includes(x.KRI_Status)
-        );
-        return !hasApprovedOrRejected;
+        if(this.selectedRowFrequency) {
+            console.log('this.selectedRowFrequency : ', this.selectedRowFrequency)
+            this.toolTipButton = "Partial submission is not allowed. Review all reported metrics department-wise to enable the submit button. Additionally, ensure that the approved/rejected filter is not selected and the Unit dropdown is selected.";
+            return true;
+        } else if ((this.selectedStatus === 'Approved' || this.selectedStatus === 'Rejected') && this.completedata.filter((ob:any) => ob.KRI_Status == this.selectedStatus)?.some((ele:any)=>(ele.KRI_Status == "Approved" && ele.IsReviewed == true) || (ele.IsReviewed == false && ele.IsSaved == true) || (ele.KRI_Status == "Reported" || ele.KRI_Status == "Not Measured" || ele.KRI_Status == "Measured" )  && (ele.IsReviewed == false || ele.IsReviewed == null ) ) ) {
+            this.toolTipButton = "Partial submission is not allowed. Review all reported metrics department-wise to enable the submit button. Additionally, ensure that the approved/rejected filter is not selected and the Unit dropdown is selected.";
+            return true;
+        } else if (this.dataSource.data.some((ele:any)=> (ele.KRI_Status == "Reported" || ele.KRI_Status == "Not Measured" || ele.KRI_Status == "Measured" ) && (ele.IsReviewed == false || ele.IsReviewed == null))){
+            this.toolTipButton = "Partial submission is not allowed. Review all reported metrics department-wise to enable the submit button. Additionally, ensure that the approved/rejected filter is not selected and the Unit dropdown is selected.";
+            return true;
+        } else if (this.dataSource.data.some((ele:any)=> (ele.KRI_Status == "Rejected" ) && (ele.IsReviewed == false || ele.IsReviewed == null) && ele.IsSaved == false)){
+            this.toolTipButton = "Partial submission is not allowed. Review all reported metrics department-wise to enable the submit button. Additionally, ensure that the approved/rejected filter is not selected and the Unit dropdown is selected.";
+            return true;
+        } else if (this.dataSource.data.some((ele:any)=> (ele.KRI_Status == "Rejected" ) && (ele.IsReviewed == false || ele.IsReviewed == null) && ele.IsSaved == true)){
+            this.toolTipButton = "";
+            return false;
+        } else if ((this.groupID != 0 && this.unitID != 0 ) && this.filteredStatusALL == "all" && (this.dataSource.data.some((ele:any)=> (ele.KRI_Status == "Rejected" ) && (ele.IsReviewed == false || ele.IsReviewed == null) && ele.IsSaved == true))){
+            this.toolTipButton = "";
+            return false;
+        } else {
+            // console.log("else")
+            this.toolTipButton = '';
+            return false;
+        }
     }
 
 
     shouldDisableCheckbox(element: any): boolean {
-        this.disableData = ((element.ReportStatusID == 2 && element.IsReviewed == false && element.IsSaved == false) || (element.ReportStatusID == 3 && element.IsReviewed == true && element.IsSaved == false) || this.isReadOnly || (element.KRI_Status === 'Measured' || element.KRI_Status === 'Not Measured') || element.IsReviewed === true);
+        this.disableData = ((element.ReportStatusID == 2 && element.IsReviewed == false && element.IsSaved == false ) || (element.ReportStatusID == 3 && element.IsReviewed == true && element.IsSaved == false )|| this.isReadOnly || (element.KRI_Status === 'Measured' || element.KRI_Status === 'Not Measured') || element.IsReviewed === true);
         return this.disableData
-    }
+         }
 
-    bulkSelectionDisable () {
+         refreshTable() {
+            // Call renderRows() to refresh the table
+            this.myTable.renderRows();
+          }
 
-    }
+          emailEnable(data:any){
+            this.filterKRIData = data.filter((ele:any)=> {
+                if(ele.KRI_EmailStatus == null && this.kriService.kriReviewerUser) {
+                    let curDate     = new Date();
+                    let currMonth   = curDate.getMonth() + 1;
+                    let currDay     = curDate.getDate();
 
-    refreshTable() {
-        // Call renderRows() to refresh the table
-        this.myTable.renderRows();
-    }
+                    let triggerMonth = this.kriService.emailTrigger[0].Month;
+                    let triggerDay = this.kriService.emailTrigger[0].Day;
 
-    emailEnable(data: any) {
-        this.filterKRIData = data.filter((ele: any) => {
-            if (ele.KRI_EmailStatus == null && this.kriService.kriReviewerUser) {
-                let curDate = new Date();
-                let currMonth = curDate.getMonth() + 1;
-                let currDay = curDate.getDate();
+                    if((ele.KRI_EmailStatus == null && (currMonth >= triggerMonth && currDay >= triggerDay))){
 
-                let triggerMonth = this.kriService.emailTrigger[0].Month;
-                let triggerDay = this.kriService.emailTrigger[0].Day;
-
-                if ((ele.KRI_EmailStatus == null && (currMonth >= triggerMonth && currDay >= triggerDay))) {
-
-                    this.isEnabledIcon = true;
-                } else if ((currMonth >= triggerMonth || currMonth == triggerMonth) && currDay >= triggerDay) {
-                    this.isEnabledIcon = true;
-                } else {
-                    this.isEnabledIcon = false;
+                        this.isEnabledIcon = true;
+                    }else if ((currMonth >= triggerMonth || currMonth == triggerMonth) && currDay >= triggerDay ) {
+                        this.isEnabledIcon = true;
+                    } else {
+                        this.isEnabledIcon = false;
+                    }
                 }
-            }
-        })
-    }
+            })
+        }
 
-    getBulkRejectTooltipMessage() {
-        if (this.groupSelected == 'all' || this.unitSelected == '' || this.unitSelected == 'all') {
+    getBulkRejectTooltipMessage(){
+        if(this.groupSelected == 'all'|| this.unitSelected == '' || this.unitSelected == 'all') {
             return ''
-        } else if ((this.groupSelected != 'all' && this.unitSelected != 'all' && this.unitSelected != '')) {
-            return "Select to Bulk Reject"
-        } else if (this.allApprovedRejected && (this.unitSelected == 'all' || this.unitSelected != '') && this.rejectedMetrics) {
+        } else if((this.groupSelected != 'all' && this.unitSelected != 'all' && this.unitSelected != '' && this.rejectReported && !this.rejectedMetrics)){
+           return "Select to Bulk Reject"
+        }else if(this.allApprovedRejected && (this.unitSelected == 'all' || this.unitSelected != '') && this.rejectedMetrics){
             return "No KRI is submitted for review "
-        } else if (this.rejectedMetrics) {
+        }else if(this.rejectedMetrics){
             return "No KRI's is submitted for review "
-        } else {
+        }else{
             return ""
         }
     }
 
-    get isRejectedValid(): boolean {
-        // (this.isReadOnly || this.groupSelected === 'all' || this.rejectedMetrics || this.unitSelected == '' || this.unitSelected == 'all');
-        return (this.isReadOnly || this.groupSelected === 'all' || this.unitSelected == '' || this.unitSelected == 'all');
-    }    
-
-    getBulkApproveTooltipMessage() {
-        if (this.groupSelected == 'all' || this.unitSelected == '' || this.unitSelected == 'all') {
+    getBulkApproveTooltipMessage(){
+        if(this.groupSelected == 'all'|| this.unitSelected == '' || this.unitSelected == 'all') {
             return ''
-        } else if ((this.groupSelected != 'all' && this.unitSelected != 'all' && this.unitSelected != '')) {
+        } else if((this.groupSelected != 'all' && this.unitSelected != 'all' && this.unitSelected != '' && this.rejectReported && !this.rejectedMetrics)){
             return "Select to Bulk Approve"
-        } else if (this.allApprovedRejected && (this.unitSelected == 'all' || this.unitSelected != '' || this.rejectedMetrics)) {
-            return "No KRI is submitted for review "
-        } else if (this.rejectedMetrics) {
-            return "No KRI's is submitted for review "
-        } else {
-            return ""
-        }
+         }else if(this.allApprovedRejected && (this.unitSelected == 'all' || this.unitSelected != '' || this.rejectedMetrics )){
+             return "No KRI is submitted for review "
+         }else if(this.rejectedMetrics ){
+             return "No KRI's is submitted for review "
+         }else{
+             return ""
+         }
     }
 
-    get isApprovedValid(): boolean {
-        // (this.isReadOnly || this.groupSelected === 'all' || !this.allApprovedRejected || this.rejectedMetrics || this.unitSelected == '' || this.unitSelected == 'all');
-        return (this.isReadOnly || this.groupSelected === 'all' || this.unitSelected == '' || this.unitSelected == 'all');
-    }    
-
-    resetFilter() {
+    resetFilter(){
         this.groupSelected = "all";
         this.dataSource.filter = "";
         this.colorValues = "total"
@@ -1858,10 +1843,10 @@ export class KriMeasurementReviewComponent implements OnInit {
         // this.filterUnits({value:this.unitSelected})
         this.kriService.getkrireporteddata();
         this.groupID = 'all';
-        this.unitID = 'all';
-        this.completedata = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
+        this.unitID  = 'all';
+        this.completedata       = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
 
-        this.dataSource.data = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
+        this.dataSource.data    = JSON.parse(JSON.stringify(this.kriService?.kriMeasurments));
         this.checkedAll = null
 
     }

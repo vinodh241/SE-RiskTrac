@@ -8,9 +8,10 @@ import { IncidentService } from 'src/app/services/incident/incident.service';
     styleUrls: ['./incident-master.component.scss']
 })
 export class IncidentMasterComponent implements OnInit {
-    displayedColumns: string[] = ['Index', 'Name',  'IsActive'];// 'Action',
+
+    displayedColumns: string[] = ['Index', 'Name', 'Action', 'IsActive'];
     displayedColumns1: string[] = ['UserIndex', 'FullName', 'IsActive'];
-    displayedColumns2: string[] = ['UserIndex', 'Group', 'Unit', 'FullName', 'IsActive'];
+    displayedColumns2: string[] = ['UserIndex', 'Group','Unit','FullName','IsActive'];
     newRowName: string = "";
     isEdit: boolean = false;
     flag: number = 0;
@@ -22,11 +23,12 @@ export class IncidentMasterComponent implements OnInit {
     newEditIR: boolean = false;
     newEditIA: boolean = false;
     newEditCA: boolean = false;
-    enableUser: boolean = false;
+    enableUser:boolean = false;
     selectedUser: string = "";
     selectedUnit: string = "";
     selectedGroup: string = "";
-    filterGroup: any;
+    filterGroup:any;
+
     previousNameIT: string = "";
     previousNameSI: string = "";
     previousNameCrit: string = "";
@@ -34,6 +36,7 @@ export class IncidentMasterComponent implements OnInit {
     previousNameIR: string = "";
     previousNameIA: string = "";
     previousNameCA: string = "";
+
     @ViewChild('paginatorIT') paginatorIT!: MatPaginator;
     @ViewChild('paginatorSI') paginatorSI!: MatPaginator;
     @ViewChild('paginatorCrit') paginatorCrit!: MatPaginator;
@@ -41,10 +44,11 @@ export class IncidentMasterComponent implements OnInit {
     @ViewChild('paginatorIR') paginatorIR!: MatPaginator;
     @ViewChild('paginatorIA') paginatorIA!: MatPaginator;
     @ViewChild('paginatorCA') paginatorCA!: MatPaginator;
+
     disableEdit: boolean = false;
     filterUnitData: any;
     filteredUserData: any;
-    filterGroupData: any
+    filterGroupData:any
     filteredUnit: any;
     filterTableData: any;
     filterUnitRecords: any;
@@ -63,12 +67,15 @@ export class IncidentMasterComponent implements OnInit {
                 this.service.masterIR.paginator = this.paginatorIR;
                 this.service.masterIA.paginator = this.paginatorIA;
                 this.service.masterCA.paginator = this.paginatorCA;
+
             }
         });
     }
 
     ngOnInit(): void {
         this.service.getIncidentMaster();
+     console.log("selectedUnit",this.selectedUnit)
+
     }
 
     applyFilter(event: Event, tableName: string) {
@@ -148,11 +155,14 @@ export class IncidentMasterComponent implements OnInit {
         } else if (tableName == "OperationalRiskLoss") {
             tableData = this.service.masterORLEC;
         }
+
         this.duplicate = Object.values(tableData.data)?.filter((ele: any) => !ele.EditMode)
             .some((ele: any) => ele.Name.trim().toLowerCase() == data.trim().toLowerCase());
+        // console.log("this.duplicate::", this.duplicate)
     }
 
     approve(rowData: any, tableName: any) {
+        console.log("rowData",rowData)
         this.isEdit = true;
         let data = [];
         if (tableName == "incidentTable") {
@@ -184,26 +194,43 @@ export class IncidentMasterComponent implements OnInit {
             })
             this.service.setIncidentMaster({ "operationalRiskLossEventCategory": data }, this.isEdit);
         } else if (tableName == "IncidentReviewers") {
+            // const selectedRow = this.service.masterIR.filteredData.filter((ele) => ele.ReviewerID === rowData.ReviewerID)[0];
+            // data.push({
+            //     "reviewerID": selectedRow.ReviewerID,
+            //     "userGUID": this.selectedUser == '' ? selectedRow.UserGUID : this.service.masterUsers.filter((ele: any) => ele.FullName == this.selectedUser).map((ele: any) => ele.UserGUID)[0],
+            //     "isActive": selectedRow.IsActive
+            // });
+            // console.log("rowData::",rowData)
             data.push({
                 "approverID": rowData.ReviewerID,
                 "userGUID": rowData.UserGUID,
                 "isActive": rowData.IsActive
             })
+            // console.log("data::", data);
             this.service.setIncidentMaster({ "incidentReviewers": data }, this.isEdit);
         } else if (tableName == "IncidentApprovalUsers") {
+            // const selectedRow = this.service.masterIA.filteredData.filter((ele) => ele.ApproverID === rowData.ApproverID)[0];
+            // data.push({
+            //     "approverID": rowData.ApproverID,
+            //     "userGUID": this.selectedUser == '' ? selectedRow.UserGUID : this.service.masterUsers.filter((ele: any) => ele.FullName == this.selectedUser).map((ele: any) => ele.UserGUID)[0],
+            //     "isActive": rowData.IsActive
+            // })
+            // console.log("rowData::",rowData)
             data.push({
                 "approverID": rowData.ApproverID,
                 "userGUID": rowData.UserGUID,
                 "isActive": rowData.IsActive
             })
+            // console.log("data::", data);
             this.service.setIncidentMaster({ "incidentApprovalUsers": data }, this.isEdit);
         } else if (tableName == "IncidentCheckers") {
             data.push({
                 "checkerID": rowData.CheckerID,
                 "userGUID": rowData.UserGUID,
                 "isActive": rowData.IsActive,
-                "unitID": rowData.UnitID
+                "unitID" : rowData.UnitID
             })
+            // console.log("data::", data);
             this.service.setIncidentMaster({ "IncidentCheckers": data }, this.isEdit);
         }
         rowData.EditMode = false;
@@ -247,6 +274,7 @@ export class IncidentMasterComponent implements OnInit {
             this.service.setIncidentMaster({ "operationalRiskLossEventCategory": data }, this.isEdit);
         } else if (tableName == "IncidentReviewers") {
             this.newEditIR = false;
+            // console.log("this.userGUID::", this.selectedUserID)
             let userGUID = this.service.masterUsers.filter((ele: any) => ele.FullName == this.selectedUser).map((ele: any) => ele.UserGUID);
             data.push({
                 "userGUID": userGUID[0],
@@ -255,21 +283,29 @@ export class IncidentMasterComponent implements OnInit {
             this.service.setIncidentMaster({ "incidentReviewers": data }, this.isEdit);
         } else if (tableName == "IncidentApprovalUsers") {
             this.newEditIA = false;
+            // console.log("userDetails::",this.service.masterUsers);
             let userGUID = this.service.masterUsers.filter((ele: any) => ele.FullName == this.selectedUser).map((ele: any) => ele.UserGUID);
+            // console.log(userGUID[0]);
+            // console.log("this.userGUID::", this.selectedUserID)
             data.push({
                 "userGUID": userGUID[0],
                 "isActive": true
             });
             this.service.setIncidentMaster({ "incidentApprovalUsers": data }, this.isEdit);
-        } else if (tableName == "IncidentCheckers") {
+        }  else if (tableName == "IncidentCheckers") {
             this.newEditCA = false;
+            console.log("this.selectedUnit",this.selectedUnit)
+            // console.log("userDetails::",this.service.masterUsers);
             let userGUID = this.service.masterAddingCheckersAvlUsers.filter((ele: any) => ele.FullName == this.selectedUser).map((ele: any) => ele.UserGUID);
             let UnitID = this.service.masterAddingCheckersAvlUnit.filter((ele: any) => ele.Name === this.selectedUnit)
+            // this.service.masterAddingCheckersAvlUnit.filter((item:any) => item.GroupID === this.filterGroup[0].GroupID)
             let GroupID = this.service.masterAddingCheckersAvlGroup.filter((ele: any) => ele.GroupName == this.selectedGroup).map((ele: any) => ele.GroupID);
+            // console.log(userGUID[0]);
+            console.log("this.UnitID::", UnitID)
             data.push({
                 "userGUID": userGUID[0],
-                "unitID": UnitID[0].UnitID,
-                "group": GroupID[0],
+                "unitID" : UnitID[0].UnitID,
+                "group" : GroupID[0],
                 "isActive": true
             });
             this.service.setIncidentMaster({ "IncidentCheckers": data }, this.isEdit);
@@ -278,7 +314,7 @@ export class IncidentMasterComponent implements OnInit {
         this.newRowName = "";
         this.selectedUser = "";
         this.selectedUnit = "";
-        this.selectedGroup = "";
+        this.selectedGroup ="";
         this.duplicate = false;
     }
 
@@ -296,6 +332,7 @@ export class IncidentMasterComponent implements OnInit {
     }
 
     isUserExists(rowData: any, tableName: any) {
+        // console.log("tableName",tableName)
         if (tableName == 'IncidentReviewers') {
             return !this.service.masterIA.data.filter((ele: any) => ele.UserGUID == rowData.UserGUID)[0]?.IsActive;
         } else if (tableName == 'IncidentApprovalUsers') {
@@ -384,10 +421,11 @@ export class IncidentMasterComponent implements OnInit {
             rowData.EditMode = true;
         }
     }
-    
+
     onSelectChange() {
-        this.filterGroup = (this.service.masterAddingCheckersAvlGroup.filter((item: any) => item.GroupName === this.selectedGroup))
-        this.unitData = this.service.masterAddingCheckersAvlUnit.filter((item: any) => item.GroupID === this.filterGroup[0].GroupID)
+        // this.enableUser = true
+        this.filterGroup =  (this.service.masterAddingCheckersAvlGroup.filter((item:any) => item.GroupName === this.selectedGroup))
+        this.unitData  = this.service.masterAddingCheckersAvlUnit.filter((item:any) => item.GroupID === this.filterGroup[0].GroupID)
         this.filteredUsersData = this.service.masterAddingCheckersAvlUsers.filter((item: any) => {
             if (item.UnitName === this.selectedUnit) {
                 const mastercaMatch = this.service.masterCA.data.find((masterItem: any) =>
@@ -405,6 +443,14 @@ export class IncidentMasterComponent implements OnInit {
             }
             return true;
         });
-        this.filteredUsers = this.filteredUsersData.filter((item: any) => item.UnitName === this.selectedUnit);
-    }
+
+        this.filteredUsers = this.filteredUsersData.filter((item:any) => item.UnitName === this.selectedUnit);
+
+
+console.log("🚀 ~ file: incident-master.component.ts:445 ~ IncidentMasterComponent ~ this.filteredUsers=this.filteredUsers.reduce ~ this.filteredUsers:", this.filteredUsers)
+
+
+      }
+
 }
+

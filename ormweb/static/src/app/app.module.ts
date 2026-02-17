@@ -41,7 +41,9 @@ import { MasterRcsaModule } from './pages/rcsa/master/master-rcsa/master-rcsa.mo
 import { KriSendEmailReminderDialogComponent } from './pages/dashboards/kri/kri-measurement/kri-send-email-reminder-dialog/kri-send-email-reminder-dialog.component';
 import { RiskRegisterComponent } from './pages/risk-register/risk-register.component';
 import { RiskRegisterAssessmentWiseComponent } from './pages/rcsa/schedule-assessments/risk-register-assessment-wise/risk-register-assessment-wise.component';
-import { TemplateDialogComponent } from './includes/utilities/popups/TemplateDialog/template-dialog.component';
+// import { KriMeasurementReviewComponent } from './pages/kri-measurement-review/kri-measurement-review.component';
+// import { KriMeasurementMykriComponent } from './pages/kri-measurement-mykri/kri-measurement-mykri.component';
+
 
 @NgModule({
   declarations: [
@@ -64,7 +66,8 @@ import { TemplateDialogComponent } from './includes/utilities/popups/TemplateDia
     KriSendEmailReminderDialogComponent,
     RiskRegisterComponent,
     RiskRegisterAssessmentWiseComponent,
-    TemplateDialogComponent
+    // KriMeasurementReviewComponent,
+    // KriMeasurementMykriComponent,
   ],
   imports: [
     FormsModule,
@@ -89,7 +92,7 @@ import { TemplateDialogComponent } from './includes/utilities/popups/TemplateDia
     CoresharedModule,
     MasterRcsaModule
   ],
-  providers: [DatePipe, { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'fill' } }],
+  providers: [DatePipe,  { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'fill' } }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

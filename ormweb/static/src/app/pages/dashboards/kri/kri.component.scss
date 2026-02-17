@@ -3,41 +3,36 @@ body {
     font-size: 18px;
     color: rgba(0, 0, 0, .8);
 }
-
-.mainClassRow {
+.mainClassRow{
     display: flex;
     flex-direction: column;
     height: calc(100vh - 18.8vh);
 }
-
-.mainClassRowInner {
-    display: flex;
-    margin-top: 4vh;
+.mainClassRowInner{
+    display:flex;  
+    margin-top: 4vh; 
     height: calc(100vh - 18.8vh - 4vh - 37px);
 }
 
 .matInnerClassFirst {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    margin: 0 1.33vh 0 0;
+    display:flex;  
+    flex-direction: column; 
+    height:100%;
+    margin: 0 1.33vh 0 0; 
     width: calc(33.33% - 2.66vh);
 }
-
 .matInnerClassSecond {
-    height: 100%;
+    height:100%;
     margin: 0 2.66vh 0 2.66vh;
     width: calc(33.33% - 2.66vh);
 }
-
 .matInnerClassThird {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+    display:flex; 
+    flex-direction: column; 
+    height:100%;
     margin: 0 0 0 1.33vh;
     width: calc(33.33% - 2.66vh);
 }
-
 .rd-redbox {
     background-image: linear-gradient(#E5C7D7, #F6F6F6);
     height: 120px;
@@ -55,15 +50,13 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
 }
-
-.no-data {
+.no-data{
     height: 150px;
     display: flex;
     align-items: center;
     justify-content: center;
 
 }
-
 .rd-redbox .rd-redbox-inner div {
     text-align: center;
     margin-left: auto;
@@ -274,11 +267,10 @@ body {
     font-weight: bold;
     margin-top: 12px;
 }
-
-.custom.mat-card-content {
+.custom.mat-card-content{
     //your styles
     margin-bottom: 0px;
-}
+   }
 
 // .rd-kris-sc2{color:#A06000;font-size: 200%; font-weight:bold;}
 // .rd-kris-sc3{color:#00526C;font-size: 200%; font-weight:bold;}
@@ -294,7 +286,7 @@ body {
     box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.45);
     border-radius: 50vw;
     height: 100px;
-    width: 60px;
+    width:60px;
     text-align: center;
 }
 
@@ -383,7 +375,7 @@ body {
     border-radius: 45px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: end;
     // height: 100%;
     position: relative;
     display: inline-block;
@@ -448,28 +440,29 @@ body {
     border-top: none
 }
 
-.mat-column-unit {
+.mat-column-unit{
     width: 60%;
 }
-
 // ::ng-deep.mat-paginator-page-size.mat-paginator-range-label{
 //     display: none !important;
 // }
 
 
-.mat-row:hover {
+.mat-row:hover
+
+ {
     background-color: #fffdeb;
-}
+  }
 
 
 
-.mat-row {
+.mat-row{
     // background-color: rgb(233, 233, 230);
     height: 35px;
 }
 
 
-.viewAll {
+.viewAll{
     background-color: transparent;
     border: none;
     color: #1b61d1;
@@ -485,75 +478,41 @@ body {
 //   }
 
 .triangle-up {
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-bottom: 10px solid red;
+	width: 0;
+	height: 0;
+	border-left: 8px solid transparent;
+	border-right: 8px solid transparent;
+	border-bottom: 10px solid red;
 }
 
 .triangle-down {
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 10px solid green;
+	width: 0;
+	height: 0;
+	border-left: 8px solid transparent;
+	border-right: 8px solid transparent;
+	border-top: 10px solid green;
 }
 
-.triangle-space {
-    margin-left: 17px;
+.triangle-space{
+margin-left: 17px;
 }
 
-.all-header-fontsize {
+.all-header-fontsize{
     font-size: 2.6vh;
 }
 
-.due-date {
-    color: #DAD9D9;
+.due-date{
+    color:  #DAD9D9;
     font-size: 1.7vh;
 }
 
-.quater-dts {
-    font-size: 1.8vh;
+.quater-dts{
+    font-size:1.8vh;
 }
 
-.all-header-kris {
-    font-size: 2.2vh;
+.all-header-kris{
+    font-size:2.2vh;
 }
 
-.top-bar {
-    height: 1em;
-    width: 7vw;
-    padding: 1.3vh 0.8vw;
-    line-height: 1;
-    color: #000;
-    margin-left: 0.5vw;
-    border-radius: 20px;
-    text-align: center;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
-}
 
-.top-bar.month-one {
-    background-color: #82e49f;
-}
 
-.top-bar.month-two {
-    background-color: #e4da82;
-}
-
-.top-bar.month-three {
-    background-color: #82bde4;
-}
-
-/* NEW: state styles */
-.top-bar.active-month {
-    opacity: 1;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
-    transform: translateY(-2px);
-}
-
-.top-bar.inactive-month {
-    opacity: 0.4;
-    /* gray-out look */
-    filter: grayscale(0.4);
-}
