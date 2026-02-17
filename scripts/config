@@ -1,0 +1,4 @@
+# Server host for SE-RiskTrac (used when deployed on a remote/server host).
+# Scripts use this to show the correct login and app URLs.
+# Leave unset or set to empty to show localhost.
+export APP_HOST="${APP_HOST:-10.0.1.32}"

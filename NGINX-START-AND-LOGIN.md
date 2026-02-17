@@ -1,5 +1,18 @@
 # How to Start Nginx & Check the Application Login Page
 
+## Deployed on a server (e.g. 10.0.1.32)
+
+When the stack runs on a **server** (e.g. **10.0.1.32**), open the app from your browser using the **server IP** and port **8080**:
+
+- **Login page:** **http://10.0.1.32:8080/**
+- **Health:** http://10.0.1.32:8080/health
+- **ORM:** http://10.0.1.32:8080/orm/
+- **User Management:** http://10.0.1.32:8080/user-management/
+
+The scripts in `scripts/` use `scripts/config` with `APP_HOST=10.0.1.32` so start/status output shows these URLs.
+
+---
+
 ## Prerequisites
 
 - Docker and Docker Compose installed
@@ -30,41 +43,49 @@ This starts: **authapi**, **umapi**, **ormapi**, **bcmapi**, **umweb**, **ormweb
 docker ps
 ```
 
-You should see a container named **nginx** with port **80->80**. Optional:
+You should see a container named **nginx** with port **8080->80** (or 80->80 if you use port 80). Optional:
 
 ```bash
 docker logs nginx
 ```
 
-To hit Nginx directly (should return 200):
+To hit Nginx directly from the server (should return 200):
 
 ```bash
-curl -s -o NUL -w "%{http_code}" http://localhost/health
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/health
 ```
 
-You should see `200`.
+You should see `200`. (On the server use port 8080; from another machine use http://10.0.1.32:8080/health.)
 
 ## 4. Open the application login page
 
-The **login page** is served by **hostweb** at the **root** URL:
+The **login page** is served by **hostweb** at the **root** URL.
 
-- **URL:** **http://localhost/**
-- Or: **http://localhost/login** (redirects as needed)
-- If you use a hostname (e.g. after configuring DNS/hosts): **http://serisktrac.secureyes.net/**
+**If the app is on a server (e.g. 10.0.1.32):**
+
+- **URL:** **http://10.0.1.32:8080/**  
+- From your PC/laptop, open a browser and go to that URL.
+
+**If running on the same machine (local):**
+
+- **URL:** **http://localhost:8080/**  
+- Or with a hostname: **http://serisktrac.secureyes.net/** (if DNS points to the server).
 
 Steps:
 
-1. Open a browser.
-2. Go to: **http://localhost/**
+1. Open a browser (on your PC or on the server).
+2. Go to: **http://10.0.1.32:8080/** (replace with your server IP if different).
 3. You should see the SE-RiskTrac **login page** (hostweb).
 
 ## 5. Other useful URLs (after login)
 
 | URL | App |
 |-----|-----|
-| http://localhost/ | Host web – **login page** (default) |
-| http://localhost/user-management/ | User Management web |
-| http://localhost/orm/ | ORM web |
+| http://10.0.1.32:8080/ | Host web – **login page** (default) |
+| http://10.0.1.32:8080/user-management/ | User Management web |
+| http://10.0.1.32:8080/orm/ | ORM web |
+
+*(Use your server IP instead of 10.0.1.32 if different; use localhost:8080 when testing on the same machine.)*
 
 ## 6. Seeing "hello from nginx web server" instead of the login page?
 
