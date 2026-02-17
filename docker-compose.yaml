@@ -17,9 +17,9 @@ services:
     image: vinod9072/ormapi:v1
     container_name: ormapi
   
-  ormweb:
-     image: vinod9072/ormweb:v1
-     container_name: ormweb
+  # ormweb:
+  #    image: vinod9072/ormweb:v1
+  #    container_name: ormweb
 
   # bcmapi:
   #   image: vinod9072/bcmapi:v1
