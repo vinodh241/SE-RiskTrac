@@ -10,7 +10,7 @@ services:
     image: vinod9072/umapi:v1
     container_name: umapi
   umweb:
-    image: umweb:v1
+    image: vinod9072/umweb:v1
     container_name: umweb
 
   ormapi:
