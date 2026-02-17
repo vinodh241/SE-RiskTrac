@@ -6,32 +6,31 @@ networks:
     # external: true  # Uncomment if you created the network outside
 
 services:
-
   umapi:
-    image: um:v1
+    image: vinod9072/umapi:v1
     container_name: umapi
   umweb:
     image: umweb:v1
     container_name: umweb
 
   ormapi:
-    image: orm:v1
+    image: vinod9072/ormapi:v1
     container_name: ormapi
   
   ormweb:
-     image: ormweb:v1
+     image: vinod9072/ormweb:v1
      container_name: ormweb
 
-  bcmapi:
-    image: bcm:v1
-    container_name: bcmapi
+  # bcmapi:
+  #   image: vinod9072/bcmapi:v1
+  #   container_name: bcmapi
 
   authapi:
-    image: auth:v1
+    image: vinod9072/authapi:v1
     container_name: authapi
 
   hostweb:
-    image: hostweb:v1
+    image: vinod9072/hostweb:v1
     container_name: hostweb
 
   # bcmweb:
