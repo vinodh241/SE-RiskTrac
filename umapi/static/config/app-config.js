@@ -64,9 +64,10 @@ const LOG_CONFIG = {
 };
 
 /**
- * If AMLAK Auth application deployed into local machine
+ * Auth API base URL. In Docker use AUTH_SERVICE_URL=http://authapi:6001 (service name).
+ * When not set, defaults to host:6001 for non-Docker deployment.
  */
-const AUTH_SERVICE_URL = "http://10.0.1.32:6001";
+const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || "http://10.0.1.32:6001";
 
 /**
  * If AMLAK Auth application deployed into development VM machine

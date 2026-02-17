@@ -13,10 +13,14 @@ services:
       - "6001:6001"
 
   umapi:
+    build: ./umapi
     image: vinod9072/umapi:v1
     container_name: umapi
     ports:
       - "6002:6002"
+    environment:
+      # umapi calls authapi for get-key/login; use Docker service name when all run in same stack
+      - AUTH_SERVICE_URL=http://authapi:6001
 
   ormapi:
     image: vinod9072/ormapi:v1
