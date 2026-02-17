@@ -47,6 +47,7 @@ services:
   #   container_name: bcmweb
 
   nginx:
+    build: ./nginx
     image: vinod9072/nginx:v1
     container_name: nginx
     ports:
