@@ -41,6 +41,7 @@ services:
     image: vinod9072/nginx:v1
     container_name: nginx
     ports:
+    - "80:80"
     depends_on:
       - umweb
     networks:
