@@ -1,9 +1,10 @@
 FROM nginx:1.25-alpine
 
-# Remove default nginx static assets
-RUN rm -rf /usr/share/nginx/html/*
+# Remove default nginx static assets and any default server config (avoids "hello from nginx" or welcome page)
+RUN rm -rf /usr/share/nginx/html/* && \
+    rm -f /etc/nginx/conf.d/default.conf
 
-# Copy nginx configuration
+# Copy nginx configuration (our config does not include conf.d, so root / goes to hostweb)
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Set proper permissions (nginx runs as root but drops privileges in nginx.conf)
