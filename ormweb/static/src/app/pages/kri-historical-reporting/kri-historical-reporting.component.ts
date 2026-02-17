@@ -93,7 +93,6 @@ export class KriHistoricalReportingComponent implements OnInit {
 
     onYearChange(selectedYear:any) {
         this.kriService.kriHistoricSelectedYear = selectedYear;
-        console.log('this.kriService.kriHistoricSelectedYear: ', this.kriService.kriHistoricSelectedYear);
         this.kriService.getKriHistoricalReportedMetricsData();
     }
     exportAsExcel(i: number, groupName: string, unitName: string, data: any) {
@@ -144,8 +143,6 @@ export class KriHistoricalReportingComponent implements OnInit {
     }
 
     getAllUnitRowsFilteredLength(): number {
-        console.log('this.kriService.kriHistoricalReportedSelectedUnitNameRows: ', this.kriService.kriHistoricalReportedSelectedUnitNameRows);
-
         let filterLength = this.kriService.kriHistoricalReportedSelectedUnitNameRows
             ?.map((unit: any) => unit.Metrics.filteredData.length)
             .reduce((a: any, b: any) => (a + b), 0);

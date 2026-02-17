@@ -31,7 +31,7 @@ export class DashboardService extends RestService {
   public gotincidentDashboardMaster: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public gotYearQuater: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public gotOverallDashboardMaster: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  public riskMetricData: any=[];
+  public riskMetricData: any = [];
   public dashboardRCSAMaster: any;
   public dashboardRAMaster: any;
   public dashboardKRIMaster: any;
@@ -39,21 +39,22 @@ export class DashboardService extends RestService {
   public dashboardKRIColorMaster: any;
   public dashboardRAColor: any;
 
-  public inAppRCSA:any;
-  public inAppRA:any;
-  public inAppKRI:any;
-  public inAppINC:any;
-  public CurrencyType: any = environment.currency;
-  KeyRiskIndicatorScore: any []=[];
+  public inAppRCSA: any;
+  public inAppRA: any;
+  public inAppKRI: any;
+  public inAppINC: any;
+  public CurrencyType: any;
+  KeyRiskIndicatorScore: any[] = [];
   KeyRiskIndicatorZone!: MatTableDataSource<any>;
   // KeyRiskIndicatorUnits!: MatTableDataSource<any>;
   KeyRiskIndicatorCycleReporting: any;
   KeyRiskIndicatorChart: any;
   KeyRiskIndicatorData!: any;
-    quarterData: any;
-    yearData: any;
-    quaterValue: any;
-    yearValue: any;
+  quarterData: any;
+  yearData: any;
+  quaterValue: any;
+  yearValue: any;
+  reportingFrequencyData: any[] =[];
 
   constructor(
     private utils: UtilsService,
@@ -64,8 +65,8 @@ export class DashboardService extends RestService {
     super(_http, _dialog);
   }
 
-  private processKeyRiskIndicator(res: any):void {
-    this.KeyRiskIndicatorData=res.result
+  private processKeyRiskIndicator(res: any): void {
+    this.KeyRiskIndicatorData = res.result
     // console.log(this.KeyRiskIndicatorData)
   }
 
@@ -73,8 +74,6 @@ export class DashboardService extends RestService {
     this.post("/operational-risk-management/dashboard/get-dashboard-kri", {}).subscribe(res => {
       next:
       if (res.success == 1) {
-        console.log(res);
-
         this.processRiskIndicatorSchedule(res)
       } else {
         if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
@@ -83,13 +82,13 @@ export class DashboardService extends RestService {
           this.popupInfo("Unsuccessful", res.error.errorMessage)
       }
     });
-    // return  this.post("/operational-risk-management/dashboard/get-dashboard-kri",{})
   }
 
   processRiskIndicatorSchedule(response: any): void {
     this.masterIndicator = response.result.KRIData;
     this.masterKRICode = response.result.KRIColorData;
     this.masterIndicatorNew = JSON.stringify(response.result.KRIData);
+    this.reportingFrequencyData = response.result.reportingFrequencyData;
     this.gotMasterIndicator.next(true);
   }
 
@@ -123,19 +122,19 @@ export class DashboardService extends RestService {
     //     "token": "eyJ0eXAiOiJKV"
     //   })
     // } else {
-      this.post("/operational-risk-management/dashboard/get-dashboard-rcsa", {}).subscribe(res => {
-        next:
-        if (res.success == 1) {
-          console.log(res);
+    this.post("/operational-risk-management/dashboard/get-dashboard-rcsa", {}).subscribe(res => {
+      next:
+      if (res.success == 1) {
+        // console.log(res);
 
-          this.processRiskAssessmentSchedule(res)
-        } else {
-          if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
-            this.utils.relogin(this._document);
-          else
-            this.popupInfo("Unsuccessful", res.error.errorMessage)
-        }
-      });
+        this.processRiskAssessmentSchedule(res)
+      } else {
+        if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
+          this.utils.relogin(this._document);
+        else
+          this.popupInfo("Unsuccessful", res.error.errorMessage)
+      }
+    });
     // }
   }
 
@@ -147,73 +146,73 @@ export class DashboardService extends RestService {
 
   getInheritRiskSchedule(): void {
     // if (environment.dummyData) {
-      this.processInheritRiskSchedule({
-        "success": 1,
-        "message": "Data fetch from DB successful.",
-        "result": {
-          "analysisData": [{
-            "name": "Operations",
-            "value": 11
+    this.processInheritRiskSchedule({
+      "success": 1,
+      "message": "Data fetch from DB successful.",
+      "result": {
+        "analysisData": [{
+          "name": "Operations",
+          "value": 11
+        }, {
+          "name": "Treasury",
+          "value": 8
+        }, {
+          "name": "Retail Credit",
+          "value": 3
+        }, {
+          "name": "Financial Reporting & Planning",
+          "value": 1
+        }],
+        "inheritRiskFirstStep": [
+          {
+            "color": "#cfcfcf",
+            "name": "High Risk Count",
+            "y": 34
           }, {
-            "name": "Treasury",
-            "value": 8
+            "color": "#cfcfcf",
+            "name": "# of Risk migrated from Low/Mid to High",
+            "y": 12
           }, {
-            "name": "Retail Credit",
-            "value": 3
+            "color": "#fc7575",
+            "name": "# of Risk migrated from High to Low/Mid",
+            "y": 37
+          }
+        ],
+        "inheritRiskSecondStep": [
+          {
+            "color": "#fc7575",
+            "name": "High Risk Count",
+            "y": 39
           }, {
-            "name": "Financial Reporting & Planning",
-            "value": 1
-          }],
-          "inheritRiskFirstStep": [
-            {
-              "color": "#cfcfcf",
-              "name": "High Risk Count",
-              "y": 34
-            }, {
-              "color": "#cfcfcf",
-              "name": "# of Risk migrated from Low/Mid to High",
-              "y": 12
-            }, {
-              "color": "#fc7575",
-              "name": "# of Risk migrated from High to Low/Mid",
-              "y": 37
-            }
-          ],
-          "inheritRiskSecondStep": [
-            {
-              "color": "#fc7575",
-              "name": "High Risk Count",
-              "y": 39
-            }, {
-              "color": "#fc7575",
-              "name": "# of Risk migrated from Low/Mid to High",
-              "y": 24
-            }, {
-              "color": "#8ae6d0",
-              "name": "# of Risk migrated from High to Low/Mid",
-              "y": 26
-            }
-          ],
-          "legendsFordata": [
-            {
-              "color": "#cfcfcf",
-              "name": "Previous Data"
-            }, {
-              "color": "#fc7575",
-              "name": "Current Data High Risk"
-            }, {
-              "color": "#8ae6d0",
-              "name": "Current Data Low/Med Risk"
-            }
-          ],
+            "color": "#fc7575",
+            "name": "# of Risk migrated from Low/Mid to High",
+            "y": 24
+          }, {
+            "color": "#8ae6d0",
+            "name": "# of Risk migrated from High to Low/Mid",
+            "y": 26
+          }
+        ],
+        "legendsFordata": [
+          {
+            "color": "#cfcfcf",
+            "name": "Previous Data"
+          }, {
+            "color": "#fc7575",
+            "name": "Current Data (Priority >= High) Risk"
+          }, {
+            "color": "#8ae6d0",
+            "name": "Current Data Low/Med Risk"
+          }
+        ],
 
-        },
-        "error": {
-          "errorCode": null,
-          "errorMessage": null
-        },
-        "token": "eyJ0eXAiOiJKV"
-      })
+      },
+      "error": {
+        "errorCode": null,
+        "errorMessage": null
+      },
+      "token": "eyJ0eXAiOiJKV"
+    })
     // } else {
     //   this.post("/operational-risk-management/incidents/get-incident-master-data", {}).subscribe(res => {
     //     next:
@@ -235,73 +234,73 @@ export class DashboardService extends RestService {
 
   getResidualRiskSchedule(): void {
     // if (environment.dummyData) {
-      this.processResidualRiskSchedule({
-        "success": 1,
-        "message": "Data fetch from DB successful.",
-        "result": {
-          "analysisData": [{
-            "name": "Management",
-            "value": 5
+    this.processResidualRiskSchedule({
+      "success": 1,
+      "message": "Data fetch from DB successful.",
+      "result": {
+        "analysisData": [{
+          "name": "Management",
+          "value": 5
+        }, {
+          "name": "Customer Care",
+          "value": 3
+        }, {
+          "name": "Treasury",
+          "value": 2
+        }, {
+          "name": "Financial Reporting & Planning",
+          "value": 1
+        }],
+        "ResidualRiskFirstStep": [
+          {
+            "color": "#cfcfcf",
+            "name": "(Priority >= High) Risk Count",
+            "y": 17
           }, {
-            "name": "Customer Care",
-            "value": 3
+            "color": "#cfcfcf",
+            "name": "# of Risk migrated from Low/Mid to (Priority >= High)",
+            "y": 8
           }, {
-            "name": "Treasury",
-            "value": 2
+            "color": "#fc7575",
+            "name": "# of Risk migrated from (Priority >= High) to Low/Mid",
+            "y": 17
+          }
+        ],
+        "ResidualRiskSecondStep": [
+          {
+            "color": "#fc7575",
+            "name": "(Priority >= High) Risk Count",
+            "y": 24
           }, {
-            "name": "Financial Reporting & Planning",
-            "value": 1
-          }],
-          "ResidualRiskFirstStep": [
-            {
-              "color": "#cfcfcf",
-              "name": "High Risk Count",
-              "y": 17
-            }, {
-              "color": "#cfcfcf",
-              "name": "# of Risk migrated from Low/Mid to High",
-              "y": 8
-            }, {
-              "color": "#fc7575",
-              "name": "# of Risk migrated from High to Low/Mid",
-              "y": 17
-            }
-          ],
-          "ResidualRiskSecondStep": [
-            {
-              "color": "#fc7575",
-              "name": "High Risk Count",
-              "y": 24
-            }, {
-              "color": "#fc7575",
-              "name": "# of Risk migrated from Low/Mid to High",
-              "y": 12
-            }, {
-              "color": "#8ae6d0",
-              "name": "# of Risk migrated from High to Low/Mid",
-              "y": 14
-            }
-          ],
-          "legendsFordata": [
-            {
-              "color": "#cfcfcf",
-              "name": "Previous Data"
-            }, {
-              "color": "#fc7575",
-              "name": "Current Data High Risk"
-            }, {
-              "color": "#8ae6d0",
-              "name": "Current Data Low/Med Risk"
-            }
-          ],
+            "color": "#fc7575",
+            "name": "# of Risk migrated from Low/Mid to (Priority >= High)",
+            "y": 12
+          }, {
+            "color": "#8ae6d0",
+            "name": "# of Risk migrated from (Priority >= High) to Low/Mid",
+            "y": 14
+          }
+        ],
+        "legendsFordata": [
+          {
+            "color": "#cfcfcf",
+            "name": "Previous Data"
+          }, {
+            "color": "#fc7575",
+            "name": "Current Data (Priority >= High) Risk"
+          }, {
+            "color": "#8ae6d0",
+            "name": "Current Data Low/Med Risk"
+          }
+        ],
 
-        },
-        "error": {
-          "errorCode": null,
-          "errorMessage": null
-        },
-        "token": "eyJ0eXAiOiJKV"
-      })
+      },
+      "error": {
+        "errorCode": null,
+        "errorMessage": null
+      },
+      "token": "eyJ0eXAiOiJKV"
+    })
     // } else {
     //   this.post("/operational-risk-management/dashboard/get-dashboard-rcsa", {}).subscribe(res => {
     //     next:
@@ -323,66 +322,66 @@ export class DashboardService extends RestService {
 
   getMhrSchedule(): void {
     // if (environment.dummyData) {
-      this.processMhrSchedule({
-        "success": 1,
-        "message": "Data fetch from DB successful.",
-        "result": {
-          "inherent": [
-            {
-              "name": "Corporate Credit",
-              "y": 12
-            }, {
-              "name": "Collection",
-              "y": 11
-            }, {
-              "name": "Cyber Security",
-              "y": 10
-            }, {
-              "name": "Risk Management",
-              "y": 7
-            }, {
-              "name": "Business Countinuity",
-              "y": 6
-            }, {
-              "name": "Corporate Credit",
-              "y": 12
-            }, {
-              "name": "Collection",
-              "y": 11
-            }
-          ],
-          "residual": [
-            {
-              "name": "Corporate Credit",
-              "y": 15
-            }, {
-              "name": "Collection",
-              "y": 11
-            }, {
-              "name": "Cyber Security",
-              "y": 13
-            }, {
-              "name": "Risk Management",
-              "y": 3
-            }, {
-              "name": "Business Countinuity",
-              "y": 7
-            }, {
-              "name": "Corporate Credit",
-              "y": 15
-            }, {
-              "name": "Collection",
-              "y": 11
-            }
-          ],
+    this.processMhrSchedule({
+      "success": 1,
+      "message": "Data fetch from DB successful.",
+      "result": {
+        "inherent": [
+          {
+            "name": "Corporate Credit",
+            "y": 12
+          }, {
+            "name": "Collection",
+            "y": 11
+          }, {
+            "name": "Cyber Security",
+            "y": 10
+          }, {
+            "name": "Risk Management",
+            "y": 7
+          }, {
+            "name": "Business Countinuity",
+            "y": 6
+          }, {
+            "name": "Corporate Credit",
+            "y": 12
+          }, {
+            "name": "Collection",
+            "y": 11
+          }
+        ],
+        "residual": [
+          {
+            "name": "Corporate Credit",
+            "y": 15
+          }, {
+            "name": "Collection",
+            "y": 11
+          }, {
+            "name": "Cyber Security",
+            "y": 13
+          }, {
+            "name": "Risk Management",
+            "y": 3
+          }, {
+            "name": "Business Countinuity",
+            "y": 7
+          }, {
+            "name": "Corporate Credit",
+            "y": 15
+          }, {
+            "name": "Collection",
+            "y": 11
+          }
+        ],
 
-        },
-        "error": {
-          "errorCode": null,
-          "errorMessage": null
-        },
-        "token": "eyJ0eXAiOiJKV"
-      })
+      },
+      "error": {
+        "errorCode": null,
+        "errorMessage": null
+      },
+      "token": "eyJ0eXAiOiJKV"
+    })
     // } else {
 
     // this.post("/operational-risk-management/dashboard/get-dashboard-rcsa", { }).subscribe(res => {
@@ -597,18 +596,18 @@ export class DashboardService extends RestService {
   // }
 
 
-getDashboardRiskAppetite(): any {
-  this.post("/operational-risk-management/dashboard/get-dashboard-risk-appetite", {}).subscribe(res => {
+  getDashboardRiskAppetite(): any {
+    this.post("/operational-risk-management/dashboard/get-dashboard-risk-appetite", {}).subscribe(res => {
       if (res.success == 1) {
-          this.processRiskAppetiteSchedule(res.result);
+        this.processRiskAppetiteSchedule(res.result);
       } else {
-          if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
-              this.utils.relogin(this._document);
-          else
-              this.popupInfo("Unsuccessful", res.error.errorMessage)
+        if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
+          this.utils.relogin(this._document);
+        else
+          this.popupInfo("Unsuccessful", res.error.errorMessage)
       }
-  });
-}
+    });
+  }
 
   processRiskAppetiteSchedule(response: any): void {
     this.RAMaster = response;
@@ -628,17 +627,17 @@ getDashboardRiskAppetite(): any {
               TotalReported: 1210,
             },
             {
-                Id: 2,
+              Id: 2,
               Quarter: 'Q2-21',
               TotalReported: 1014,
             },
             {
-                Id: 3,
+              Id: 3,
               Quarter: 'Q3-23',
               TotalReported: 123,
             },
             {
-                Id: 4,
+              Id: 4,
               Quarter: 'Q4-22',
               TotalReported: 1.582,
             },
@@ -679,11 +678,11 @@ getDashboardRiskAppetite(): any {
               totalScore: 387,
               persentage: "20%",
               quarterWise: "position",
-              title:"testing 1",
-              status:"Remidiation",
-              incidentDate:"28 Mar 2023",
-              reportingDate:"28 Mar 2023",
-              amount:"2,80,000"
+              title: "testing 1",
+              status: "Remidiation",
+              incidentDate: "28 Mar 2023",
+              reportingDate: "28 Mar 2023",
+              amount: "2,80,000"
             },
             {
               id: 2,
@@ -691,11 +690,11 @@ getDashboardRiskAppetite(): any {
               totalScore: 350,
               persentage: "10%",
               quarterWise: "position",
-              title:"testing 1",
-              status:"Remidiation",
-              incidentDate:"28 Mar 2023",
-              reportingDate:"28 Mar 2023",
-              amount:"2,80,000"
+              title: "testing 1",
+              status: "Remidiation",
+              incidentDate: "28 Mar 2023",
+              reportingDate: "28 Mar 2023",
+              amount: "2,80,000"
             },
             {
               id: 3,
@@ -703,11 +702,11 @@ getDashboardRiskAppetite(): any {
               totalScore: 254,
               persentage: "5%",
               quarterWise: "position",
-              title:"testing 1",
-              status:"Remidiation",
-              incidentDate:"28 Mar 2023",
-              reportingDate:"28 Mar 2023",
-              amount:"2,80,000"
+              title: "testing 1",
+              status: "Remidiation",
+              incidentDate: "28 Mar 2023",
+              reportingDate: "28 Mar 2023",
+              amount: "2,80,000"
             },
           ],
           // identificationCounts
@@ -738,50 +737,52 @@ getDashboardRiskAppetite(): any {
   }
 
   processIncidentdata(response: any): void {
-    console.log("response",response)
+    // console.log("response", response)
     this.master = response.result;
     this.gotMaster.next(true);
   }
 
 
   processIncident(response: any): void {
-    console.log("response",response)
-    this.dashboardIncMaster = response;
+    // console.log("response", response)
+    this.dashboardIncMaster = Array.isArray(response) ? response : [];
     this.gotincidentDashboardMaster.next(true);
   }
 
   getIncidentData(): any {
-    this.post("/operational-risk-management/dashbaord/incident/get-dashboard-incident", { }).subscribe(res => {
-        if (res.success == 1) {
-            this.processIncident(res.result);
-        } else {
-            if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
-                this.utils.relogin(this._document);
-            else
-                this.popupInfo("Unsuccessful", res.error.errorMessage)
-        }
+    this.post("/operational-risk-management/dashbaord/incident/get-dashboard-incident", {}).subscribe(res => {
+      if (res.success == 1) {
+        this.processIncident(res.result);
+      } else {
+        if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
+          this.utils.relogin(this._document);
+        else
+          this.popupInfo("Unsuccessful", res.error.errorMessage)
+      }
     });
-}
+  }
 
-getOverallDashbardData(year:any): any {
-    this.post("/operational-risk-management/dashbaord/overall/get-overall-dashboard", {  data: {
+  getOverallDashbardData(year: any): any {
+    this.post("/operational-risk-management/dashbaord/overall/get-overall-dashboard", {
+      data: {
         Year: year,
-      }}).subscribe(res => {
-        if (res.success == 1) {
-            this.processDashboardData(res.result);
-        } else {
-            if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
-                this.utils.relogin(this._document);
-            else
-                this.popupInfo("Unsuccessful", res.error.errorMessage)
-        }
+      }
+    }).subscribe(res => {
+      if (res.success == 1) {
+        this.processDashboardData(res.result);
+      } else {
+        if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
+          this.utils.relogin(this._document);
+        else
+          this.popupInfo("Unsuccessful", res.error.errorMessage)
+      }
     });
-}
+  }
 
-processDashboardData(response: any):any {
+  processDashboardData(response: any): any {
     this.dashboardRCSAMaster = response.RCSA_DATA;
-    this.dashboardRAMaster  = response.RA_DATA;
-    this.dashboardRAColor  = response.RA_COLOR_DATA;
+    this.dashboardRAMaster = response.RA_DATA;
+    this.dashboardRAColor = response.RA_COLOR_DATA;
     this.dashboardKRIMaster = JSON.stringify(response.KRI_DATA);
     this.dashboardKRIColorMaster = response.KRI_COLOR_DATA;
     this.dashboardINCMaster = response.INCIDENT_DATA;
@@ -789,23 +790,23 @@ processDashboardData(response: any):any {
     this.inAppKRI = response.KRIInApp
     this.inAppRA = response.RAInApp
     this.inAppINC = response.INCInApp
-    // this.CurrencyType = response.CurrencyType
+    this.CurrencyType = response.CurrencyType
     this.gotOverallDashboardMaster.next(true);
-}
+  }
 
 
-   getQuarterData(data:any){
-      this.quarterData = data
-      this.getYearQuarterData()
-   }
-   getYearData(data:any){
+  getQuarterData(data: any) {
+    this.quarterData = data
+    this.getYearQuarterData()
+  }
+  getYearData(data: any) {
     this.yearData = data
     this.getYearQuarterData()
-   }
+  }
 
-   getYearQuarterData(){
+  getYearQuarterData() {
     this.quaterValue = this.quarterData
     this.yearValue = this.yearData
     this.gotYearQuater.next(true);
-    }
+  }
 }

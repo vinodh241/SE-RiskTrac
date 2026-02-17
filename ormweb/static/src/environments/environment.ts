@@ -5,15 +5,14 @@
 export const environment = {
   dummyData: false,
   production: false,
-//   umapiUrl: "http://localhost:46002", // local API
-  umapiUrl: "http://10.0.1.21:46002", // DEV API
-  // umapiUrl: "http://10.0.1.6:8002", // QA
-  // ormapiUrl: "http://localhost:46003", // Local API
-  ormapiUrl: "http://10.0.1.21:46003", // Dev API
- // ormapiUrl: "http://10.0.1.6:8003", // QA API
+  umapiUrl: "http://localhost:9002", // local API
+  // umapiUrl: "http://10.0.1.21:9002", // DEV API
+  // umapiUrl: "http://10.0.1.23:9002", // QA API
+  ormapiUrl: "http://localhost:9003", // Local API
+  // ormapiUrl: "http://10.0.1.21:9003", // Dev API
+  // ormapiUrl: "http://10.0.1.23:9003", // QA API
   hostUrl: "http://localhost:5000",  // local UI URL
-   //hostUrl: "http://10.0.1.5:5000,"
-  currency: 'SAR',
+  currency: 'ZMW',
 };
 
 /*

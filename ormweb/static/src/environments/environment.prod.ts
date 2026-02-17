@@ -1,9 +1,9 @@
 export const environment = {
   dummyData: false,
   production: true,
-  umapiUrl:'umapi',
-  ormapiUrl:'ormapi',
-  hostUrl: "https://serisktrac.secureyes.net",
-  bcmapiUrl:'bcmapi',
-  currency: 'SAR'
-  };
+  umapiUrl: 'umapi',
+  ormapiUrl: 'ormapi',
+  hostUrl: "https://risktrac.zra.org.zm",
+  bcmapiUrl: 'bcmapi',
+  currency: 'ZMW'
+};

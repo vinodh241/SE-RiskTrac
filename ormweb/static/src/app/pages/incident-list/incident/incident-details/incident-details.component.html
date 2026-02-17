@@ -16,18 +16,13 @@
                 <mat-form-field appearance="fill">
                     <mat-label>Select a Group</mat-label>
                     <mat-select formControlName="groupName" [(ngModel)]="incident.GroupID"
-                    (selectionChange)="selectedUnit($event, incident)"
-                    [disabled]="incident.StatusID >= 1"
-                    [matTooltip]="incident.StatusID >= 1 ? 'Group cannot be edited once it is saved':''">
-            <mat-option *ngFor="let group of service.info?.groups" [value]="group.GroupID">
-                {{ group?.Name }}
-            </mat-option>
-        </mat-select>
-
-
+                        (selectionChange)="selectedUnit($event, incident)" [disabled]="incident.StatusID >= 1"
+                        [matTooltip]="incident.StatusID >= 1 ? 'Group cannot be edited once it is saved':''">
+                        <mat-option *ngFor="let group of service.info?.groups" [value]="group.GroupID">
+                            {{ group?.Name }}
+                        </mat-option>
+                    </mat-select>
                 </mat-form-field>
-                <!-- <div class="grpvalidation">Group cannot be edited once it is saved</div> -->
-
                 <div class="form-label">
                     <label>Unit Name <span style="color: red;">*</span></label>
                 </div>
@@ -40,12 +35,9 @@
                             {{unit?.Name}}
                         </mat-option>
                     </mat-select>
-
                 </mat-form-field>
-
             </div>
             <div class="grpvalidation" *ngIf="!isSaved">Group and Unit cannot be edited once it is saved</div>
-
             <h3>Incident Information</h3>
             <mat-divider></mat-divider>
             <div class="form-row">
@@ -77,24 +69,13 @@
                 <div class="form-label">
                     <label>Incident Date <span style="color: red;">*</span></label>
                 </div>
-                <!-- <mat-form-field appearance="fill" (click)="picker.open()">
-                    <input matInput formControlName="incidentDate" [matDatepicker]="picker" [max]="maxDate"
-                        [ngModel]="incident.IncidentDate" (dateChange)="changeIncidentDate('change', $event)">
-                    <mat-datepicker-toggle matSuffix [for]=picker></mat-datepicker-toggle>
-                    <mat-datepicker #picker></mat-datepicker>
-                </mat-form-field> -->
-                <!-- Add the (keydown) event handler to the incidentDate input field -->
-                <mat-form-field appearance="fill" (click)="picker.open()">
+                 <mat-form-field appearance="fill" (click)="picker.open()">
                     <input matInput formControlName="incidentDate" [max]="maxDate" [matDatepicker]="picker"
                         [ngModel]="incident.IncidentDate" (dateChange)="changeIncidentDate('change', $event)"
                         (keydown.enter)="$event.preventDefault()">
                     <mat-datepicker-toggle matSuffix [for]=picker></mat-datepicker-toggle>
                     <mat-datepicker #picker></mat-datepicker>
                 </mat-form-field>
-
-                <!-- <mat-form-field appearance="fill">
-                    <input type="date" matInput formControlName="incidentDate" [ngModel]="incident.IncidentDate | date:'yyyy-MM-dd'">
-                </mat-form-field> -->
             </div>
             <div class="form-row">
                 <div class="form-label">
@@ -173,26 +154,43 @@
             </div>
             <div class="form-row">
                 <div class="form-label">
-                    <label>Loss Amount({{currency}})</label>
+                    <label>Direct Loss Amount ({{ currency }})</label>
                 </div>
                 <mat-form-field appearance="fill">
-                    <input matInput type="number" formControlName="lossAmount" min="0" [(ngModel)]="incident.LossAmount"
-                        (change)="onChangeSAR()">
+                    <input matInput type="number" formControlName="DirectLoss" [(ngModel)]="incident.DirectLoss" (change)="onChangeSAR('DirectLoss')" />
                 </mat-form-field>
                 <div class="form-label">
-                    <label>Identification Date</label>
+                    <label>Indirect Loss Amount ({{ currency }})</label>
                 </div>
+                <mat-form-field appearance="fill">
+                    <input matInput type="number" formControlName="IndirectLoss" [(ngModel)]="incident.IndirectLoss" (change)="onChangeSAR('IndirectLoss')" />
+                </mat-form-field>
+            </div>
+            <div class="form-row">
+                <div class="form-label">
+                    <label>Recovered Amount ({{ currency }})</label>
+                </div>                
+                <mat-form-field appearance="fill">                    
+                    <input matInput type="number" formControlName="Recoveries" [(ngModel)]="incident.Recoveries" (change)="onChangeSAR('Recoveries')" />
+                </mat-form-field>
+                <div class="form-label">
+                    <label>Loss Amount ({{ currency }})</label>
+                </div>                
+                <mat-form-field appearance="fill">                     
+                    <input matInput type="number" formControlName="lossAmount" [(ngModel)]="incident.LossAmount" (change)="onChangeSAR('lossAmount')" readonly/>
+                </mat-form-field>                
+            </div>
+            <div class="form-row">
+                <div class="form-label">
+                    <label>Identification Date</label>
+                </div>  
                 <mat-form-field appearance="fill" (click)="picker1.open()">
                     <input matInput formControlName="identificationDate" [max]="maxDate" [matDatepicker]="picker1"
-                        [ngModel]="incident.IdentificationDate"
-                        (dateChange)="changeIdentificationDate('change', $event)"
-                        (keydown.enter)="$event.preventDefault()">
-                    <mat-datepicker-toggle matSuffix [for]=picker1></mat-datepicker-toggle>
+                        [ngModel]="incident.IdentificationDate" (dateChange)="changeIdentificationDate('change', $event)"
+                        (keydown.enter)="$event.preventDefault()" />
+                    <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
                     <mat-datepicker #picker1></mat-datepicker>
                 </mat-form-field>
-                <!-- <mat-form-field appearance="fill">
-                    <input matInput type="date" formControlName="identificationDate" [ngModel]="incident.IdentificationDate | date:'yyyy-MM-dd'">
-                </mat-form-field> -->
             </div>
             <div class="form-row">
                 <div class="form-label">
@@ -214,9 +212,6 @@
             <div class="form-row">
                 <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                 <label style="font-weight: bold;">Total {{getLossTotal()}}%</label>
-                <!-- <mat-error *ngIf="!validateLossValue()">&nbsp;&nbsp;&nbsp;&nbsp;Please select the impacted units along
-                    with the loss percentage, Total Loss% should be 100
-                </mat-error> -->
                 <label>&nbsp;&nbsp;&nbsp;&nbsp;(Select Multiple if impact applicable across)</label>
             </div>
             <div class="form-row">
@@ -224,7 +219,7 @@
                     <label>All Units</label>
                 </div>
                 <div class="unit-container unit-types">
-                    <app-unit *ngFor="let unit of service.info?.units" [unit]="unit" [loss]="incident.LossAmount>0">
+                    <app-unit *ngFor="let unit of service.info?.units" [unit]="unit"  [loss]="+(incidentForm.value.lossAmount ?? 0) > 0">
                     </app-unit>
                 </div>
             </div>
@@ -243,20 +238,17 @@
         <div class="form-actions">
             <b style="color: red;" *ngIf="incidentForm.invalid || !areAllChecked() || !isUnitValid">The save button is
                 enabled once all the mandatory fields are entered</b>
-            <!-- <button mat-raised-button color="primary" type="submit"
-                [disabled]="incidentForm.invalid || !areAllChecked() || !isUnitValid" (click)="save()">
-                Save
-            </button>
-            <button mat-stroked-button type="button" (click)="closeDialog()" style="margin-right:1vw">Cancel</button> -->
-
-            <div class="move-buttons" >
-                <button class="buttons save" id="saveSub"  type="submit" [disabled]="incidentForm.invalid || !areAllChecked() || !isUnitValid" (click)="save()" ><img src="./assets/images/icon-application.svg"
-                          alt="Save">Save</button>
-
-                </div>
-                        <button type="button" class="btn btn-secondary modalCancelBtn" id="cancel" (click)="closeDialog()" style="margin-right: 1vw;height: 5.5vh;margin-top: 1.1vh;">Cancel</button>
+            <div class="move-buttons">
+                <button class="buttons save" id="saveSub" type="submit"
+                    [disabled]="incidentForm.invalid || !areAllChecked() || !isUnitValid" (click)="save()"><img
+                        src="./assets/images/icon-application.svg" alt="Save">Save</button>
+            </div>
+            <button type="button" class="btn btn-secondary modalCancelBtn" id="cancel" (click)="closeDialog()"
+                style="margin-right: 1vw;height: 5.5vh;margin-top: 1.1vh;">Cancel</button>
         </div>
     </form>
+
+    <!-- no editable start -->
     <div *ngIf="!service?.isIncidentEditable">
         <mat-card class="form-view">
             <div class="main-details">
@@ -330,7 +322,6 @@
                             {{service.incident?.Recommendation}}
                         </p>
                     </div>
-
                     <div class="row">
                         <h5>Action Taken</h5>&nbsp;&nbsp;
                         <p class="width-20">
@@ -352,6 +343,18 @@
                                         {{inc?.Name}}&nbsp;&nbsp;
                                     </p>
                                 </div>
+                            </div>
+                            <div class="row">
+                                <h5>Direct Loss Amount({{currency}})</h5>&nbsp;&nbsp;
+                                <p>{{service.incident?.DirectLoss}}</p>
+                            </div>
+                            <div class="row">
+                                <h5>Indirect Loss Amount({{currency}})</h5>&nbsp;&nbsp;
+                                <p>{{service.incident?.IndirectLoss}}</p>
+                            </div>
+                            <div class="row">
+                                <h5>Recovered Amount({{currency}})</h5>&nbsp;&nbsp;
+                                <p>{{service.incident?.Recoveries}}</p>
                             </div>
                             <div class="row">
                                 <h5>Loss Amount({{currency}})</h5>&nbsp;&nbsp;

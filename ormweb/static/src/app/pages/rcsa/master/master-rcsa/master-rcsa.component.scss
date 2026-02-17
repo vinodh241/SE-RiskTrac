@@ -1,98 +1,110 @@
 .mat-toolbar {
-    height: 6.4vh;
+  height: 6.4vh;
 }
 
-.container{
+.container {
 
-    padding: 20px 20px;
+  padding: 20px 20px;
 }
 
-.Grouptable{
-    margin-bottom: 20px;
-}
-.mat-row:nth-child(odd){
-    background-color: #ffffff !important;
-  }
-  .mat-row:nth-child(even){
-      background-color: #ced2d04d !important;
-    }
-
-  .mat-slide-toggle{
-    margin-right: 5px;
-  }
-  mat-cell.tablecolumnspan span{
-    white-space: nowrap;
-  }
-  mat-table.mat-table {
-    margin-top: 10px;
-    max-height: 230px;
-    min-height: 230px;
-    overflow: auto;
-  }
-  .formulacontent{
-    margin-top: 10px;
-    max-height: 240px;
-    min-height: 240px;
-    overflow: auto;
-  }
-
-  .content p{
-    font-size: 15px;
+.Grouptable {
+  margin-bottom: 20px;
 }
 
-.content ul{
-    display: flex;
-    padding: 7px;
-    margin: 0px 0;
-    border-radius: 5px;
-    // border: 1px solid #ffffff;
+.mat-row:nth-child(odd) {
+  background-color: #ffffff !important;
 }
-.content span{
-    margin-left: 12px;
+
+.mat-row:nth-child(even) {
+  background-color: #ced2d04d !important;
 }
-.content ul li{
-   list-style: none;
-   margin: 4px 3px;
-   align-items: center;
-   border-radius: 5px;
-   background: #f2f2f2;
-   padding: 5px 8px 5px 10px;
-   border: 1px solid #e3d1e1;
+
+.mat-slide-toggle {
+  margin-right: 5px;
+}
+
+mat-cell.tablecolumnspan span {
+  white-space: nowrap;
+}
+
+mat-table.mat-table {
+  margin-top: 10px;
+  max-height: 230px;
+  min-height: 230px;
+  overflow: auto;
+}
+
+.formulacontent {
+  margin-top: 10px;
+  max-height: 240px;
+  min-height: 240px;
+  overflow: auto;
+}
+
+.content p {
+  font-size: 15px;
+}
+
+.content ul {
+  display: flex;
+  padding: 7px;
+  margin: 0px 0;
+  border-radius: 5px;
+  // border: 1px solid #ffffff;
+}
+
+.content span {
+  margin-left: 12px;
+}
+
+.content ul li {
+  list-style: none;
+  margin: 4px 3px;
+  align-items: center;
+  border-radius: 5px;
+  background: #f2f2f2;
+  padding: 5px 8px 5px 10px;
+  border: 1px solid #e3d1e1;
 
 }
-.content :where(li,li mat-icon){
-    display: flex;
-    align-items: center;
+
+.content :where(li, li mat-icon) {
+  display: flex;
+  align-items: center;
 }
-.content ul li mat-icon{
-    height: 20px;
-    width: 20px;
-    color: #808080;
-    cursor: pointer;
-    font-size: 12px;
-    margin-left: 8px;
-    border-radius: 50%;
-    background: #dfdfdf;
-    justify-content: center;
- }
 
- .content ul input{
-    flex: 1;
-    border: none;
-    outline: none;
-    padding: 5px;
-    font-size: 16px;
- }
- .tag-box-items ul li{
-    cursor: pointer;
- }
+.content ul li mat-icon {
+  height: 20px;
+  width: 20px;
+  color: #808080;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 8px;
+  border-radius: 50%;
+  background: #dfdfdf;
+  justify-content: center;
+}
 
- .formulaCard{
-    background: #F9f6ed;
- }
- .mat-column-Index {
+.content ul input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 5px;
+  font-size: 16px;
+}
+
+.tag-box-items ul li {
+  cursor: pointer;
+}
+
+.formulaCard {
+  background: #F9f6ed;
+}
+
+.mat-column-Index {
   flex: 0 0 5% !important;
 }
+
 .mat-column-RowNumber {
   flex: 0 0 5% !important;
 }
@@ -101,9 +113,10 @@
   flex: 0 0 23% !important;
 }
 
-.mat-column-Action> button {
+.mat-column-Action>button {
   width: 5vh;
 }
+
 // .mat-column-ControlTestingResult {
 //   flex: 0 0 45% !important;
 
@@ -117,12 +130,13 @@
   max-width: 10vw;
 }
 
-.colorbox-small{
+.colorbox-small {
   width: 15px;
   height: 15px;
   margin-right: 5px;
 }
-.colorbox{
+
+.colorbox {
   width: 30px;
   height: 30px;
 }
@@ -138,11 +152,12 @@
 .mat-cell {
   overflow: hidden;
 }
+
 // .mat-row {
 //   height: 16px !important;
 // }
 
-mat-cell.tablecolumnspan{
+mat-cell.tablecolumnspan {
   white-space: normal;
   word-wrap: break-word;
 }
@@ -155,7 +170,8 @@ input.ng-star-inserted {
   // border: 1px solid #0e0000 !important;
   border-radius: 5px;
 }
-.beforeeditcomputedtext{
+
+.beforeeditcomputedtext {
   margin: 10px 0px !important;
 }
 
@@ -180,12 +196,12 @@ input.ng-star-inserted {
 .field:focus,
 .field:not(:placeholder-shown) {
   &+.label {
-      transform: translate(.25rem, -65%) scale(.8);
-      color: #1065E4;
-      padding: 0px 3px;
-      background: #e8e7e78c;
-      top: 6px;
-      border-radius: 50%;
+    transform: translate(.25rem, -65%) scale(.8);
+    color: #1065E4;
+    padding: 0px 3px;
+    background: #e8e7e78c;
+    top: 6px;
+    border-radius: 50%;
   }
 }
 
@@ -231,26 +247,28 @@ input.ng-star-inserted {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  align-items: end;
+  align-items: flex-end;
   width: 90%;
 }
 
 .field:focus,
 .field:not(:placeholder-shown) {
   &+.label {
-      transform: translate(.25rem, -65%) scale(.8);
-      color: #1065E4;
-      padding: 0px 3px;
-      background: #e8e7e78c;
-      top: 6px;
-      border-radius: 50%;
+    transform: translate(.25rem, -65%) scale(.8);
+    color: #1065E4;
+    padding: 0px 3px;
+    background: #e8e7e78c;
+    top: 6px;
+    border-radius: 50%;
   }
 }
+
 .cal-icon {
   position: absolute;
   right: 2%;
   top: 25%;
 }
+
 .searchtxtboxicon {
   /* position: absolute;
   right: 3%;
@@ -260,6 +278,7 @@ input.ng-star-inserted {
   // font-size: 120%;
   // font-size: 400;
 }
+
 .searchtxtboxicons {
   position: absolute;
   right: 3%;
@@ -269,6 +288,7 @@ input.ng-star-inserted {
   /* font-size: 120%; */
   font-size: 400;
 }
+
 button,
 input,
 optgroup,
@@ -277,9 +297,9 @@ textarea input:focus,
 select:focus,
 textarea:focus,
 button:focus {
-outline: none;
-box-shadow: none;
-//   font-size: 100% !important;
+  outline: none;
+  box-shadow: none;
+  //   font-size: 100% !important;
 }
 
 .fldcolor,
@@ -287,13 +307,13 @@ box-shadow: none;
 .fldcolor:focus-visible,
 input.fldcolor:focus,
 input.fldcolor:focus-visible {
-background-color: #e6e6e6;
-/* border: 1px solid #676767; */
-color: #000;
-box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
-padding: 0.375rem 0.75rem;
-border-radius: .3em !important;
-//   font-size: 100% !important;
+  background-color: #e6e6e6;
+  /* border: 1px solid #676767; */
+  color: #000;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
+  padding: 0.375rem 0.75rem;
+  border-radius: .3em !important;
+  //   font-size: 100% !important;
 }
 
 // ---------------------------------------------------------------------------------------
@@ -339,17 +359,37 @@ border-radius: .3em !important;
   position: relative;
 
   &:hover {
-      cursor: pointer;
+    cursor: pointer;
   }
 }
 
-.red{background-color: #C01313 !important;}
-.orange{background-color: #EA7C17 !important;}
-.green{background-color: #009E50 !important;}
-.redText{color: #C01313 !important;}
-.orangeText{color: #EA7C17 !important;}
-.greenText{color: #009E50 !important;}
-.text-color{color: #000 !important;}
+.red {
+  background-color: #C01313 !important;
+}
+
+.orange {
+  background-color: #EA7C17 !important;
+}
+
+.green {
+  background-color: #009E50 !important;
+}
+
+.redText {
+  color: #C01313 !important;
+}
+
+.orangeText {
+  color: #EA7C17 !important;
+}
+
+.greenText {
+  color: #009E50 !important;
+}
+
+.text-color {
+  color: #000 !important;
+}
 
 .result-textbox {
   box-shadow: 0px 4px 5px #00000073;
@@ -429,8 +469,68 @@ border-radius: .3em !important;
   top: 25%;
 }
 
-.mat-cell, .mat-header-cell { word-break: break-word; }
+.mat-cell,
+.mat-header-cell {
+  word-break: break-word;
+}
 
 .disable-color {
   color: rgb(133, 133, 133);
+}
+
+/* Corporate Objective table */
+.co-table {
+
+  // make it look like Control Testing's grid
+  .mat-header-row,
+  .mat-row {
+    align-items: center;
+  }
+
+  .mat-column-RowNumber {
+    flex: 0 0 56px;
+    max-width: 56px;
+    text-align: left;
+  }
+
+  .mat-column-Name {
+    flex: 1 1 35%;
+    min-width: 180px;
+  }
+
+  .mat-column-Description {
+    flex: 1 1 45%;
+    min-width: 220px;
+  }
+
+  .mat-column-Action {
+    flex: 0 0 110px;
+    max-width: 110px;
+    justify-content: center;
+  }
+
+  .mat-column-Status {
+    flex: 0 0 160px;
+    max-width: 160px;
+  }
+}
+
+/* common cell helpers */
+.co-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.co-input {
+  width: 100%;
+}
+
+/* visually truncate in table cells (we still cut to 10 chars in template for strict rule) */
+.co-ellipsis {
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

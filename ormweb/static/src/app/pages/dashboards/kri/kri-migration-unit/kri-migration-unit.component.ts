@@ -35,11 +35,10 @@ export class KriMigrationUnitComponent implements OnInit {
 
   ngOnInit(): void {
     this.dataSource.sort((a:any, b:any) =>  b.Count - a.Count);
-    console.log("dinesh", this.dataSource)
-         
+        
     let index = 1 
     for (let i =0; this.dataSource?.length > 0; i++) {
-      this.dataSource[i].sno = index + i
+      this.dataSource[i]['sno'] = index + i
     }
   }
 
@@ -59,9 +58,9 @@ export class KriMigrationUnitComponent implements OnInit {
       dts = da
     }
 
-    console.log(this.data.kri,el)
+    // console.log(this.data.kri,el)
     const dta = this.data.kri.filter((dat: any) => dat.Unit === da)
-    console.log("mig", dta)
+    // console.log("mig", dta)
     const data = this.getIndex(dta)
     const kriPopup = this.dialog.open(KriPopupComponent, {
       disableClose: false,
@@ -77,16 +76,16 @@ export class KriMigrationUnitComponent implements OnInit {
     let index = 1
     let list = []
     for (let i of dt) {
-      i.sno = index
+      i['sno'] = index
       list.push(i)
       index++
     }
-    console.log(list)
+    // console.log(list)
     return list
   }
 
   getRow(row: any) {
-    console.log(row)
+    // console.log(row)
     let name
     if (this.data.abc == 1) {
       name = 'List of KRI in Red Zone'

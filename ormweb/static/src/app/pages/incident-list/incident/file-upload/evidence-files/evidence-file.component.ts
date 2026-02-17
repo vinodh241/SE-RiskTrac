@@ -88,7 +88,7 @@ export class EvidenceFileComponent implements OnInit {
         } else {
             this.remarkError = true;
         }
-        console.log("this.remarkError::", this.remarkError);
+        // console.log("this.remarkError::", this.remarkError);
     }
 
     // onEvidenceId(event: any) {

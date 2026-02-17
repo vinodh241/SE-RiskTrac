@@ -1,10 +1,12 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { TooltipPosition } from '@angular/material/tooltip';
 import { IncidentService } from 'src/app/services/incident/incident.service';
 import { UtilsService } from 'src/app/services/utils/utils.service';
 import { CommentDialogComponent } from '../comment-dialog/comment-dialog.component';
+import { ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
 
 @Component({
     selector: 'app-recommendation',
@@ -12,11 +14,12 @@ import { CommentDialogComponent } from '../comment-dialog/comment-dialog.compone
     styleUrls: ['./recommendation.component.scss']
 })
 export class RecommendationComponent implements OnInit, OnChanges {
+    @ViewChild('recForm') recForm?: NgForm;
     @Input() recommendations: any[] = [];
     @Output() recommendedCount: EventEmitter<number> = new EventEmitter();
     copy = { "Description": "", "TargetDate": "", "UnitID": -1, "UnitName": "" }
 
-    arrRecos:any[] = []
+    arrRecos: any[] = []
     startDate = new FormControl(new Date());
     TargetDate = new FormControl();
 
@@ -28,7 +31,7 @@ export class RecommendationComponent implements OnInit, OnChanges {
         unit: new FormControl(''),
         date: new FormControl('')
     });
-
+    attemptedSaveId: number | null = null;
     constructor(
         public service: IncidentService,
         public utils: UtilsService,
@@ -45,27 +48,27 @@ export class RecommendationComponent implements OnInit, OnChanges {
     ngOnInit(): void {
     }
 
-    refresh(recData:any): void {
-        if(recData.length>0) {
+    refresh(recData: any): void {
+        if (recData.length > 0) {
             const reco = this.arrRecos.find(reco => reco.RecommendationID == recData[0].RecommendationID)
-            if(reco)
+            if (reco)
                 reco.recData = recData
             else
-                this.arrRecos.push({"RecommendationID":recData[0].RecommendationID, "recData":recData})
+                this.arrRecos.push({ "RecommendationID": recData[0].RecommendationID, "recData": recData })
         }
     }
 
     add(): void {
         let date = ""
-        let data = { "Description": "", "TargetDate": date, "UnitID": -1, "isEditable": true, "expanded":true }
+        let data = { "Description": "", "TargetDate": date, "UnitID": -1, "isEditable": true, "expanded": true }
         this.recommendations.push(data)
         this.copy = JSON.parse(JSON.stringify(data))
         this.service.isReviewInEdit = true
     }
 
-    remove(data:any): void {
+    remove(data: any): void {
         let idx = this.recommendations.indexOf(data)
-        if(idx !== -1)
+        if (idx !== -1)
             this.recommendations.splice(idx, 1)
         this.service.isReviewInEdit = this.inEdit()
     }
@@ -79,34 +82,44 @@ export class RecommendationComponent implements OnInit, OnChanges {
     save(data: any): void {
         data.Description = this.copy.Description
         data.UnitID = this.copy.UnitID
-        data.UnitName = this.service.info.units.filter((unit:any)=>unit.UnitID==this.copy.UnitID)[0].Name || ""
-        data.TargetDate = this.utils.ignoreTimeZone(this.copy.TargetDate) 
+        data.UnitName = this.service.info.units.filter((unit: any) => unit.UnitID == this.copy.UnitID)[0].Name || ""
+        data.TargetDate = this.utils.ignoreTimeZone(this.copy.TargetDate)
         data.StatusName = "Open"
         data.isEditable = false
         this.service.isReviewInEdit = this.inEdit();
-        
+
     }
 
     cancel(data: any): void {
-        if(data.UnitID == -1) 
+        if (data.UnitID == -1)
             this.remove(data)
         data.isEditable = false
         this.service.isReviewInEdit = this.inEdit()
     }
 
     inEdit(): boolean {
-        return this.recommendations.some((reco:any)=>reco.isEditable==true)
+        return this.recommendations.some((reco: any) => reco.isEditable == true)
     }
 
     sameReporteeUnit(reco: any): boolean {
         return this.service.info?.currentUserData[0].UnitIDs.includes(reco.UnitID) || false
     }
 
-    action(reco: any): void {
+    action(reco: any) {
+        if (!reco) { return; }
+        const controlName = 'action' + reco.RecommendationID;
+        const ctrl = this.recForm?.controls ? (this.recForm.controls[controlName] as AbstractControl | undefined) : undefined;
+        ctrl?.markAsTouched();
+        this.attemptedSaveId = reco.RecommendationID;
+        if (!reco.Action || !reco.Action.toString().trim()) {
+            return;
+        }
+        this.attemptedSaveId = null;
         let data = {
             "recommendationID": reco.RecommendationID,
             "action": reco.Action,
-            "fileIDs": this.arrRecos.find((rec:any)=>rec.RecommendationID==reco.RecommendationID)?.recData.map((ele:any) => ele.EvidenceID).join(',') || ""
+            "LessonLearnt": reco.LessonLearnt,
+            "fileIDs": this.arrRecos.find((rec: any) => rec.RecommendationID == reco.RecommendationID)?.recData.map((ele: any) => ele.EvidenceID).join(',') || ""
         }
         this.service.setRecommendationAction(data);
     }
@@ -123,8 +136,8 @@ export class RecommendationComponent implements OnInit, OnChanges {
         this.openComment(reco, 1)
     }
 
-    isModified(data: any): boolean { 
-        let newFiles = this.arrRecos.find(evdn => evdn.RecommendationID == data.RecommendationID)?.recData.map((evdn:any) => evdn.EvidenceID).toString() || ""
+    isModified(data: any): boolean {
+        let newFiles = this.arrRecos.find(evdn => evdn.RecommendationID == data.RecommendationID)?.recData.map((evdn: any) => evdn.EvidenceID).toString() || ""
         return !data.OldAction || data.OldAction != data.Action
             || data.OldFiles != newFiles
     }
@@ -151,22 +164,20 @@ export class RecommendationComponent implements OnInit, OnChanges {
     openPanel(data: any) {
         data.panelState = true;
         let item = this.service.expandedRecommendationIDs.find(x => x.id == data.RecommendationID);
-        if(item) {
+        if (item) {
             item.panelState = true;
         } else {
-            this.service.expandedRecommendationIDs.push({id: data.RecommendationID, panelState: true});
+            this.service.expandedRecommendationIDs.push({ id: data.RecommendationID, panelState: true });
         }
     }
 
     closePanel(data: any) {
         data.panelState = false;
         let item = this.service.expandedRecommendationIDs.find(x => x.id == data.RecommendationID);
-        if(item) {
+        if (item) {
             item.panelState = false;
         } else {
-            this.service.expandedRecommendationIDs.push({id: data.RecommendationID, panelState: false});
+            this.service.expandedRecommendationIDs.push({ id: data.RecommendationID, panelState: false });
         }
     }
-
-
 }

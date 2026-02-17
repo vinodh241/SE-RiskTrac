@@ -27,7 +27,7 @@ export class ScheduleAssessmentsService extends RestService {
   }
 
   getSchedulePeriod() {
-    return this.post("/rcsa/schedule/get-schedule-period-data", {},false);
+    return this.post("/rcsa/schedule/get-schedule-period-data", {}, false);
   }
 
   getActiveReviewer() {
@@ -55,7 +55,7 @@ export class ScheduleAssessmentsService extends RestService {
 
   getAssessmentCard(data: any) {
     return this.post("/rcsa/scheduleassessment/get-all-schedule-assessment-cards-data", data, false);
-  }  
+  }
 
   getSnapInprogressDetails(data: any) {
     return this.post("/rcsa/schedule/get-snapshot-for-inprogress-schedule-assessment-details-data", data, false);
@@ -68,5 +68,4 @@ export class ScheduleAssessmentsService extends RestService {
   getEmailReminderData(data: any) {
     return this.post("/rcsa/schedule/get-reminder-email-data", data);
   }
-
 }

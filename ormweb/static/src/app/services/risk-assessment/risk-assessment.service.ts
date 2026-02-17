@@ -50,7 +50,7 @@ export class RiskAssessmentService extends RestService {
 
     setRiskMetricsDraft(source: any, collectionScheduleID: any) {
         let data: any = [];
-        console.log('setRiskMetricsDraft-source::', source);
+        // console.log('setRiskMetricsDraft-source::', source);
 
         source.forEach((row: any) => {
             let evidencesNew = (row?.evidences && row?.evidences.length > 0 ? (row?.evidences.map((ele: any) => ele.EvidenceID)).join() : '')

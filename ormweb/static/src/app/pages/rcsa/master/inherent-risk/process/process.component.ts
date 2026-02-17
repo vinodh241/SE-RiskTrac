@@ -84,17 +84,17 @@ export class ProcessComponent implements OnInit {
                 "result": {
                     "recordset": [
                         {
-                            "Name": "Low Risk",
+                            "Name": "Low",
                             "IsActive": "1",
                             "ProcessID": 1
                         },
                         {
-                            "Name": "Moderate Risk",
+                            "Name": "Moderate",
                             "IsActive": "0",
                             "ProcessID": 2
                         },
                         {
-                            "Name": "High Risk",
+                            "Name": "High",
                             "IsActive": "0",
                             "ProcessID": 3
                         }

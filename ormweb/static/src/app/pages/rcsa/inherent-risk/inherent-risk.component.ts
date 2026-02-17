@@ -1,21 +1,22 @@
+// Angular
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectorRef, Component, Inject, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
+// Angular Material
 import { MatDialog } from '@angular/material/dialog';
-import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { InfoComponent } from 'src/app/includes/utilities/popups/info/info.component';
-import { InherentRiskService } from 'src/app/services/rcsa/inherent-risk/inherent-risk.service';
-import { ControlAutomationScoreService } from 'src/app/services/rcsa/master/control-environment/control-automation-score.service';
-import { UtilsService } from 'src/app/services/utils/utils.service';
-import { environment } from 'src/environments/environment';
-import { NewInherentRiskComponent } from 'src/app/pages/rcsa/inherent-risk/new-inherent-risk/new-inherent-risk.component';
-import { TableUtil } from "./tableUtil";
+import { MatTableDataSource } from '@angular/material/table';
+// Third-party
 import { FileUploader } from 'ng2-file-upload';
 import * as XLSX from 'xlsx';
-import { keys } from 'highcharts';
+// App (absolute)
 import { fileNamePattern } from 'src/app/core-shared/commonFunctions';
+import { InfoComponent } from 'src/app/includes/utilities/popups/info/info.component';
+import { NewInherentRiskComponent } from 'src/app/pages/rcsa/inherent-risk/new-inherent-risk/new-inherent-risk.component';
+import { InherentRiskService } from 'src/app/services/rcsa/inherent-risk/inherent-risk.service';
+import { UtilsService } from 'src/app/services/utils/utils.service';
+// Relative
+import { TableUtil } from './tableUtil';
 
 export interface DataModel {
     RowNumber?: number,
@@ -46,33 +47,33 @@ export interface DataModel {
     styleUrls: ['./inherent-risk.component.scss']
 })
 export class InherentRiskComponent implements OnInit {
-
-    displayedColumns: string[] = ['RowNumber', 'SLNO', 'Group', 'Unit', 'Process', 'RiskCategory', 'Risk', 'InherentLikelihood', 'InherentImpactRating', 'OverallInherentName', 'Action', 'Status'];
+    displayedColumns: string[] = ['RowNumber', 'SLNO', 'Group', 'Unit', 'Process',
+        'RiskCategory', 'CorporateObjectiveName', 'Risk', 'InherentLikelihood',
+        'InherentImpactRating', 'OverallInherentName',
+        'Action', 'Status'];
     dataSource!: MatTableDataSource<DataModel>;
     saveerror: string = "";
     exportActive: boolean = false;
     excelData: any;
     matColumns: string[] = ["RowNumber", "Process"];
     showexportData: boolean = false;
-    isStandardUser:boolean=false;
+    isStandardUser: boolean = false;
     // @ts-ignore
     @ViewChild(MatPaginator) paginator: MatPaginator;
     // @ts-ignore
     @ViewChild(MatSort) sort: MatSort;
     // @ts-ignore
     @ViewChild('TABLE', { static: true }) table: ElementRef;
-
     filenameWithoutExtension: any[] = [];
     invalidfile: boolean = false;
     bulkInherentRiskData: FormData = new FormData();
     ExcelValidExtension: Array<string> = ['xlsx'];
     selectedExcelJson: any[] = [];
-    excelValidHeaders = ["#", "Group *", "Auditable Unit*", "Risk Category*", "Process", "Risk*", "Inherent Likelihood Rating*", "Inherent Impact Rating*"];
-    fileName: string =  ''
+    excelValidHeaders = ["#", "Group*", "Auditable Unit*", "Risk Category*", "Process", "Risk*", "Inherent Likelihood Rating*", "Inherent Impact Rating*"];
+    fileName: string = ''
     validFileNameErr: boolean = false;
-    disableToggle:number = 0;
-    importButtonFlag:boolean = false
-    
+    disableToggle: number = 0;
+    importButtonFlag: boolean = false
     public uploader: FileUploader = new FileUploader({
         isHTML5: true
     });
@@ -86,13 +87,12 @@ export class InherentRiskComponent implements OnInit {
 
     ngOnInit(): void {
         this.getgriddata();
-        this.isStandardUser=this.utils.isStandardUser();
+        this.isStandardUser = this.utils.isStandardUser();
     }
 
     applyFilter(event: Event) {
         const filterValue = (event.target as HTMLInputElement).value;
         this.dataSource.filter = filterValue.trim().toLowerCase();
-
         if (this.dataSource.paginator) {
             this.dataSource.paginator.firstPage();
         }
@@ -104,16 +104,17 @@ export class InherentRiskComponent implements OnInit {
         if (this.dataSource.filteredData.length > 0) {
             this.dataSource.filteredData.forEach((m: any) => {
                 obj.push({
-                    SLNO: m.SLNO,
-                    Group: m.GroupName,
-                    Unit: m.UnitName,
-                    Process: m.ProcessName,
+                    "SLNO": m.SLNO,
+                    "Group": m.GroupName,
+                    "Unit": m.UnitName,
+                    "Process": m.ProcessName,
                     "Risk Category": m.RiskCategoryName,
-                    Risk: m.Risk,
+                    "Risk": m.Risk,
                     "Likelihood Rating": m.InherentLikelihoodName,
                     "Impact Rating": m.InherentImpactRatingName,
                     "Overall Inherent Risk Rating": m.OverallInherentName,
-                    "Status":m.IsActive?"Active":"Inactive"
+                    "Corporate Objective": m.CorporateObjectiveName,
+                    "Status": m.IsActive ? "Active" : "Inactive"
                 });
             });
             TableUtil.exportArrayToExcel(obj, "Inherent_Risk");
@@ -121,111 +122,10 @@ export class InherentRiskComponent implements OnInit {
     }
 
     getgriddata(): void {
-        if (environment.dummyData) {
-            let data = {
-                "success": 1,
-                "message": "Data fetch from DB successful.",
-                "result": {
-                    "recordset": [
-                        {
-                            "SLNO": "FA-12",
-                            "GroupID": 1,
-                            "GroupName": "Group 1",
-                            "UnitID": 1,
-                            "UnitName": "Unit 1",
-                            "ProcessID": 1,
-                            "ProcessName": "Process 1",
-                            "RiskCategoryID": 1,
-                            "RiskCategoryName": "RiskCategory 1",
-                            "Risk": "Automation",
-                            "InherentLikelihoodID": 1,
-                            "InherentLikelihoodName": "InherentLikelihoodName",
-                            "InherentImpactRatingID": 1,
-                            "InherentImpactRatingName": "InherentImpactRatingName",
-                            "OverallInherentName": "InherentImpactRatingName",
-                            "OverallInherentRisk": "OverallInherentRisk",
-                            "IsActive": true,
-                            "InherentRisksID": 1
-                        },
-                        {
-                            "SLNO": "FA-13",
-                            "GroupID": 1,
-                            "GroupName": "Group 1",
-                            "UnitID": 1,
-                            "UnitName": "Unit 1",
-                            "ProcessID": 1,
-                            "ProcessName": "Process 1",
-                            "RiskCategoryID": 1,
-                            "RiskCategoryName": "RiskCategory 1",
-                            "Risk": "Automation",
-                            "InherentLikelihoodID": 1,
-                            "InherentLikelihoodName": "InherentLikelihoodName",
-                            "InherentImpactRatingID": 1,
-                            "InherentImpactRatingName": "InherentImpactRatingName",
-                            "InherentRiskRatingID": 1,
-                            "InherentRiskRatingName": "InherentImpactRatingName",
-                            "OverallInherentRisk": "OverallInherentRisk",
-                            "IsActive": true,
-                            "InherentRisksID": 1
-                        },
-                        {
-                            "SLNO": "FA-14",
-                            "GroupID": 1,
-                            "GroupName": "Group 1",
-                            "UnitID": 1,
-                            "UnitName": "Unit 1",
-                            "ProcessID": 1,
-                            "ProcessName": "Process 1",
-                            "RiskCategoryID": 1,
-                            "RiskCategoryName": "RiskCategory 1",
-                            "Risk": "Automation",
-                            "InherentLikelihoodID": 1,
-                            "InherentLikelihoodName": "InherentLikelihoodName",
-                            "InherentRiskRatingID": 1,
-                            "InherentRiskRatingName": "InherentImpactRatingName",
-                            "InherentImpactRatingID": 1,
-                            "InherentImpactRatingName": "InherentImpactRatingName",
-                            "OverallInherentRisk": "OverallInherentRisk",
-                            "IsActive": true,
-                            "InherentRisksID": 1
-                        },
-                        {
-                            "SLNO": "FA-15",
-                            "GroupID": 1,
-                            "GroupName": "Group 1",
-                            "UnitID": 1,
-                            "UnitName": "Unit 1",
-                            "ProcessID": 1,
-                            "ProcessName": "Process 1",
-                            "RiskCategoryID": 1,
-                            "RiskCategoryName": "RiskCategory 1",
-                            "Risk": "Automation",
-                            "InherentLikelihoodID": 1,
-                            "InherentLikelihoodName": "InherentLikelihoodName",
-                            "InherentRiskRatingID": 1,
-                            "InherentRiskRatingName": "InherentImpactRatingName",
-                            "InherentImpactRatingID": 1,
-                            "InherentImpactRatingName": "InherentImpactRatingName",
-                            "OverallInherentRisk": "OverallInherentRisk",
-                            "IsActive": true,
-                            "InherentRisksID": 1
-                        }
-                    ]
-                },
-                "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1",
-                "error": {
-                    "errorCode": null,
-                    "errorMessage": null
-                }
-            };
-            this.process(data);
-        } else {
-
-            this.service.getAll().subscribe(res => {
-                next:
-                this.process(res);
-            });
-        }
+        this.service.getAll().subscribe(res => {
+            next:
+            this.process(res);
+        });
     }
 
     process(data: any): void {
@@ -233,7 +133,7 @@ export class InherentRiskComponent implements OnInit {
             if (data.result.recordset.length > 0) {
                 let docs = data.result.recordset;
                 this.excelData = docs;
-                if (docs && docs[0].SLNO!=undefined) {
+                if (docs && docs[0].SLNO != undefined) {
                     let id = 0;
                     docs.forEach((doc: any) => {
                         id++;
@@ -243,8 +143,7 @@ export class InherentRiskComponent implements OnInit {
                     this.dataSource.paginator = this.paginator
                     this.dataSource.sort = this.sort
                     this.showexportData = this.dataSource.filteredData.length > 0 ? true : false;
-                    this.disableToggle  = this.dataSource.filteredData.filter((ob:any) => ob.IsActive == 1)?.length
-
+                    this.disableToggle = this.dataSource.filteredData.filter((ob: any) => ob.IsActive == 1)?.length
                 }
             }
         } else {
@@ -263,10 +162,9 @@ export class InherentRiskComponent implements OnInit {
             }
         })
         assesment.afterClosed().subscribe(result => {
-            if(result)
+            if (result)
                 this.getgriddata();
         })
-        //this.adddg = true;
     }
 
     editData(data: any): void {
@@ -279,22 +177,20 @@ export class InherentRiskComponent implements OnInit {
                 data: data
             })
             assesment.afterClosed().subscribe(result => {
-                if(result)
+                if (result)
                     this.getgriddata();
             })
         }
     }
 
     changed(data: any): void {
-        console.log('✌️data --->', data);
-        if(this.canFullAccess()){
+        if (this.canFullAccess()) {
             let obj = {
                 "id": data.InherentRisksID,
                 "isActive": !data.IsActive
             }
             this.service.updateStatus(obj).subscribe(res => {
                 next:
-
                 if (res.success == 1) {
                     this.changeDetectorRefs.detectChanges();
                     this.saveSuccess(res.message);
@@ -307,9 +203,9 @@ export class InherentRiskComponent implements OnInit {
                 error:
                 console.log("err::", "error");
             });
-            
         }
     }
+
     saveSuccess(content: string): void {
         const timeout = 3000; // 3 Seconds
         const confirm = this.dialog.open(InfoComponent, {
@@ -322,7 +218,6 @@ export class InherentRiskComponent implements OnInit {
                 content: content
             }
         });
-
         confirm.afterOpened().subscribe(result => {
             setTimeout(() => {
                 confirm.close();
@@ -333,94 +228,122 @@ export class InherentRiskComponent implements OnInit {
 
     canFullAccess(): boolean {
         let result = false;
-        result = ((this.utils.isFunctionalAdmin() || this.utils.isPowerUser()) && this.utils.isRiskManagementUnit());
+        result = ((this.utils.isFunctionalAdmin() || this.utils.isPowerUser())); // && this.utils.isRiskManagementUnit()
         return result;
     }
 
-    seletedFileDetails(event: any) {
+    seletedFileDetails(event: Event): void {
         this.importButtonFlag = true;
-        const fileInput = event.target;
+        const fileInput = event.target as HTMLInputElement;
+        // Keep only the latest file in the queue
         if (this.uploader.queue.length > 1) {
-            console.log('this.uploader.queue.length: '+this.uploader.queue)
-            let latestFile = this.uploader.queue[this.uploader.queue.length - 1]
-            this.uploader.queue = [];
-            this.uploader.queue.push(latestFile);
+            const latestFile = this.uploader.queue[this.uploader.queue.length - 1];
+            this.uploader.queue = [latestFile];
+        }
+        // Nothing to process
+        if (this.uploader.queue.length === 0) {
+            return;
         }
         this.invalidfile = false;
-        for (let j = 0; j < this.uploader.queue.length; j++) {
-            let fileItem: File = this.uploader.queue[j]._file;
-            this.fileName = fileItem.name;
-            this.filenameWithoutExtension = this.fileName.split('.').slice();
-            let extension = this.fileName.split('.').pop() as string;
-            if (this.ExcelValidExtension.includes(extension.toLowerCase())) {
-                this.invalidfile = false;
-                const reader: FileReader = new FileReader();
-                reader.readAsBinaryString(fileItem);
-                reader.onload = (e: any) => {
-                /* create workbook */
-                const binarystr: string = e.target.result;
-                const wb: XLSX.WorkBook = XLSX.read(binarystr, { type: 'binary' });
-
-                /* selected the first sheet */
+        // We only ever keep one file at this point
+        const fileItem: File = this.uploader.queue[0]._file as File;
+        this.fileName = fileItem.name;
+        // Name without extension (for later use if needed)
+        this.filenameWithoutExtension = this.fileName.split('.').slice(0, -1);
+        // Validate file name (no special chars)
+        if (fileNamePattern(this.fileName)) {
+            this.validFileNameErr = true;
+            this.popupInfoError("Unsuccessful", "Special Characters are not allowed in File name");
+            fileInput.value = '';
+            this.uploader.clearQueue();
+            return;
+        } else {
+            this.validFileNameErr = false;
+        }
+        // Validate extension
+        const extension = (this.fileName.split('.').pop() || '').toLowerCase();
+        if (!this.ExcelValidExtension.includes(extension)) {
+            this.invalidfile = true;
+            this.popupInfoError("Unsuccessful", "Invalid File Type");
+            fileInput.value = '';
+            this.uploader.clearQueue();
+            return;
+        }
+        // Read the file using the modern API
+        const reader = new FileReader();
+        reader.onerror = () => {
+            this.popupInfoError("Unsuccessful", "Unable to read the file.");
+            fileInput.value = '';
+            this.uploader.clearQueue();
+        };
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+            try {
+                const arrayBuffer = e.target?.result as ArrayBuffer;
+                // XLSX can read ArrayBuffer directly
+                const wb: XLSX.WorkBook = XLSX.read(arrayBuffer, { type: 'array' });
+                // First sheet only (as before)
                 const wsname: string = wb.SheetNames[0];
                 const ws: XLSX.WorkSheet = wb.Sheets[wsname];
-
-                /* save data */
-                const data = XLSX.utils.sheet_to_json(ws, {defval : null}); // to get 2d array pass 2nd parameter as object {header: 1}
-                console.log("data",data); // Data will be logged in array format containing objects
+                // Convert to JSON; keep empty cells as null
+                const data = XLSX.utils.sheet_to_json(ws, { defval: null });
+                // console.log("data", data);
                 this.selectedExcelJson = JSON.parse(JSON.stringify(data)) || [];
-
-                let isValidHeaders = false, isElementsValid = true;
-                this.selectedExcelJson.forEach((excelJson)=>{
-                    let list = [...Object.keys(excelJson).map((ele: any) => ele.trim())]
-                    list.forEach(header => {
-                        if (this.excelValidHeaders.includes(header)) {
-                            isValidHeaders = true;
+                // --- Validation ---
+                // 1) Headers: union of all keys across rows, trimmed
+                const allHeaders = new Set<string>();
+                this.selectedExcelJson.forEach(row => {
+                    Object.keys(row || {}).forEach(k => allHeaders.add(String(k).trim()));
+                });
+                // Require that every expected header is present
+                const sheetHeaders = Array.from(allHeaders);
+                const isValidHeaders =
+                    Array.isArray(this.excelValidHeaders) &&
+                    this.excelValidHeaders.every((h: string) => sheetHeaders.includes(h));
+                // 2) Mandatory fields: any header containing '*' must be non-empty (per row)
+                let isElementsValid = true;
+                for (const row of this.selectedExcelJson) {
+                    for (const key of Object.keys(row || {})) {
+                        const header = String(key).trim();
+                        if (header.includes('*')) {
+                            const val = row[key];
+                            const text = (val ?? '').toString().trim();
+                            if (!text) {
+                                isElementsValid = false;
+                                break;
+                            }
                         }
-                        if(header.includes('*') && !excelJson[header].trim()){
-                            isElementsValid = false;
-                        }
-                    });
-                    if(isValidHeaders && isElementsValid) {
-                        console.log('isElementsValid: ', isElementsValid);
-                        console.log('isValidHeaders: ', isValidHeaders);
-                        this.importButtonFlag = true;
-                        console.log("insdie if")
-                        this.bulkInherentRiskData = new FormData;
-                        this.bulkInherentRiskData.append('InherentRiskData', JSON.stringify(data));
-                        this.bulkInherentRiskData.append('fileName', JSON.stringify(this.fileName));
-                    } else {
-                        this.popupInfoError("Unsuccessful", "Please select a valid template file with all mandatory parameters.")
                     }
-                    console.log(isValidHeaders,"invalid", isElementsValid);
-                })
-
-              fileInput.value = '';
-              this.uploader.clearQueue();
-            };
-            } else {
-                this.invalidfile = true;
-                this.popupInfoError("Unsuccessful", "InValid File Type")
+                    if (!isElementsValid) break;
+                }
+                if (isValidHeaders && isElementsValid) {
+                    this.importButtonFlag = true;
+                    this.bulkInherentRiskData = new FormData();
+                    this.bulkInherentRiskData.append('InherentRiskData', JSON.stringify(data));
+                    this.bulkInherentRiskData.append('fileName', JSON.stringify(this.fileName));
+                } else {
+                    this.popupInfoError(
+                        "Unsuccessful",
+                        "Please select a valid template file with all mandatory parameters."
+                    );
+                }
+            } catch (err) {
+                this.popupInfoError("Unsuccessful", "Unable to read Excel file.");
+            } finally {
+                // Always clean up
+                fileInput.value = '';
+                this.uploader.clearQueue();
             }
-            if (fileNamePattern(this.fileName)) {
-                this.validFileNameErr = true;
-                this.popupInfoError("Unsuccessful","Special Characters are not allowed in File name")
-            }else {
-                this.validFileNameErr = false;
-            }
-        }
+        };
+        // ✅ non-deprecated
+        reader.readAsArrayBuffer(fileItem);
     }
 
-
-
-
     bulkUploadExcelFile() {
-        if(this.filenameWithoutExtension.length > 0) {
+        if (this.filenameWithoutExtension.length > 0) {
             this.service.bulkUploadInherentRisk(this.bulkInherentRiskData).subscribe(res => {
                 next:
                 localStorage.setItem('token', res.token);
                 if (res.success == 1) {
-
                     this.popupInfo("Success", res.message)
                     this.importButtonFlag = false
                     setTimeout(() => {
@@ -450,7 +373,6 @@ export class InherentRiskComponent implements OnInit {
                 content: message
             }
         });
-
         confirm.afterOpened().subscribe(result => {
             setTimeout(() => {
                 confirm.close();
@@ -470,7 +392,6 @@ export class InherentRiskComponent implements OnInit {
                 content: message
             }
         });
-
         confirm.afterOpened().subscribe(result => {
             this.fileName = ''
             this.importButtonFlag = false;
@@ -479,7 +400,6 @@ export class InherentRiskComponent implements OnInit {
             }, timeout)
         });
     }
-
 
     downloadSampleFile() {
         let link = document.createElement('a');
@@ -491,5 +411,50 @@ export class InherentRiskComponent implements OnInit {
         link.remove();
     }
 
+    getContrastColor(inputColor: string | null | undefined): string {
+        const hex = this._toHex(inputColor || '#eee');
+        if (!hex) { return '#000000'; }
+
+        const r = parseInt(hex.substr(1, 2), 16);
+        const g = parseInt(hex.substr(3, 2), 16);
+        const b = parseInt(hex.substr(5, 2), 16);
+
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness > 128 ? '#000000' : '#ffffff';
+    }
+
+    private _toHex(color: string | null | undefined): string | null {
+        if (!color) return null;
+        color = color.trim();
+
+        if (color.startsWith('#')) {
+            let hex = color.slice(1);
+            if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+            return /^[0-9A-Fa-f]{6}$/.test(hex) ? '#' + hex : null;
+        }
+
+        const rgb = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+        if (rgb) {
+            return '#' +
+                this._componentToHex(+rgb[1]) +
+                this._componentToHex(+rgb[2]) +
+                this._componentToHex(+rgb[3]);
+        }
+
+        try {
+            const ctx = document.createElement('canvas').getContext('2d');
+            if (ctx) {
+                ctx.fillStyle = color;
+                return this._toHex(ctx.fillStyle);
+            }
+        } catch { }
+
+        return null;
+    }
+
+    private _componentToHex(c: number): string {
+        const hex = c.toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+    }
 
 }

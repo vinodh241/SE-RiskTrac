@@ -38,7 +38,7 @@ export class ViewallComponent implements OnInit {
     this.dashboardservice.gotincidentDashboardMaster.subscribe((value) => {
         if (value == true) {
             this.RawData = this.dashboardservice.dashboardIncMaster;
-            console.log('this.RawData: ', this.RawData);
+            // console.log('this.RawData: ', this.RawData);
             this.dashboardservice.gotYearQuater.subscribe((value) => {
                 this.yearData = this.dashboardservice.yearValue;
                 this.quaterData = this.dashboardservice.quaterValue;
@@ -59,28 +59,28 @@ export class ViewallComponent implements OnInit {
                         : currQuarter) +
                     '-' +
                     this.yearData.toString().substr(2, 2);
-                    console.log('this.quarterFilter: ', this.quarterFilter);
+                    // console.log('this.quarterFilter: ', this.quarterFilter);
 
 
             this.listdata = this.RawData.filter(
                 (data: any) =>(data.StatusID != 1 && data.StatusID != 11 && data.StatusID != 12 && data.StatusID != 17 && data.StatusID != 18 && data.StatusID != 13 && data.StatusID != 14 && data.StatusID != 15 && data.StatusID != 16) && data.Quater === this.quarterFilter
             );
-            console.log(' this.listdata : ',  this.listdata );
+            // console.log(' this.listdata : ',  this.listdata );
 
             // this.countIncidentTypes(this.listdata)
             })
         }
     });
     this.dataSource = this.parent.id;
-    console.log("this.dataSource",this.dataSource)
+    // console.log("this.dataSource",this.dataSource)
   }
 
   getDecimalData(num: any) {
     return parseFloat(num).toFixed(0.0);
 }
 unitData(unitName: any){
-    console.log('unitName: ', unitName);
-    console.log('this.listdata: ', this.listdata);
+    // console.log('unitName: ', unitName);
+    // console.log('this.listdata: ', this.listdata);
     const dialog = this.dialog.open(IncidentRecordsComponent, {
         disableClose: true,
         maxWidth: '100vw',

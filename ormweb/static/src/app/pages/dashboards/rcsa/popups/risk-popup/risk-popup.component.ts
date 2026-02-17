@@ -18,7 +18,7 @@ export class RiskPopupComponent implements OnInit {
 
   ngOnInit(): void {
     this.listdata = this.data.data;
-    console.log(this.data)
+    // console.log(this.data)
   }
 
 }

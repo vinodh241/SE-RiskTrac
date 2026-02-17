@@ -132,7 +132,7 @@
 .risk-limit-left {
     display: flex;
     flex: 1;
-    justify-content: end;
+    justify-content: flex-end;
     margin: 0px 5px 0px 0px;
 }
 
@@ -140,7 +140,7 @@
     display: flex;
     flex: 1;
     align-items: center;
-    justify-content: start;
+    justify-content: flex-start;
     margin: 5px;
 }
 
@@ -329,3 +329,4 @@
     cursor: not-allowed; /* Unclickable cursor */
     opacity: 0.7; /* Slight transparency for disabled state */
 }
+

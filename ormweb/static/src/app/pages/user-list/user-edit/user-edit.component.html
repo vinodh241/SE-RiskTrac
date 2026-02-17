@@ -1,0 +1,184 @@
+<mat-toolbar>
+    <h2 mat-dialog-title> {{copy.mode=="add"?"Add User":"Edit User"}} </h2>
+    <span class="spacer"></span>
+    <button mat-icon-button title="Close" cdkFocusInitial mat-dialog-close id="closeUserPopup">
+        <mat-icon aria-hidden="false" aria-label="Close" fontIcon="close"></mat-icon>
+    </button>
+</mat-toolbar>
+
+
+<!-- <mat-dialog-content> -->
+   <div class = 'dialog-content'style="height: 64.5vh; display:flex;">
+    <div class="left">
+        <mat-card style="background-color: #F2F2F2;" >
+            <!-- AD authentication -->
+            <div style="padding: 20px; flex-direction: column;" >
+                <form [formGroup]="searchForm" (ngSubmit)="onSubmit()" autocomplete="off">
+                    <div class="row-wise">
+                        <mat-form-field appearance="outline">
+                            <mat-label> Search by User ID </mat-label>
+                            <input matInput id="userid" formControlName="userid" placeholder="username@domain">
+                        </mat-form-field>
+                        <mat-label style="margin-top: 2vh;">OR</mat-label>
+                        <mat-form-field appearance="outline">
+                            <mat-label> Search by Email ID </mat-label>
+                            <input matInput id="emailid" formControlName="emailid" placeholder="username@domain">
+                        </mat-form-field>
+                    </div>
+    
+                    <div class="row-wise">
+                        <mat-error *ngIf="searcherror">{{searcherror}}</mat-error>
+                        <span class="spacer"></span>
+                        <button mat-raised-button color="primary" type="submit" [disabled]="copy.mode=='edit'" id="searchUser"> Search User </button>
+                    </div>
+                </form>
+                <br>
+                <div class="row-wise">
+                    <mat-form-field appearance="outline">
+                        <mat-label> First Name </mat-label>
+                        <input matInput id="FirstName" placeholder="Enter First Name" #FirstName="ngModel" name="FirstName" [(ngModel)]="copy.FirstName" required>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label> Middle Name </mat-label>
+                        <input matInput id="MiddleName" placeholder="Enter Middle Name" name="MiddleName" [(ngModel)]="copy.MiddleName">
+                    </mat-form-field>
+                </div>
+                <mat-form-field appearance="outline">
+                    <mat-label> Last Name </mat-label>
+                    <input matInput id="LastName" placeholder="Enter Last Name" name="LastName" [(ngModel)]="copy.LastName">
+                </mat-form-field>
+    
+                <div class="row-wise">
+                    <mat-form-field appearance="outline">
+                        <mat-label> Mobile Number </mat-label>
+                        <input matInput id="MobileNumber" placeholder="Enter Mobile Number" #MobileNumber="ngModel" name="MobileNumber" [(ngModel)]="copy.MobileNumber" required>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label> Email ID </mat-label>
+                        <input matInput id="EmailID" placeholder="Enter Email ID" #EmailID="ngModel" name="EmailID" [(ngModel)]="copy.EmailID" required email>
+                    </mat-form-field>
+                </div>
+            </div>
+        </mat-card>
+    </div>
+    <div class="right">
+        <mat-card style=" background-color: #F2F2F2;" >
+           
+                <span> Assign Module(s) </span>
+
+            <div class="mat-elevation-z8 modules">
+                <mat-table [dataSource]="copy.Modules" matSort>
+                    <ng-container matColumnDef="module">
+                        <mat-header-cell *matHeaderCellDef>
+                            <!-- <mat-checkbox [disabled]="copy.IsUserManager"> Module </mat-checkbox> -->
+                            Module
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            <mat-checkbox [id]="'Checked' + row.ModuleAbbreviation" [disabled]="copy.IsUserManager" [checked]="row.IsSelected" (change)="changeModule(row)">{{row.ModuleAbbreviation}}</mat-checkbox>
+                        </mat-cell>
+                    </ng-container>
+    
+                    <ng-container matColumnDef="role">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Role </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            <mat-label>Standard&nbsp;</mat-label>
+                            <mat-slide-toggle [id]="'URole' + row.ModuleAbbreviation"  [disabled]="copy.IsUserManager || !row.IsSelected" [checked]="row.RoleID==4"
+                            [ngClass]="{'power-toggle': row.RoleID==4, 'standardColor-toggle': row.RoleID!=4}" (change)="changeRole(row)"></mat-slide-toggle>
+                            <mat-label>&nbsp;Power</mat-label>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="admin">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Is Functional Admin </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            <mat-label>No&nbsp;</mat-label>
+                            <mat-slide-toggle [id]="'FAdmin' + row.ModuleAbbreviation" [disabled]="copy.IsUserManager || !row.IsSelected || row.RoleID==5" 
+                            [checked]="row.IsFunctionalAdmin"
+                            [ngClass]="{'noColor-toggle': !row.IsFunctionalAdmin, 'standard-toggle': row.IsFunctionalAdmin}"
+                           
+                                (change)="row.IsFunctionalAdmin=!row.IsFunctionalAdmin"></mat-slide-toggle>
+                            <mat-label>&nbsp;Yes</mat-label>
+                        </mat-cell>
+                    </ng-container>
+                    <mat-header-row *matHeaderRowDef="dcModules; sticky: true;" [style.background-color]="headerRowColor"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: dcModules;"></mat-row>
+                </mat-table>
+            </div>
+            <mat-error *ngIf="moduleerror">{{moduleerror}}</mat-error>
+        </mat-card>
+        <mat-card style="height: 31vh; background-color: #F2F2F2; margin-top: 1vh;">
+            <span> Assign Unit(s) </span>
+            <div class="mat-elevation-z8 units" *ngIf="copy && groups && units">
+                <!-- <app-group-unit [source]="source" [groups]="groups" [units]="units"></app-group-unit> -->
+                <mat-table [dataSource]="copy.Units" matSort id="tblunit">
+                    <ng-container matColumnDef="id">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> # </mat-header-cell>
+                        <mat-cell *matCellDef="let row"> {{row.id}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="group">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Group </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            <mat-select id="row.GroupID" [(ngModel)]="row.GroupID" [disabled]="copy.IsUserManager" (ngModelChange)="onGroupChange(row)"  placeholder="Select Group">
+                                <mat-option *ngFor="let group of groups" [value]="group.GroupID">
+                                    {{group.Name}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="unit">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Unit </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            <mat-select id="row.UnitID" [(ngModel)]="row.UnitID" [disabled]="copy.IsUserManager" placeholder="Select Unit">
+                                <mat-option *ngFor="let unit of filteredUnits(row.GroupID)" [value]="unit.UnitID" (click)="duplicateUnits(unit.UnitID)">
+                                    {{unit.Name}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="action">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Action </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            <button mat-icon-button [disabled]="copy.IsUserManager" title="Delete">
+                                <mat-icon (click)="deleteUnit(row)" aria-hidden="false" aria-label="Delete" fontIcon="delete">
+                                </mat-icon>
+                            </button>
+                        </mat-cell>
+                    </ng-container>
+                    <mat-header-row *matHeaderRowDef="dcUnits; sticky: true;" [style.background-color]="headerRowColor"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: dcUnits;" [style.backgroundColor]="dupUnitIDs.has(row.UnitID) ?  '#ec6565' : ''"></mat-row>
+                </mat-table>
+            </div>
+            <div class="row-wise">
+                <mat-error *ngIf="uniterror" style="margin-top : 15px">{{uniterror}}</mat-error>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <mat-dialog-actions >
+                    <button mat-raised-button color="primary" (click)="assignUnit()" [disabled]="copy.IsUserManager" style="margin-bottom: 20px; background-color: #1C9F50;" 
+                    >+ Assign Unit </button>
+                </mat-dialog-actions>
+            </div>
+        </mat-card>
+        
+    </div>
+
+   </div>
+<!-- </mat-dialog-content> -->
+
+
+
+<span class="spacer"></span>
+ <mat-error *ngIf="saveerror">{{saveerror}}</mat-error>
+
+<mat-dialog-actions>
+    <div style="display: contents;">
+        <img src="assets/usermanager.svg" style="height:4vh;     margin-bottom: -1vh;"> &nbsp;
+        <mat-checkbox id="UserManager" [checked]="copy.IsUserManager" (change)="changeUserManager()">User Manager</mat-checkbox>
+        <span class="spacer"></span>
+        <button mat-button mat-dialog-close id="CancelPopup">Cancel</button>
+
+        <div class="applyFilter addDesktop position-relative text-start me-4">
+            <button type="button" class="btn btn-dark btnGradient ad" data-bs-toggle="modal" style="color: white;cursor: pointer;" (click)="validateSave()" id="SaveUserDetails">Save User Details
+            </button>
+            <span class="position-absolute vmiddleLeft text-white iconPositionLeft">
+                <img src="assets/save.svg" height="100%" alt="Save" style= "width: 2vh;margin-left:-0.8vh"> </span>
+        </div>
+    </div>
+</mat-dialog-actions>

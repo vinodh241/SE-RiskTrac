@@ -15,10 +15,6 @@ import { environment } from 'src/environments/environment';
     styleUrls: ['./incident-details.component.scss']
 })
 export class IncidentDetailsComponent implements OnInit, OnDestroy {
-    // myFilter = (d: Date | null): boolean => {
-    //     const day = (d || new Date()).getDay();
-    //     return day !== 0 && day !== 6;
-    //   }
     @Output() close: EventEmitter<boolean> = new EventEmitter();
     maxDate!: Date;
     incidentForm = this.fb.group({
@@ -31,8 +27,11 @@ export class IncidentDetailsComponent implements OnInit, OnDestroy {
         incidentTitle: ['', Validators.required],
         recommendedAction: ['', Validators.required],
         actionTaken: ['', Validators.required],
-        rca : ['', Validators.required],
-        lossAmount: [''],
+        rca: ['', Validators.required],
+        DirectLoss: [0],
+        IndirectLoss: [0],
+        Recoveries: [0],
+        lossAmount: [0],
         identificationDate: [''],
         partyDetails: [''],
         criticality: ['', Validators.required],
@@ -41,10 +40,12 @@ export class IncidentDetailsComponent implements OnInit, OnDestroy {
         lossCategory: ['']
     });
     reportingDate!: string;
-    incident: any = { "IncidentCode": "", "GroupID": -1 };
+    // incident: any = { "IncidentCode": "", "GroupID": -1 };
+    incident: any = { DirectLoss: 0, IndirectLoss: 0, Recoveries: 0, lossAmount: 0, IncidentCode: "", GroupID: -1 };
+
     isUnitValid = true;
-    isSaved:boolean = false
-    currency: any= environment.currency || '';
+    isSaved: boolean = false
+    currency: any = environment.currency || '';
 
     constructor(
         private fb: FormBuilder,
@@ -58,7 +59,7 @@ export class IncidentDetailsComponent implements OnInit, OnDestroy {
         service.gotInfo.subscribe(value => {
             if (value == true) {
                 let units = service.info?.units.filter((unit: any) => unit.UnitID == service.info.currentUserData[0].UnitIDs[0])
-                console.log("🚀 ~ IncidentDetailsComponent ~ service.info:", service.info)
+                // console.log("🚀 ~ IncidentDetailsComponent ~ service.info:", service.info)
                 if (this.incident.IncidentCode == "" && units.length > 0) {
                     this.incident.GroupID = units[0].GroupID
                     this.incident.UnitID = units[0].UnitID
@@ -88,9 +89,9 @@ export class IncidentDetailsComponent implements OnInit, OnDestroy {
         this.isSaved = true
         let evidenceIDs: number[] = []
         if (!this.validateLossValue()) {
-            this.popupInfo();
+            this.popupInfo(`Please select the impacted units along with the loss percentage, Total Loss% should be 100`);;
         }
-        else{
+        else {
             if (this.service.incEvidences && this.service.incEvidences.data.length > 0) {
                 this.service.incEvidences.data.forEach(evd => {
                     evidenceIDs.push(evd.EvidenceID)
@@ -120,6 +121,9 @@ export class IncidentDetailsComponent implements OnInit, OnDestroy {
                 "rca": this.incidentForm.value.rca,
                 "incidentTypeIDs": this.service.info.incidentTypes.filter((type: any) => type.checked).map((type: any) => type.TypeID).toString() || null,
                 "incidentSourceID": this.incidentForm.value.incidentSource,
+                "DirectLoss": this.incidentForm.value.DirectLoss,
+                "IndirectLoss": this.incidentForm.value.IndirectLoss,
+                "Recoveries": this.incidentForm.value.Recoveries,
                 "lossAmount": this.incidentForm.value.lossAmount,
                 "identificationDate": this.incidentForm.value.identificationDate,
                 "aggPartyDetails": this.incidentForm.value.partyDetails,
@@ -165,6 +169,7 @@ export class IncidentDetailsComponent implements OnInit, OnDestroy {
             })
         })
         this.incident = JSON.parse(JSON.stringify(this.service.incident))
+      //  // console.log('edit-this.incident::', this.incident);
         this.service.isIncidentEditable = true
     }
 
@@ -173,44 +178,13 @@ export class IncidentDetailsComponent implements OnInit, OnDestroy {
         if (this.service.info) {
             let losses = this.service.info.units.map((loss: any) => Number(loss.LossValue) || 0)
             lossTotal = losses.reduce((sum: number, val: number) => sum + val, 0)
-            // if(this.incidentForm.value.lossAmount == undefined || this.incidentForm.value.lossAmount == ''){
-            //     this.isUnitValid = true;
-            // }
-            // else{
-            //     if(lossTotal == 100){
-            //         this.isUnitValid = true;
-            //     }
-            //     else{
-            //         this.isUnitValid = false;
-            //     }
-            // }
         }
         return lossTotal
     }
 
-    validateLossValue(): boolean {
-        let checks = []
-        let vLossValue: boolean;
-        let lossTotal = 0
-        if (this.service.info) {
-            checks = this.service.info.units.filter((loss: any) => loss.checked)
-            let losses = this.service.info.units.map((loss: any) => Number(loss.LossValue) || 0)
-            lossTotal = losses.reduce((sum: number, val: number) => sum + val, 0)
-        }
-        if (this.incident.LossAmount && Number(this.incident.LossAmount) > 0)
-            vLossValue = lossTotal == 100
-        else {
-            // if (checks.length > 0)
-            //     this.isUnitValid = lossTotal == 100
-            // else
-            vLossValue = true
-        }
-        return vLossValue
-    }
-
     filteredUnits(groupID: any) {
-        // console.log('groupID: ', groupID);
-        // console.log("this.incidentForm.value.unitName",this.incidentForm.value.unitName)
+        // // console.log('groupID: ', groupID);
+        // // console.log("this.incidentForm.value.unitName",this.incidentForm.value.unitName)
         return this.service.info?.units.filter((unit: any) => unit.GroupID == groupID)
     }
 
@@ -236,51 +210,94 @@ export class IncidentDetailsComponent implements OnInit, OnDestroy {
         this.close.emit(true);
     }
 
-    onChangeSAR() {
+    onChangeSAR(changedField?: string) {
+        // Ensure values are non-negative
+        let direct = this._clampToNonNegative(Number(this.incidentForm.value.DirectLoss || 0));
+        let indirect = this._clampToNonNegative(Number(this.incidentForm.value.IndirectLoss || 0));
+        let recoveries = this._clampToNonNegative(Number(this.incidentForm.value.Recoveries || 0));
+        let manualLoss = this._clampToNonNegative(Number(this.incidentForm.value.lossAmount || 0));
+
+        // Clamp negative → 0 and sync form values
+        this._syncField('DirectLoss', direct);
+        this._syncField('IndirectLoss', indirect);
+        this._syncField('Recoveries', recoveries);
+        this._syncField('lossAmount', manualLoss);
+
+        // Recoveries should not exceed Direct + Indirect
+        const sum = direct + indirect;
+        if (recoveries > sum) {
+            recoveries = sum;
+            this._syncField('Recoveries', recoveries);
+            this.popupInfo(`Recoveries cannot exceed Direct + Indirect Loss (${sum}). Value adjusted.`);
+        }
+
+        // Recalculate LossAmount
+        let calculatedLoss = sum - recoveries;
+        if (calculatedLoss < 0) calculatedLoss = 0;
+
+        // If user changed lossAmount manually, validate
+        if (changedField === 'lossAmount') {
+            if (manualLoss !== calculatedLoss) {
+                this.popupInfo(`Loss Amount must equal (Direct + Indirect) - Recoveries. Adjusted from ${manualLoss} to ${calculatedLoss}.`);
+            }
+        }
+
+        // Always update to calculatedLoss
+        this._syncField('lossAmount', calculatedLoss);
+
+        // Keep unit % validation
         if (!this.validateLossValue()) {
-            this.popupInfo();
+            this.popupInfo(`Please select the impacted units along with the loss percentage, Total Loss% should be 100`);
         }
     }
 
-    // popupInfo() {
-    //     const timeout = 3000; // 3 seconds
-    //     const confirm = this.dialog.open(AlertComponent, {
-    //       id: "InfoComponent",
-    //       disableClose: false,
-    //       minWidth: "300px",
-    //       panelClass: "my-dialog",
-    //       data: {
-    //         title: '',
-    //         content: `Please select the impacted units along
-    //         with the loss percentage, Total Loss% should be 100`
-    //       }
-    //     });
+    /** Helper to clamp negative values to zero */
+    private _clampToNonNegative(val: number): number {
+        return val < 0 || isNaN(val) ? 0 : val;
+    }
 
-    //     confirm.afterOpened().subscribe((result) => {
-    //       setTimeout(() => {
-    //         confirm.close();
-    //         // this.router.navigate(['']);
-    //       }, timeout)
-    //     });
-    //   }
+    /** Helper to sync form + incident object */
+    private _syncField(field: string, value: number) {
+        this.incident[field] = value;
+        if (this.incidentForm.get(field)) {
+            this.incidentForm.get(field)!.setValue(value, { emitEvent: false });
+        }
+    }
 
-    popupInfo() {
+
+    validateLossValue(): boolean {
+        let checks = []
+        let vLossValue: boolean;
+        let lossTotal = 0
+        if (this.service.info) {
+            checks = this.service.info.units.filter((loss: any) => loss.checked)
+            let losses = this.service.info.units.map((loss: any) => Number(loss.LossValue) || 0)
+            lossTotal = losses.reduce((sum: number, val: number) => sum + val, 0)
+        }
+        if (this.incident.LossAmount && Number(this.incident.LossAmount) > 0)
+            vLossValue = lossTotal == 100
+        else {
+            vLossValue = true
+        }
+        return vLossValue
+    }
+
+    popupInfo(content: string) {
         const dialogRef = this.dialog.open(AlertComponent, {
             width: '250px',
             panelClass: "dark",
             data: {
                 title: '',
-                content: `Please select the impacted units along
-                with the loss percentage, Total Loss% should be 100`
+                content: content
             }
-          });
+        });
 
-          dialogRef.afterClosed().subscribe(result => {
-            console.log('The dialog was closed');
-          });
-      }
-      selectedUnit(event: any, incident: any) {
-        console.log("Clicked mat-select", event, incident);
+        dialogRef.afterClosed().subscribe(result => {
+            // console.log('The dialog was closed');
+        });
+    }
+    selectedUnit(event: any, incident: any) {
+        // console.log("Clicked mat-select", event, incident);
         incident.UnitID = ""
     }
 }

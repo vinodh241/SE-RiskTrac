@@ -33,41 +33,41 @@ export interface kriDefine {
     providers: [KriService]
 })
 export class KriDefinitionsComponent implements OnInit {
-    displayedColumns: string[] = ['id','KriCode', 'group', 'unit', 'Indicator', 'Measurmentfrequency', 'Reportingfrequency', 'Target', 'Kritype', 'thresholdvalue-1', 'thresholdvalue-2', 'thresholdvalue-3', 'thresholdvalue-4', 'thresholdvalue-5', 'action',];
+    displayedColumns: string[] = ['id', 'KriCode', 'group', 'unit','InherentRisk', 'Indicator', 'Measurmentfrequency', 'Reportingfrequency', 'Target', 'Kritype', 'thresholdvalue-1', 'thresholdvalue-2', 'thresholdvalue-3', 'thresholdvalue-4', 'thresholdvalue-5', 'action',];
     dataSource!: MatTableDataSource<kriDefine>;
 
     @ViewChild(MatPaginator) paginator: MatPaginator | any;
     @ViewChild(MatSort) sort: MatSort | undefined;
     utils: any;
-      filenameWithoutExtension: any[] = [];
-        invalidfile: boolean = false;
-        bulkRIData: FormData = new FormData();
-        ExcelValidExtension: Array<string> = ['xlsx'];
-        selectedExcelJson: any[] = [];
-        excelValidHeaders = ["UnitName ", "Description", "Measurement Frequency", "KRI Type", "Threshold Value1", "Threshold Value2", "Threshold Value3","Threshold Value4","Threshold Value5"];
-        fileName: string =  ''
-        validFileNameErr: boolean = false;
-        disableToggle:number = 0;
-        
-        public uploader: FileUploader = new FileUploader({
-            isHTML5: true
-        });
-        importButtonFlag:boolean = false
-    
+    filenameWithoutExtension: any[] = [];
+    invalidfile: boolean = false;
+    bulkRIData: FormData = new FormData();
+    ExcelValidExtension: Array<string> = ['xlsx'];
+    selectedExcelJson: any[] = [];
+    excelValidHeaders = ["UnitName ", "Description", "Measurement Frequency", "KRI Type", "Threshold Value1", "Threshold Value2", "Threshold Value3", "Threshold Value4", "Threshold Value5"];
+    fileName: string = ''
+    validFileNameErr: boolean = false;
+    disableToggle: number = 0;
+
+    public uploader: FileUploader = new FileUploader({
+        isHTML5: true
+    });
+    importButtonFlag: boolean = false
+
 
     constructor(public kriService: KriService, public dialog: MatDialog,
-          @Inject(DOCUMENT) private _document: any
+        @Inject(DOCUMENT) private _document: any
     ) {
 
     }
 
-    getKriDefine(): any {
-        if (environment.dummyData) {
-            let data = {
-            };
-            this.process(data);
-        }
-    }
+    // getKriDefine(): any {
+    //     if (environment.dummyData) {
+    //         let data = {
+    //         };
+    //         this.process(data);
+    //     }
+    // }
 
     ngOnInit(): any {
         this.kriService.getKriDefine();
@@ -76,14 +76,11 @@ export class KriDefinitionsComponent implements OnInit {
                 this.paginations();
             }
         })
-
-
     }
 
     paginations() {
-
         setTimeout(() => {
-            console.log(' this.kriService.kriDefine: ' + this.kriService.kriDefine)
+            // console.log(' this.kriService.kriDefine: ' + this.kriService.kriDefine)
             this.kriService.kriDefine.paginator = this.paginator;
         }, 1000);
     }
@@ -116,7 +113,7 @@ export class KriDefinitionsComponent implements OnInit {
             }
         });
         definition.afterClosed().subscribe(result => {
-            if(result || result == undefined){
+            if (result || result == undefined) {
                 this.kriService.getKriDefine();
                 this.paginations();
             }
@@ -143,8 +140,8 @@ export class KriDefinitionsComponent implements OnInit {
         });
 
         kriDefineList.afterClosed().subscribe(result => {
-            if(result || result == undefined){
-                console.log("result")
+            if (result || result == undefined) {
+                // console.log("result")
                 this.kriService.getKriDefine();
                 this.paginations();
             }
@@ -166,7 +163,7 @@ export class KriDefinitionsComponent implements OnInit {
         confirm.afterClosed().subscribe(result => {
             if (result) {
                 this.kriService.deletekridefinition(row).subscribe((res: any) => {
-                    console.log(res)
+                    // console.log(res)
                     next:
                     this.deleteSuccess();
                     error:
@@ -202,37 +199,37 @@ export class KriDefinitionsComponent implements OnInit {
         this.importButtonFlag = true;
         const fileInput = event.target;
         if (this.uploader.queue.length > 1) {
-            console.log('this.uploader.queue.length: ' + this.uploader.queue.length);
+            // console.log('this.uploader.queue.length: ' + this.uploader.queue.length);
             let latestFile = this.uploader.queue[this.uploader.queue.length - 1];
             this.uploader.queue = [];
             this.uploader.queue.push(latestFile);
         }
         this.invalidfile = false;
-        
+
         for (let j = 0; j < this.uploader.queue.length; j++) {
             let fileItem: File = this.uploader.queue[j]._file;
             this.fileName = fileItem.name;
             this.filenameWithoutExtension = this.fileName.split('.').slice();
             let extension = this.fileName.split('.').pop() as string;
-            
+
             if (this.ExcelValidExtension.includes(extension.toLowerCase())) {
                 this.invalidfile = false;
                 const reader: FileReader = new FileReader();
                 reader.readAsBinaryString(fileItem);
-                
+
                 reader.onload = (e: any) => {
                     /* Create workbook */
                     const binarystr: string = e.target.result;
                     const wb: XLSX.WorkBook = XLSX.read(binarystr, { type: 'binary' });
-                    
+
                     /* Select the first sheet */
                     const wsname: string = wb.SheetNames[0];
                     const ws: XLSX.WorkSheet = wb.Sheets[wsname];
-                    
+
                     /* Convert sheet data to JSON with default null values */
                     let data = XLSX.utils.sheet_to_json(ws, { defval: null });
-                    console.log("Raw Data:", data);
-                    
+                    // console.log("Raw Data:", data);
+
                     /* Trim headers */
                     if (data.length > 0) {
                         data = data.map((row: any) => {
@@ -244,13 +241,13 @@ export class KriDefinitionsComponent implements OnInit {
                             return trimmedRow;
                         });
                     }
-                    
+
                     this.selectedExcelJson = JSON.parse(JSON.stringify(data)) || [];
-                    
+
                     let isValidHeaders = false, isElementsValid = true;
                     this.selectedExcelJson.forEach((excelJson) => {
                         let list = [...Object.keys(excelJson).map((ele: any) => ele.trim())];
-                        
+
                         list.forEach(header => {
                             if (this.excelValidHeaders.includes(header)) {
                                 isValidHeaders = true;
@@ -259,10 +256,10 @@ export class KriDefinitionsComponent implements OnInit {
                                 isElementsValid = false;
                             }
                         });
-                        
+
                         if (isValidHeaders && isElementsValid) {
                             this.importButtonFlag = true;
-                            console.log("Valid Data, Proceeding with Upload");
+                            // console.log("Valid Data, Proceeding with Upload");
                             this.bulkRIData = new FormData();
                             this.bulkRIData.append('bulkKRIData', JSON.stringify(data));
                             this.bulkRIData.append('fileName', this.fileName);
@@ -270,8 +267,8 @@ export class KriDefinitionsComponent implements OnInit {
                             this.popupInfoKRI("Unsuccessful", "Please select a valid template file with all mandatory parameters.");
                         }
                     });
-                    
-                    console.log("Header Validation:", isValidHeaders, "Element Validation:", isElementsValid);
+
+                    // console.log("Header Validation:", isValidHeaders, "Element Validation:", isElementsValid);
                     fileInput.value = '';
                     this.uploader.clearQueue();
                 };
@@ -279,7 +276,7 @@ export class KriDefinitionsComponent implements OnInit {
                 this.invalidfile = true;
                 this.popupInfoKRI("Unsuccessful", "Invalid File Type");
             }
-            
+
             if (fileNamePattern(this.fileName)) {
                 this.validFileNameErr = true;
                 this.popupInfoKRI("Unsuccessful", "Special Characters are not allowed in File name");
@@ -291,7 +288,7 @@ export class KriDefinitionsComponent implements OnInit {
 
 
     bulkUploadExcelFile() {
-        if(this.filenameWithoutExtension.length > 0) {
+        if (this.filenameWithoutExtension.length > 0) {
             this.kriService.bulkUploadKriMetrics(this.bulkRIData).subscribe(res => {
                 next:
                 localStorage.setItem('token', res.token);
@@ -299,7 +296,7 @@ export class KriDefinitionsComponent implements OnInit {
 
                     this.popupInfo("Success", res.message)
                     // if(this.invalidData.length > 0){
-                        this.importButtonFlag = false
+                    this.importButtonFlag = false
                     //   }
                     setTimeout(() => {
                         this.kriService.getKriDefine();

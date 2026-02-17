@@ -207,4 +207,12 @@ div.summaryinfo {
     transition: width 2s;
     border-radius: 0.5vh;
     color: white;
+    white-space: nowrap;
+}
+
+.leftPlusIcon {
+    left: -15%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-16%);
 }

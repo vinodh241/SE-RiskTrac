@@ -1,0 +1,90 @@
+.button-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    margin: 0 4vh 0 4vh;
+}
+
+.mat-elevation-z8 {
+    margin: 0 4vh 0 4vh;
+}
+
+.mat-header-row {
+    min-height: 10vh;
+}
+
+.mat-header-cell{
+  min-width: 34vh;
+}
+
+.mat-column-Index {
+    min-width: 5vh;
+}
+
+.mat-column-Name {
+  min-width: 15vw;
+}
+
+.mat-column-UnitNames {
+  min-width: 25vw;
+}
+
+.mat-column-ORMRole {
+  min-width: 18vh;
+}
+
+.mat-column-ORMAdmin {
+  min-width: 15vh;
+}
+
+.mat-column-BCMRole {
+  min-width: 18vh;
+}
+
+.mat-column-BCMAdmin {
+  min-width: 15vh;
+}
+
+.mat-column-Action {
+  min-width: 15vh;
+}
+
+.mat-column-Role,
+
+.tablestyle{
+  border-right: 1px solid #eee;
+  padding-right: 24px;
+  padding-left: 5px;
+}
+
+.mat-table-padding tr:nth-child(even) {
+  background-color: #f3f3f3;
+}
+
+::ng-deep .power-toggle .mat-slide-toggle-thumb {
+  background-color: #C24F32 !important;
+}
+
+::ng-deep .standard-toggle .mat-slide-toggle-thumb {
+  background-color: #40D790 !important;
+}
+::ng-deep .noColor-toggle .mat-slide-toggle-thumb {
+  background-color: #77828A !important;
+}
+
+::ng-deep .standardColor-toggle .mat-slide-toggle-thumb {
+  background-color: #6f79db !important;
+}
+
+.mat-header-cell {
+  padding-top: 25px;
+}
+
+
+.disableClass{
+  pointer-events: none;
+}
+
+::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
+  background-color: #CCCECF;
+}

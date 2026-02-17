@@ -40,7 +40,7 @@ export class IncidentDashboardComponent implements OnInit {
     incidentopendata: any;
     incidentOpenRecords: any;
     overduerecords: any;
-    overduerecordsPercentage=0;
+    overduerecordsPercentage = 0;
     overduedata: any;
     lossdataRecords: any;
     potentialLossCount: any;
@@ -76,25 +76,25 @@ export class IncidentDashboardComponent implements OnInit {
     totalopencount: any;
     value: any;
     totaldata: any;
-    totalNoOfOpen=0;
-    totalNoOfOverdue=0;
-    totalNoOfRejected=0
+    totalNoOfOpen = 0;
+    totalNoOfOverdue = 0;
+    totalNoOfRejected = 0
     quarterFilter: any;
-    totalRecData=0;
-    totalNoOfClaimClosed=0;
-    totalNoOfClosed=0;
-    currency: any =environment.currency;
+    totalRecData = 0;
+    totalNoOfClaimClosed = 0;
+    totalNoOfClosed = 0;
+    currency: any;
 
     // UnitData: any[];
     constructor(
         public dashboardservice: DashboardService,
         public dialog: MatDialog
-    ) {}
+    ) { }
 
     ngOnInit(): void {
         this.dashboardservice.getIncidentData();
         this.dashboardservice.getYearQuarterData();
-        // this.currency = this.dashboardservice.CurrencyType?.length > 0 ? this.dashboardservice.CurrencyType[0].Currency : '';
+        this.currency = this.dashboardservice.CurrencyType?.length > 0 ? this.dashboardservice.CurrencyType[0].Currency : '';
         this.dashboardservice.gotincidentDashboardMaster.subscribe((value) => {
             if (value == true) {
                 this.RawData = this.dashboardservice.dashboardIncMaster;
@@ -119,13 +119,13 @@ export class IncidentDashboardComponent implements OnInit {
                         '-' +
                         currentDate.getFullYear().toString().substr(2, 2); // Get the current quarter
 
-                    this.allData = this.RawData.filter(
+                    this.allData = (Array.isArray(this.RawData) ? this.RawData : []).filter(
                         (data: any) =>
                             data.Quater === this.quarterFilter && (data.StatusID != 1 && data.StatusID != 11 && data.StatusID != 12 && data.StatusID != 17 && data.StatusID != 18 && data.StatusID != 13 &&
-                               data.StatusID != 14 && data.StatusID != 15 &&
-                                 data.StatusID != 16)
+                                data.StatusID != 14 && data.StatusID != 15 &&
+                                data.StatusID != 16)
                     ); // Filter the object based on the current quarter
-                    console.log(' this.allData', this.allData);
+                    // console.log(' this.allData', this.allData);
                     this.incidentAllData = this.allData.length;
                     this.totalCount = 0;
                     this.getIncidentWise();
@@ -197,7 +197,7 @@ export class IncidentDashboardComponent implements OnInit {
             UnitData.push(obj);
         }
 
-        console.log(UnitData);
+        // console.log(UnitData);
 
         this.UnitData = UnitData.sort((a, b) => b.Count - a.Count);
         this.top3Data = this.UnitData.slice(0, 3);
@@ -276,7 +276,7 @@ export class IncidentDashboardComponent implements OnInit {
                     ? SourceData[item.IncidentSource]++
                     : (SourceData[item.IncidentSource] = 1);
             });
-            console.log('SourceData', SourceData);
+            // console.log('SourceData', SourceData);
 
             for (let key in SourceData) {
                 this.levelData.push({
@@ -284,7 +284,7 @@ export class IncidentDashboardComponent implements OnInit {
                     SourceCount: SourceData[key],
                 });
             }
-            console.log('this.levelData: ', this.levelData);
+            // console.log('this.levelData: ', this.levelData);
             this.levelData = this.levelData.sort(
                 (a, b) => b.SourceCount - a.SourceCount
             );
@@ -309,28 +309,28 @@ export class IncidentDashboardComponent implements OnInit {
         for (const item of this.allData) {
             // console.log("this.allData",this.allData)
             if ("OverDueRecommendationCount" in item && item["OverDueRecommendationCount"] !== null && item["OverDueRecommendationCount"] !== 0) {
-              this.totalNoOfOverdue += item["OverDueRecommendationCount"];
+                this.totalNoOfOverdue += item["OverDueRecommendationCount"];
             }
 
-            }
-          for (const item of this.allData) {
+        }
+        for (const item of this.allData) {
             if ("NoOfClosed" in item && item["NoOfClosed"] !== null && item["NoOfClosed"] !== 0) {
-              this.totalNoOfClosed += item["NoOfClosed"];
+                this.totalNoOfClosed += item["NoOfClosed"];
             }
-          }
-          for (const item of this.allData) {
+        }
+        for (const item of this.allData) {
             if ("NoOfClaimClosed" in item && item["NoOfClaimClosed"] !== null && item["NoOfClaimClosed"] !== 0) {
                 this.totalNoOfClaimClosed += item["NoOfClaimClosed"];
-              }
+            }
         }
 
         // return totalNoOfClosed;
-        this.totalRecData =this.allData.map((item:any) => item.NoOfRecommendations)?.reduce((a:any, b:any) => a + b);
+        this.totalRecData = this.allData.map((item: any) => item.NoOfRecommendations)?.reduce((a: any, b: any) => a + b);
         this.overduerecordsPercentage =
-        (this.totalNoOfOverdue /
-        this.totalRecData) *
+            (this.totalNoOfOverdue /
+                this.totalRecData) *
             100;
-          console.log(" this.overduerecordsPercentage", this.overduerecordsPercentage)
+        // console.log(" this.overduerecordsPercentage", this.overduerecordsPercentage)
 
 
 
@@ -340,11 +340,11 @@ export class IncidentDashboardComponent implements OnInit {
         this.totalNoOfOpen = 0
         for (const item of this.allData) {
             if ("NoOfOpen" in item && item["NoOfOpen"] !== null && item["NoOfOpen"] !== 0) {
-              this.totalNoOfOpen += item["NoOfOpen"];
+                this.totalNoOfOpen += item["NoOfOpen"];
             }
-          }
+        }
 
-console.log("Total NoOfOpen values:", this.totalNoOfOpen);
+        // console.log("Total NoOfOpen values:", this.totalNoOfOpen);
 
         // return totalOpenCount
         // const lossAmount = this.allData.reduce(
@@ -410,19 +410,19 @@ console.log("Total NoOfOpen values:", this.totalNoOfOpen);
         this.rejectedRecordCountRecords = this.allData.filter(
             (ele: any) =>
                 ele.NoOfRejectedRecommendations != null &&
-                ele.NoOfRejectedRecommendations != 0 &&  ele.Quater === this.quarterFilter
+                ele.NoOfRejectedRecommendations != 0 && ele.Quater === this.quarterFilter
         );
-        console.log(
-            'this.rejectedRecordCountData1',
-            this.rejectedRecordCountData1
-        );
+        // console.log(
+        //     'this.rejectedRecordCountData1',
+        //     this.rejectedRecordCountData1
+        // );
         this.totalNoOfRejected = 0
         for (const item of this.allData) {
             if ("NoOfRejectedRecommendations" in item && item["NoOfRejectedRecommendations"] !== null && item["NoOfRejectedRecommendations"] !== 0) {
-              this.totalNoOfRejected += item["NoOfRejectedRecommendations"];
+                this.totalNoOfRejected += item["NoOfRejectedRecommendations"];
             }
-          }
-          console.log("totalNoOfRejected",this.totalNoOfRejected)
+        }
+        // console.log("totalNoOfRejected", this.totalNoOfRejected)
     }
 
     potentialLossData() {
@@ -468,7 +468,7 @@ console.log("Total NoOfOpen values:", this.totalNoOfOpen);
                 title: unitName,
             },
         });
-        dialog.afterClosed().subscribe((result) => {});
+        dialog.afterClosed().subscribe((result) => { });
     }
 
     openDataPopup() {
@@ -483,7 +483,7 @@ console.log("Total NoOfOpen values:", this.totalNoOfOpen);
                 dataId: '1',
             },
         });
-        dialog.afterClosed().subscribe((result) => {});
+        dialog.afterClosed().subscribe((result) => { });
     }
     overdueDataPopup() {
         let title = 'Overdue Recommendations';
@@ -497,7 +497,7 @@ console.log("Total NoOfOpen values:", this.totalNoOfOpen);
                 dataId: '2',
             },
         });
-        dialog.afterClosed().subscribe((result) => {});
+        dialog.afterClosed().subscribe((result) => { });
     }
 
     unitDataPopup(unitName: any) {
@@ -514,7 +514,7 @@ console.log("Total NoOfOpen values:", this.totalNoOfOpen);
                 title: unitName,
             },
         });
-        dialog.afterClosed().subscribe((result) => {});
+        dialog.afterClosed().subscribe((result) => { });
     }
 
     RejectedDataPopup() {
@@ -529,7 +529,7 @@ console.log("Total NoOfOpen values:", this.totalNoOfOpen);
                 dataId: '3',
             },
         });
-        dialog.afterClosed().subscribe((result) => {});
+        dialog.afterClosed().subscribe((result) => { });
     }
 
     viewAll() {
@@ -541,7 +541,7 @@ console.log("Total NoOfOpen values:", this.totalNoOfOpen);
                 id: this.UnitData,
             },
         });
-        dialog.afterClosed().subscribe((result) => {});
+        dialog.afterClosed().subscribe((result) => { });
     }
 
     // clickBars(data:any){

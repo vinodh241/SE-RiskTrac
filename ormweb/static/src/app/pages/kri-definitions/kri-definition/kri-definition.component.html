@@ -11,14 +11,12 @@
         <mat-icon aria-hidden="false" aria-label="Close" fontIcon="close" ></mat-icon>
     </button>
 </mat-toolbar>
-<div class="container" style="overflow-y: scroll;
-height: 82vh;
-overflow-x: hidden;">
+<div class="container" style="overflow-y: scroll; height: 82vh; overflow-x: hidden;">
     <form [formGroup]="defineKRIForm">
-        <mat-dialog-content>
-            <div class="top-section">
-                <div class="groups-units">
-                    <mat-form-field appearance="fill" *ngIf="data.mode=='add'">
+        <mat-dialog-content style="max-width: 100%;"> 
+            <div class="topNewSectionFiled">
+                <div class="topFirstField">
+                    <mat-form-field appearance="fill" *ngIf="data.mode=='add'" class="w100">
                         <mat-label>Select Group </mat-label>
                         <mat-select formControlName="groupID">
                             <mat-option *ngFor="let group of data.groups" [value]="group.GroupID">
@@ -26,7 +24,7 @@ overflow-x: hidden;">
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <mat-form-field appearance="fill" *ngIf="data.mode=='edit'">
+                    <mat-form-field appearance="fill" *ngIf="data.mode=='edit'" class="w100">
                         <mat-label>Select Group</mat-label>
                         <mat-select formControlName="groupID" [(ngModel)]="kriData.GroupName" [disabled]="true">
                             <mat-option *ngFor="let group of data.groups" [value]="group.GroupName">
@@ -34,7 +32,9 @@ overflow-x: hidden;">
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <mat-form-field appearance="fill" *ngIf="data.mode=='add'">
+                </div>
+                <div class="topFirstField">
+                    <mat-form-field appearance="fill" *ngIf="data.mode=='add'" class="w100">
                         <mat-label>Select Unit</mat-label>
                         <mat-select formControlName="unitID">
                             <mat-option *ngFor="let unit of filteredAddUnits()" [value]="unit.UnitID">
@@ -42,7 +42,7 @@ overflow-x: hidden;">
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <mat-form-field appearance="fill" *ngIf="data.mode=='edit'">
+                    <mat-form-field appearance="fill" *ngIf="data.mode=='edit'" class="w100">
                         <mat-label>Select Unit</mat-label>
                         <mat-select formControlName="unitID" [(ngModel)]="kriData.UnitID" [compareWith]="compareUnit"
                             [disabled]="true">
@@ -52,18 +52,38 @@ overflow-x: hidden;">
                         </mat-select>
                     </mat-form-field>
                 </div>
-                <div class="textinput-section">
-                    <mat-form-field style="width:100%;" *ngIf="data.mode=='add'">
-                        <mat-label>KRI</mat-label>
-                        <textarea formControlName="keyRiskIndicator" matInput placeholder="Describe KRI" cols="3"
-                            rows="6"></textarea>
-                    </mat-form-field>
-                    <mat-form-field style="width:100%;" *ngIf="data.mode=='edit'">
-                        <mat-label>KRI</mat-label>
-                        <textarea formControlName="keyRiskIndicator" [(ngModel)]="kriData.KeyRiskIndicator" matInput
-                            placeholder="Describe KRI" cols="3" rows="6"></textarea>
-                    </mat-form-field>
+                <div class="topFirstField">
+                    <mat-form-field style="width:100%;" appearance="fill" *ngIf="data.mode=='add'">
+                    <mat-label>Select Inherent Risk</mat-label>
+                    <mat-select formControlName="inherentRisk">
+                        <mat-option *ngFor="let inherentRisk of filteredAddInherentRisk()" [value]="inherentRisk.InherentRiskID">
+                            {{inherentRisk.Risk}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field style="width:100%;" appearance="fill" *ngIf="data.mode=='edit'">
+                    <mat-label>Select Inherent Risk</mat-label>
+                    <mat-select formControlName="inherentRisk" [(ngModel)]="kriData.InherentRiskID">
+                        <mat-option *ngFor="let inherentRisk of filteringEditInherentRisk()" [value]="inherentRisk.InherentRiskID">
+                            {{inherentRisk.Risk}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
                 </div>
+            </div>
+            <!-- <div class="w50plus">
+                
+            </div> -->
+            <div class="w49">
+                <mat-form-field style="width:100%;" *ngIf="data.mode=='add'">
+                    <mat-label>KRI</mat-label>
+                    <textarea formControlName="keyRiskIndicator" matInput placeholder="Describe KRI" cols="3" rows="6"></textarea>
+                </mat-form-field>
+                <mat-form-field style="width:100%;" *ngIf="data.mode=='edit'">
+                    <mat-label>KRI</mat-label>
+                    <textarea formControlName="keyRiskIndicator" [(ngModel)]="kriData.KeyRiskIndicator" matInput
+                        placeholder="Describe KRI" cols="3" rows="6"></textarea>
+                </mat-form-field>
             </div>
         </mat-dialog-content>
         <div class="mid-section">

@@ -84,7 +84,7 @@ mat-card{
  .progrescontainer .mainprogress .bar .contanrside{
     font-size: 11px;
     width: 150px;
-    text-align: end;
+    text-align: flex-end;
     line-height: normal;
  }
  .progrescontainer .mainprogress .bar .mainbar {
@@ -124,7 +124,7 @@ mat-card{
 
 .toggle-button{
    display: flex;
-   justify-content: end;
+   justify-content: flex-end;
    align-items: center;
    font-size: 13px;
    padding-right: 15px;

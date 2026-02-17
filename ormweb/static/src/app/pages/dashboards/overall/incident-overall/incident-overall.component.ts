@@ -29,7 +29,7 @@ export class IncidentOverallComponent implements OnInit {
     high: any;
     medium: any;
     low: any;
-    currency: any = environment.currency;
+    currency: any;
     constructor(public dashboardservice: DashboardService,public dialog: MatDialog, public DashboardComponent: DashboardComponent) {}
 
     ngOnInit(): void {
@@ -38,7 +38,8 @@ export class IncidentOverallComponent implements OnInit {
         this.dashboardservice.gotOverallDashboardMaster.subscribe((value) => {
             if (value == true) {
                 this.INCData = this.dashboardservice.dashboardINCMaster;
-                console.log('INCdata', this.INCData);
+                this.currency = this.dashboardservice?.CurrencyType.length > 0 ? this.dashboardservice?.CurrencyType[0].Currency : ''
+                // console.log('INCdata', this.INCData);
                 this.dashboardservice.gotYearQuater.subscribe((value) => {
                     this.yearData = this.dashboardservice.yearValue;
                     this.quaterData = this.dashboardservice.quaterValue;
@@ -62,9 +63,9 @@ export class IncidentOverallComponent implements OnInit {
                     this.listdata = this.INCData.filter(
                         (data: any) => data.StatusID != 1
                     );
-                    console.log('this.quarterFilter', this.quarterFilter);
+                    // console.log('this.quarterFilter', this.quarterFilter);
                     this.allData = this.INCData.filter((data: any) =>  data.Quater === this.quarterFilter && (data.StatusID != 1 && data.StatusID != 11 && data.StatusID != 12 && data.StatusID != 17 && data.StatusID != 18 && data.StatusID != 13 && data.StatusID != 14 && data.StatusID != 15 && data.StatusID != 16)); // Filter the object based on the current quarter
-                    console.log(' this.allData', this.allData);
+                    // console.log(' this.allData', this.allData);
                     this.incidentAllData = this.allData.length;
                     setTimeout(() => {
                         this.values = this.allData;
@@ -92,7 +93,7 @@ export class IncidentOverallComponent implements OnInit {
         });
     }
     incidentGraphData() {
-        console.log('123');
+        // console.log('123');
         this.options = {
             chart: {
                 type: 'column',
@@ -242,14 +243,14 @@ export class IncidentOverallComponent implements OnInit {
                 this.totalLossAmount += item.LossAmount;
             }
         });
-        console.log('Total Loss Amount:', this.totalLossAmount);
+        // console.log('Total Loss Amount:', this.totalLossAmount);
     }
 
     getIndex(dt: any) {
         let index = 1;
         let list = [];
         for (let i of dt) {
-            i.sno = index;
+            i['sno'] = index;
             list.push(i);
             index++;
         }

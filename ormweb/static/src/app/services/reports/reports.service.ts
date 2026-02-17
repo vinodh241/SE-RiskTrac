@@ -32,6 +32,7 @@ export class ReportsService extends RestService {
     public assesmentUnits: BehaviorSubject<any> = new BehaviorSubject([]);
     public RAResultsUnit: BehaviorSubject<any> = new BehaviorSubject([]);
     public rcsaResultUnit: BehaviorSubject<any> = new BehaviorSubject([]);
+    reportFrequencyData: any;
     constructor(
         private utils: UtilsService,
         private _http: HttpClient,
@@ -107,74 +108,14 @@ export class ReportsService extends RestService {
         }
     }
     getKRI() {
-        if (environment.dummyData) {
-            let result = {
-                "KRIData": [
-                    {
-                        "MetricID": "159",
-                        "Unit": "Compliance",
-                        "UnitID": 10,
-                        "KRICode": "KRI-CM-001",
-                        "Indicator": "% of AML investigation not completed",
-                        "MeasurementFrequency": "Monthly",
-                        "KRIType": "Process",
-                        "Period": "Jan 2023",
-                        "Date": "2023-01-31T13:36:52.990Z",
-                        "MeasurementID": "1",
-                        "MeasurementValue": 8,
-                        "ThresholdID": 1,
-                        "KRI_Value": 1,
-                        "KRI_Target": "100%",
-                        "Remark": "sxsdsada",
-                        "KRIStatus": "Measured",
-                        "Quater": "Q1-23",
-                        "ThresholdValue1": 70,
-                        "ThresholdValue2": 70,
-                        "ThresholdValue3": 80,
-                        "ThresholdValue4": 90,
-                        "ThresholdValue5": 100,
-                        "FrequencyID": 1,
-                        "Frequency": "Monthly"
-                    },
-                    {
-                        "MetricID": "159",
-                        "Unit": "Compliance",
-                        "UnitID": 10,
-                        "KRICode": "KRI-CM-001",
-                        "Indicator": "% of AML investigation not completed",
-                        "MeasurementFrequency": "Monthly",
-                        "KRIType": "Process",
-                        "Period": "Jan 2023",
-                        "Date": "2023-01-31T13:36:52.990Z",
-                        "MeasurementID": "1",
-                        "MeasurementValue": 8,
-                        "ThresholdID": 1,
-                        "KRI_Value": 1,
-                        "KRI_Target": "100%",
-                        "Remark": "sadsads",
-                        "KRIStatus": "Measured",
-                        "Quater": "Q1-23",
-                        "ThresholdValue1": 70,
-                        "ThresholdValue2": 70,
-                        "ThresholdValue3": 80,
-                        "ThresholdValue4": 90,
-                        "ThresholdValue5": 100,
-                        "FrequencyID": 1,
-                        "Frequency": "Monthly"
-                    }]
+        this.post("/operational-risk-management/report/get-report-kri", {}).subscribe(res => {
+            if (res.success == 1) {
+                this.processKRI(res.result);
+            } else {
+                if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
+                    this.utils.relogin(this._document);
             }
-            this.processKRI(result);
-        }
-        else {
-            this.post("/operational-risk-management/report/get-report-kri", {}).subscribe(res => {
-                if (res.success == 1) {
-                    this.processKRI(res.result);
-                } else {
-                    if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
-                        this.utils.relogin(this._document);
-                }
-            });
-        }
+        });
     }
     getRA() {
         if (environment.dummyData) {
@@ -218,7 +159,7 @@ export class ReportsService extends RestService {
             this.post("/operational-risk-management/report/get-report-risk-appetite", {}).subscribe(res => {
                 if (res.success == 1) {
                     this.processRA(res.result);
-                    console.log("service cal", res.result)
+                    // console.log("service cal", res.result)
                 } else {
                     if (res.error.errorCode && res.error.errorCode == "TOKEN_EXPIRED")
                         this.utils.relogin(this._document);
@@ -289,8 +230,9 @@ export class ReportsService extends RestService {
         this.gotRCSA.next(true)
     }
     processKRI(response: any): void {
-        this.KRIResults = response.KRIData
-        this.KRIResultsNew = JSON.stringify(response.KRIData)
+        this.KRIResults = response.KRIData;
+        this.KRIResultsNew = JSON.stringify(response.KRIData);
+        this.reportFrequencyData = response.reportingFrequencyData ?? [];
         this.gotKRI.next(true)
     }
     processRA(response: any): void {

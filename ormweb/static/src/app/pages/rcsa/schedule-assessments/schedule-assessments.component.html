@@ -28,11 +28,10 @@
                 <mat-icon>add</mat-icon>
             </button> -->
             <div class="applyFilter addDesktop position-relative text-start me-4" *ngIf="canCreateEditAccess()">
-                <button type="button" class="btn btn-dark btnGradient ad" [style.display]="iSCreateScheduleAssementEnabled === 1 ? ''  : 'none'" data-bs-toggle="modal" aria-label="New Schedule Assessment" (click)="initiateAdd()" matTooltip="Schedule New RCSA"><span
-                    class="font-weight-bold"></span>Schedule New RCSA</button>
-                <span class="position-absolute vmiddleLeft text-white iconPositionLeft"><img src="./assets/images/icon-add-desktop.svg" style="    width: 2vh;
-                    margin-top: 1vh;
-                    margin-left: -7.2vh;"></span>
+                <button type="button" class="btn btn-dark btnGradient ad position-relative" [style.display]="iSCreateScheduleAssementEnabled === 1 ? ''  : 'none'" data-bs-toggle="modal" aria-label="New Schedule Assessment" (click)="initiateAdd()" matTooltip="Schedule New RCSA" style="position: relative;">
+                    <span class="font-weight-bold"></span> 
+                    <span class="position-absolute vmiddleLeft text-white leftPlusIcon"><img src="./assets/images/icon-add-desktop.svg" style="width: 2vh;"></span> Schedule New RCSA</button>
+                
             </div>
             <span *ngIf="showexportData && canDownloadsearchAccess()" (click)="exportAsXLSX()" class="mat-button-wrapper"><img
                     src="assets/icon-excel.svg" style="opacity: 1;" matTooltip="Export to Excel"></span>

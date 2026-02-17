@@ -2,7 +2,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { KriService } from 'src/app/services/kri/kri.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
+import { MatTableDataSource } from '@angular/material/table';
 import { UtilsService } from 'src/app/services/utils/utils.service';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
     selector: 'app-kri-master',
@@ -10,12 +12,14 @@ import { UtilsService } from 'src/app/services/utils/utils.service';
     styleUrls: ['./kri-master.component.scss'],
 })
 export class KriMasterComponent implements OnInit {
-    displayedColumns: string[] = ['Index', 'Name', 'StatusType' ,'Action'];
+    displayedColumns: string[] = ['Index', 'Name', 'StatusType', 'Action'];
     displayedColumnsStatus: string[] = ['StatusIndex', 'StatusName'];
     displayedColumns1: string[] = ['ThreIndex', 'Value', 'ColorCode', 'Action'];
     displayedColumns2: string[] = ['Index', 'Name', 'Period', 'Status'];
+    // New column list used only for Reporting Frequency table
+    displayedColumnsRF: string[] = ['Index', 'Name', 'GracePeriodDays', 'reminderdays', 'Period', 'LastUpdatedDate', 'Status'];
     displayedColumns3: string[] = ['UserIndex', 'FullName', 'IsActive'];
-    displayedColumns4: string[] = ['Index', 'CurrentFrequency', 'NewFrequency', 'FullName', 'EffectiveDate'];
+    displayedColumns4: string[] = ['Index', 'CurrentFrequency', 'NewFrequency','OldBufferDays', 'NewBufferDays', 'EffectiveDate', 'FullName' ];
 
     days = [
         'Day 1',
@@ -44,7 +48,7 @@ export class KriMasterComponent implements OnInit {
         'Day 24',
         'Day 25',
     ];
-    months = [`Month ${ new Date().getMonth() + 1}`];
+    months = [`Month ${new Date().getMonth() + 1}`];
     quarter = ['Month 1', 'Month 2', 'Month 3'];
     semianually = [
         'Month 1',
@@ -117,15 +121,22 @@ export class KriMasterComponent implements OnInit {
     numericPartDay: any;
     numericMonthData: any;
     reportingFreq: any;
-    updatedFrequencyData:any[] =[];
-    constructor(public service: KriService, private _dialog: MatDialog, public utils: UtilsService,) {
+    updatedFrequencyData: any[] = [];
+    selectedFrequencyId: number | string | null = null;
+
+    constructor(
+        public service: KriService,
+        private _dialog: MatDialog,
+        public utils: UtilsService,
+        private cdRef: ChangeDetectorRef
+    ) {
         service.gotMaster.subscribe((value) => {
             if (value == true) {
-                this.service.masterMF.paginator     = this.paginatorMF;
-                this.service.masterKT.paginator     = this.paginatorKT;
-                this.service.masterRF.paginator     = this.paginatorRF;
+                this.service.masterMF.paginator = this.paginatorMF;
+                this.service.masterKT.paginator = this.paginatorKT;
+                this.service.masterRF.paginator = this.paginatorRF;
                 this.service.masterStatus.paginator = this.paginatorStatus;
-                this.service.masterTV.paginator     = this.paginatorTV;
+                this.service.masterTV.paginator = this.paginatorTV;
                 this.service.masterupFreq.paginator = this.paginatorUpFreq
             }
         });
@@ -138,20 +149,19 @@ export class KriMasterComponent implements OnInit {
             if (value)
                 if (this.activeMenu == 'emailTrigger') {
                     // this.service.getKriMaster();
-                    this.allMasterData          = this.service.master.reportingFrequencies;                    
-                    this.allMasterEmail         = this.service.master.emailData;                    
-                    this.filterMonthlyData      = this.allMasterData.filter((ele: any) => ele.InUse == true);
-                    this.filterEmailData        = this.allMasterEmail.filter((ele: any) => ele.InUse == true);                    
-                    this.selectedMonth          = this.filterEmailData[0].Month;
-                    this.updatedFrequencyData   = this.service.master.updatedFrequency;
-                    
+                    this.allMasterData = this.service.master.reportingFrequencies;
+                    this.allMasterEmail = this.service.master.emailData;
+                    this.filterMonthlyData = this.allMasterData.filter((ele: any) => ele.InUse == true);
+                    this.filterEmailData = this.allMasterEmail.filter((ele: any) => ele.InUse == true);
+                    this.selectedMonth = this.filterEmailData[0].Month;
+                    this.updatedFrequencyData = this.service.master.updatedFrequency;
                     if (this.filterMonthlyData[0].Name == 'Quarterly') {
                         this.header = 'Quarterly Reporting Frequency ';
                         this.yearValues = this.quarter;
-                        
+
                     } else if (this.filterMonthlyData[0].Name == 'Monthly') {
                         this.header = 'Month Reporting Frequency ';
-                       
+
                         this.yearValues = this.months;
 
                         // this.monthFlag = true;
@@ -165,10 +175,13 @@ export class KriMasterComponent implements OnInit {
                         this.yearValues = this.anually;
                     }
                 }
+
+            this.normalizeMasterRF();
+            this.initSelectedFrequency();
         });
     }
 
-    ngOnChange() {}
+    ngOnChange() { }
     applyFilter(event: Event, tableName: string) {
         const filterValue = (event.target as HTMLInputElement).value;
         if (tableName == 'MeasureFreq') {
@@ -186,6 +199,7 @@ export class KriMasterComponent implements OnInit {
             if (this.service.masterRF.paginator) {
                 this.service.masterRF.paginator.firstPage();
             }
+
         } else if (tableName == 'Status') {
             this.service.masterStatus.filter = filterValue.trim().toLowerCase();
             if (this.service.masterStatus.paginator) {
@@ -219,21 +233,18 @@ export class KriMasterComponent implements OnInit {
                         data?.Value == ele.Value ||
                         data?.ColorCode == ele.ColorCode ||
                         data?.Name.trim().toLowerCase() ==
-                            ele.Name.trim().toLowerCase()
+                        ele.Name.trim().toLowerCase()
                 );
         }
     }
 
-    selectedRadio(rowData:any) {
-        console.log('rowData: ', rowData);
+    selectedRadio(rowData: any) {
         this.reportingFreq = rowData
         this.radioSelected = true;
     }
 
     approve(rowData: any, tableName: any) {
         this.isEdit = true;
-        console.log(' this.flag : ',  this.flag );
-        console.log("rowData",rowData)
         let data = [];
         if (tableName == 'MeasureFreq') {
             data.push({
@@ -263,7 +274,6 @@ export class KriMasterComponent implements OnInit {
                     inUse: !rowData.InUse,
                     isActive: rowData.IsActive,
                 });
-                // console.log("data::", data);
             } else if (rowData.EditMode == true) {
                 if (rowData.InUse == true) {
                     data.push({
@@ -273,7 +283,6 @@ export class KriMasterComponent implements OnInit {
                         inUse: rowData.InUse,
                         isActive: rowData.IsActive,
                     });
-                    // console.log("data::", data);
                 } else {
                     if (this.radioSelected == true) {
                         data.push({
@@ -305,7 +314,6 @@ export class KriMasterComponent implements OnInit {
                             isActive: rowData.IsActive,
                         });
                     }
-                    // console.log("data::", data);
                 }
             }
             this.service.setKriMaster(
@@ -340,7 +348,7 @@ export class KriMasterComponent implements OnInit {
         }
         rowData.EditMode = false;
         this.flag = 0;
-        
+
         this.duplicate = false;
     }
 
@@ -390,13 +398,12 @@ export class KriMasterComponent implements OnInit {
             rowData.EditMode = true;
         } else if (tableName == 'ThresholdValue' && this.flag == 1) {
             rowData.EditMode = true;
-        }  else if (tableName == 'KRIReviewers' && this.flag == 1) {
+        } else if (tableName == 'KRIReviewers' && this.flag == 1) {
             rowData.EditMode = true;
         }
     }
 
     reject(rowData: any) {
-        console.log('rowData: ', rowData);
         this.flag = 0;
         rowData.EditMode = false;
         this.duplicate = false;
@@ -453,7 +460,6 @@ export class KriMasterComponent implements OnInit {
             this.service.setKriMaster({ thresholdValue: data }, this.isEdit);
         } else if (tableName == 'KRIReviewers') {
             let userGUID = this.service.masterUsers.filter((ele: any) => ele.FullName == this.selectedUser).map((ele: any) => ele.UserGUID);
-            console.log("🚀 ~ file: kri-master.component.ts:456 ~ KriMasterComponent ~ newDataApprove ~ userGUID:", userGUID)
             this.newEditKF = false;
             data.push({
                 "userGUID": userGUID[0],
@@ -501,7 +507,7 @@ export class KriMasterComponent implements OnInit {
         } else if (tableName == 'ThresholdValue' && this.flag == 1) {
             this.newEditTV = true;
         } else if (tableName == 'KRIReviewers' && this.flag == 1) {
-            this.newEditKT = false;          
+            this.newEditKT = false;
             this.newEditKF = true;
         }
     }
@@ -518,11 +524,11 @@ export class KriMasterComponent implements OnInit {
         if (menu !== 'kriReviwer') this.newEditKF = false;
         if (this.activeMenu == 'emailTrigger') {
             // this.service.getKriMaster();
-            this.allMasterData      = this.service.master.reportingFrequencies;           
-            this.allMasterEmail     = this.service.master.emailData;           
-            this.filterMonthlyData  = this.allMasterData.filter((ele: any) => ele.InUse == true);
-            this.filterEmailData    = this.allMasterEmail.filter((ele: any) => ele.InUse == true);
-            this.selectedMonth      = this.filterEmailData[0].Month;
+            this.allMasterData = this.service.master.reportingFrequencies;
+            this.allMasterEmail = this.service.master.emailData;
+            this.filterMonthlyData = this.allMasterData.filter((ele: any) => ele.InUse == true);
+            this.filterEmailData = this.allMasterEmail.filter((ele: any) => ele.InUse == true);
+            this.selectedMonth = this.filterEmailData[0].Month;
 
             if (this.filterMonthlyData[0].Name == 'Quarterly') {
                 this.header = 'Quarterly Reporting Frequency ';
@@ -538,10 +544,6 @@ export class KriMasterComponent implements OnInit {
                 this.header = 'Annuall Reporting Frequency ';
                 this.yearValues = this.anually;
             }
-            console.log(
-                '🚀 ~ file: kri-master.component.ts:347 ~ KriMasterComponent ~ openMenu ~  this.allMasterData:',
-                this.allMasterData
-            );
         }
     }
 
@@ -558,24 +560,18 @@ export class KriMasterComponent implements OnInit {
                 break; // If you want to break the loop after finding the first match
             }
         }
+        this.numericMonthData = parseInt(this.notMonth.replace(/\D/g, ''), 10);
+        this.numericPartDay = parseInt(this.notDay.replace(/\D/g, ''), 10);
 
-        // this.notMonth = this.service.master.emailData[0].Month
-        console.log('this.notMonth: ', this.notMonth);
-        console.log('this.notDay: ', this.notDay);
-
-        this.numericMonthData   = parseInt(this.notMonth.replace(/\D/g, ''), 10);
-        this.numericPartDay     = parseInt(this.notDay.replace(/\D/g, ''), 10);
-        
         let data: any = {
             emailfrequencyID: this.filterEmailData[0].EmailFrequencyID,
             reportingfrequencyID: this.filterMonthlyData[0].FrequencyID,
-            month: this.numericMonth ? this.numericMonth: this.numericMonthData,
+            month: this.numericMonth ? this.numericMonth : this.numericMonthData,
             day: this.numericPart ? this.numericPart : this.numericPartDay,
             description: this.filterMonthlyData[0].Description,
             inUse: 1,
             isActive: 1,
         };
-        console.log("data",data)
         this.service.setKriMaster({ EmailData: data }, this.isEdit);
         // this.service.getKriMaster();
     }
@@ -586,32 +582,255 @@ export class KriMasterComponent implements OnInit {
     }
 
     isUserExists(rowData: any, tableName: any) {
-        // console.log("tableName",tableName)
         if (tableName == 'KRIReviewers') {
             return !this.service.masterKR.data.filter(
                 (ele: any) => ele.UserGUID == rowData.UserGUID
             )[0]?.IsActive;
-        } else{
+        } else {
             return false
         }
     }
 
-    submitReportingFreq(){
-        this.isEdit = false
+    submitReportingFreq() {
+        this.isEdit = false;
+        // ensure table rows are normalized first
+        this.normalizeMasterRF();            // safe-guard
+        this.initSelectedFrequency();        // optional: usually not required here
 
-        let data: any = {
-           "frequencyID": this.reportingFreq.FrequencyID,
-           "name": this.reportingFreq.Name,
-           "description": this.reportingFreq.Description,
-           "inUse":1,
-           "isActive":1
+        // helper to read rows from service.masterRF whether it's MatTableDataSource or plain array
+        const getRows = (): any[] => {
+            if (!this.service || this.service.masterRF == null) return [];
+            if (this.service.masterRF instanceof MatTableDataSource) {
+                return Array.isArray(this.service.masterRF.data) ? this.service.masterRF.data : [];
+            }
+            return Array.isArray(this.service.masterRF) ? this.service.masterRF : [];
         };
-            console.log("data",data)
-        this.service.setKriMaster({ reportingFrequency: data }, this.isEdit);
 
+        // helper to get a normalized id from a row
+        const rowId = (r: any) => r?.FrequencyID ?? r?.FrequencyId ?? r?.Id ?? r?.index ?? r?.Index ?? null;
+
+        // helper to clamp the grace value
+        const clampGrace = (v: any) => {
+            let n = Number(v);
+            if (isNaN(n)) n = 0;
+            n = Math.round(n);
+            if (n < 0) n = 0;
+            if (n > 30) n = 30;
+            return n;
+        };
+
+        // Attempt 1: prefer this.reportingFreq (if available)
+        let selected = this.reportingFreq;
+
+        // Attempt 2: fallback to selectedFrequencyId (if you maintain it)
+        if (!selected && this.selectedFrequencyId != null) {
+            const rows = getRows();
+            selected = rows.find(r => rowId(r) === this.selectedFrequencyId) || undefined;
+        }
+
+        // Attempt 3: fallback to any row with InUse truthy
+        if (!selected) {
+            const rows = getRows();
+            selected = rows.find(r => r.InUse === true || r.InUse === 1 || r.InUse === '1') || undefined;
+        }
+
+        // Attempt 4: fallback to first row (last resort)
+        if (!selected) {
+            const rows = getRows();
+            if (rows.length) {
+                console.warn('submitReportingFreq: no reportingFreq object or selected id found — using first row as fallback', rows);
+                selected = rows[0];
+            }
+        }
+
+        // If still not found, abort gracefully and inform developer/user
+        if (!selected) {
+            console.error('submitReportingFreq: no reporting frequency row available to submit.');
+            // optionally show a user-friendly toast/message here
+            return;
+        }
+
+        // Ensure reportingFreq is set so future calls don't run into undefined
+        this.reportingFreq = this.reportingFreq || { ...selected };
+
+        // Build payload using values from reportingFreq (prefer reportingFreq, then selected row)
+        const freqId = this.reportingFreq?.FrequencyID ?? rowId(selected);
+        const name = this.reportingFreq?.Name ?? selected?.Name ?? '';
+        const description = this.reportingFreq?.Description ?? selected?.Description ?? '';
+        // Choose GracePeriodDays from reportingFreq if present, otherwise from selected row
+        const graceRaw = this.reportingFreq?.GracePeriodDays ?? selected?.GracePeriodDays ?? 0;
+        const graceValue = clampGrace(graceRaw);
+
+        const reminderdaysRaw = this.reportingFreq?.reminderdays ?? selected?.reminderdays ?? 0;
+        const reminderdaysalue = clampGrace(reminderdaysRaw);
+
+        const data: any = {
+            "frequencyID": freqId,
+            "name": name,
+            "description": description,
+            "inUse": 1,
+            "isActive": 1,
+            "bufferdays": graceValue,   // use the key your backend expects; change case if needed
+            "reminderdays": reminderdaysalue
+        };
+        // Call your existing service method (unchanged)
+        this.service.setKriMaster({ reportingFrequency: data }, this.isEdit);
     }
 
-    close(){
+
+    close() {
         this.service.getKriMaster();
+    }
+
+    // call this after you load/normalize masterRF
+    initSelectedFrequency(): void {
+        const rows: any[] = this.service.masterRF instanceof MatTableDataSource
+            ? (this.service.masterRF.data || [])
+            : (Array.isArray(this.service.masterRF) ? this.service.masterRF : []);
+
+        const inUseRow = rows.find(r => r.InUse === true);
+
+        if (inUseRow) {
+            this.selectedFrequencyId = inUseRow.FrequencyID ?? inUseRow.Id ?? inUseRow.Index ?? null;
+            // keep a shallow copy for editing/saving if you use reportingFreq elsewhere
+            this.reportingFreq = { ...inUseRow };
+        } else {
+            this.selectedFrequencyId = null;
+        }
+
+        // reassign data to trigger Material table change detection
+        if (this.service.masterRF instanceof MatTableDataSource) {
+            this.service.masterRF.data = [...rows];
+        }
+
+        // ensure view updates immediately
+        this.cdRef.detectChanges?.();
+    }
+
+
+
+
+    /**
+     * Called when user selects a radio for a row.
+     * Ensures only one row has InUse true and stores selectedFrequencyId.
+     */
+    onSelectFrequency(row: any) {
+        const id = row.FrequencyID ?? row.Id ?? row.Index ?? null;
+        this.selectedFrequencyId = id;
+
+        // update InUse on rows so UI reflects new selection
+        const rows: any[] = this.service.masterRF instanceof MatTableDataSource
+            ? (this.service.masterRF.data || [])
+            : (Array.isArray(this.service.masterRF) ? this.service.masterRF : []);
+
+        rows.forEach(r => {
+            const rid = r.FrequencyID ?? r.Id ?? r.Index ?? null;
+            r.InUse = (rid === id);
+        });
+
+        if (this.service.masterRF instanceof MatTableDataSource) {
+            this.service.masterRF.data = [...rows];
+        }
+    }
+
+
+    /** returns true when GracePeriodDays should be editable for this row */
+    isGraceEditable(row: any): boolean {
+        if (!row) return false;
+        const id = row.FrequencyID ?? row.Id ?? row.Index ?? null;
+        const inUse = !!row.InUse;
+        return inUse && this.selectedFrequencyId !== null && this.selectedFrequencyId === id;
+    }
+
+    /** called while typing to show live error (does not auto-correct yet) */
+    validateGrace(row: any) {
+        const v = Number(row.GracePeriodDays);
+        // show validation feedback but don't clamp yet
+        row.invalidGrace = isNaN(v) || v < 0 || v > 15;
+    }
+
+    /** called when user leaves the field to enforce clamp */
+    onGraceBlur(row: any) {
+        let v = Number(row.GracePeriodDays);
+        if (isNaN(v)) v = 0;
+        v = Math.round(v);
+        v = Math.max(0, Math.min(15, v)); // clamp to [0,15]
+        row.GracePeriodDays = v;
+
+        // trigger table update when using MatTableDataSource
+        if (this.service.masterRF instanceof MatTableDataSource) {
+            this.service.masterRF.data = [...this.service.masterRF.data];
+        }
+    }
+
+
+    private normalizeMasterRF(): void {
+        const normalizeArray = (arr: any[]): any[] => {
+            return (arr || []).map((r: any, idx: number) => {
+                if (!r) r = {};
+                // GracePeriodDays defaults and clamp
+                let gpds = (r.GracePeriodDays === undefined || r.GracePeriodDays === null) ? 0 : Number(r.GracePeriodDays);
+                if (isNaN(gpds)) gpds = 0;
+                gpds = Math.round(gpds);
+                gpds = Math.max(0, Math.min(30, gpds));
+                r.GracePeriodDays = gpds;
+
+                // // reminderdays defaults and clamp
+                let remds = (r.reminderdays === undefined || r.reminderdays === null) ? 0 : Number(r.reminderdays);
+                if (isNaN(remds)) remds = 0;
+                remds = Math.round(remds);
+                remds = Math.max(0, Math.min(30, remds));
+                r.reminderdays = remds;
+
+                // normalize InUse to boolean
+                r.InUse = (r.InUse === true) || (r.InUse === 1) || (r.InUse === '1') || (!!r.InUse && r.InUse !== 0 && r.InUse !== '0');
+
+                // ensure Index (optional)
+                if (r.Index === undefined || r.Index === null) r.Index = idx + 1;
+
+                return r;
+            });
+        };
+
+        if (this.service.masterRF instanceof MatTableDataSource) {
+            const raw = Array.isArray(this.service.masterRF.data) ? this.service.masterRF.data : [];
+            this.service.masterRF.data = normalizeArray(raw);
+            return;
+        }
+
+        if (Array.isArray(this.service.masterRF)) {
+            this.service.masterRF = new MatTableDataSource<any>(normalizeArray(this.service.masterRF));
+            return;
+        }
+
+        // fallback
+        this.service.masterRF = new MatTableDataSource<any>(normalizeArray([]));
+    }
+
+    isreminderdaysEditable(row: any): boolean {
+        if (!row) return false;
+        const id = row.FrequencyID ?? row.Id ?? row.Index ?? null;
+        const inUse = !!row.InUse;
+        return inUse && this.selectedFrequencyId !== null && this.selectedFrequencyId === id;
+    }
+
+    /** live validation while typing (does not mutate value) */
+    validateReminderdays(row: any) {
+        const v = Number(row.reminderdays);
+        row.invalidReminderdays = isNaN(v) || v < 0 || v > 30;
+    }
+
+    /** on blur — enforce integer and clamp to [0,30] */
+    onReminderdaysBlur(row: any) {
+        let v = Number(row.reminderdays);
+        if (isNaN(v)) v = 0;
+        v = Math.round(v);
+        v = Math.max(0, Math.min(30, v));
+        row.reminderdays = v;
+
+        // trigger table update when using MatTableDataSource
+        if (this.service.masterRF instanceof MatTableDataSource) {
+            this.service.masterRF.data = [...this.service.masterRF.data];
+        }
     }
 }
