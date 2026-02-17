@@ -24,19 +24,19 @@ services:
     ports:
       - "6003:6003"
 
-  # bcmapi:
-  #   image: vinod9072/bcmapi:v1
-  #   container_name: bcmapi
-  #   ports:
-  #     - "6004:6004"
+  bcmapi:
+    image: vinod9072/bcmapi:v1
+    container_name: bcmapi
+    ports:
+      - "6004:6004"
 
   umweb:
     image: vinod9072/umweb:v1
     container_name: umweb
 
-  # ormweb:
-  #   image: vinod9072/ormweb:v1
-  #   container_name: ormweb
+  ormweb:
+    image: vinod9072/ormweb:v1
+    container_name: ormweb
 
   hostweb:
     image: vinod9072/hostweb:v1
@@ -55,6 +55,7 @@ services:
       - authapi
       - umapi
       - ormapi
+      - ormweb
       - hostweb
       - umweb
     networks:
