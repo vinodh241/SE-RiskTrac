@@ -1,5 +1,4 @@
-devops@PD-Docker:~/RiskTrac/SE-RiskTrac$ docker-compose build nginx --no-cache
-ERROR: No such service: --no-cachenetworks:
+networks:
   default:
     driver: bridge
     name: risktrac
