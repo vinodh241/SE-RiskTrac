@@ -3,7 +3,7 @@ networks:
     driver: bridge
     name: risktrac
 
-    # external: true  # Uncomment if you created the network outside
+    external: true  # Uncomment if you created the network outside
 
 services:
   umapi:
@@ -37,6 +37,12 @@ services:
   #   image: bcmweb:v1
   #   container_name: bcmweb
   
-
-
+  nginx:
+    image: vinod9072/nginx:v1
+    container_name: nginx
+    ports:
+    depends_on:
+      - umweb
+    networks:
+      - default
 
